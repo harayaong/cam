@@ -105,6 +105,30 @@
             width: 100%;
             border-radius: 5px;
         }
+		.video-wrapper {
+		    position: relative;
+		    background-color: #e5e5e5;
+		    padding: 10px;
+		    border-radius: 8px;
+		}
+		
+		.new-window-button {
+		    position: absolute;
+		    bottom: 10px;
+		    right: 10px;
+		    background-color: rgba(0, 0, 0, 0.5);
+		    color: white;
+		    padding: 5px 10px;
+		    border: none;
+		    border-radius: 5px;
+		    cursor: pointer;
+		    font-size: 14px;
+		    z-index: 10;
+		}
+		
+		.new-window-button:hover {
+		    background-color: rgba(0, 0, 0, 0.7);
+		}
     </style>
 </head>
 <body>
@@ -279,41 +303,51 @@
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
         }
 
-        function loadVideos(sync, button) {
-            if (activeButton) {
-                activeButton.classList.remove('active');
-            }
-            button.classList.add('active');
-            activeButton = button;
-
-            const date = document.getElementById('date').value;
-            const program = document.getElementById('program').value;
-            const container = document.getElementById('videoContainer');
-            container.innerHTML = '';
-
-            for (let i = 1; i <= 8; i++) {
-                const videoWrapper = document.createElement('div');
-                videoWrapper.classList.add('video-wrapper');
-
-                const camLabel = document.createElement('div');
-                camLabel.classList.add('cam-label');
-                camLabel.textContent = `CAM0${i}`;
-
-                const video = document.createElement('video');
-                video.controls = true;
-                video.autoplay = true;
-                video.muted = true;
-                video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
-
-                video.onerror = function() {
-                    videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
-                };
-
-                videoWrapper.appendChild(camLabel);
-                videoWrapper.appendChild(video);
-                container.appendChild(videoWrapper);
-            }
-        }
+		function loadVideos(sync, button) {
+		    if (activeButton) {
+		        activeButton.classList.remove('active');
+		    }
+		    button.classList.add('active');
+		    activeButton = button;
+		
+		    const date = document.getElementById('date').value;
+		    const program = document.getElementById('program').value;
+		    const container = document.getElementById('videoContainer');
+		    container.innerHTML = '';
+		
+		    for (let i = 1; i <= 8; i++) {
+		        const videoWrapper = document.createElement('div');
+		        videoWrapper.classList.add('video-wrapper');
+		
+		        const camLabel = document.createElement('div');
+		        camLabel.classList.add('cam-label');
+		        camLabel.textContent = `CAM0${i}`;
+		
+		        const video = document.createElement('video');
+		        video.controls = true;
+		        video.autoplay = true;
+		        video.muted = true;
+		        video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
+		
+		        video.onerror = function() {
+		            videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
+		        };
+		
+		        // 새창으로 보기 버튼 생성
+		        const newWindowButton = document.createElement('button');
+		        newWindowButton.textContent = '새창으로';
+		        newWindowButton.classList.add('new-window-button');
+		        newWindowButton.onclick = function() {
+		            window.open(video.src, '_blank');
+		        };
+		
+		        // videoWrapper에 CAM 라벨, 비디오, 새창으로 버튼 추가
+		        videoWrapper.appendChild(camLabel);
+		        videoWrapper.appendChild(video);
+		        videoWrapper.appendChild(newWindowButton);
+		        container.appendChild(videoWrapper);
+		    }
+		}
     </script>
 </body>
 </html>
