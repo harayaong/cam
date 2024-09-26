@@ -26,7 +26,7 @@
         h1 {
             text-align: start;
             font-size: 28px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #007bff;
         }
 
@@ -81,7 +81,7 @@
             margin-top: 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            grid-gap: 20px;
+            grid-gap: 10px;
         }
 
         .video-wrapper {
@@ -276,7 +276,7 @@
             const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
             const weekday = weekdays[date.getDay()];
             
-            document.getElementById('weekday').innerHTML = `<span style="color: black; font-weight: normal;">선택된 요일은</span> <span style="font-weight: bold;">${weekday}</span> <span style="color: black; font-weight: normal;">입니다.</span>`;
+            document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
         }
 
         function loadSyncButtons() {
@@ -342,7 +342,6 @@
                 const video = document.createElement('video');
                 video.controls = true;
                 video.autoplay = true;
-                video.muted = true;
                 video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
 
                 video.onerror = function() {
