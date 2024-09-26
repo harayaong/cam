@@ -16,16 +16,16 @@
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             grid-gap: 10px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .sync-container.top {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         h1 {
-            text-align: center;
-            font-size: 32px;
+            text-align: start;
+            font-size: 28px;
             margin-bottom: 20px;
             color: #007bff;
         }
@@ -78,7 +78,7 @@
         }
 
         .video-container {
-            margin-top: 40px;
+            margin-top: 10px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-gap: 20px;
@@ -105,35 +105,45 @@
             width: 100%;
             border-radius: 5px;
         }
-		.video-wrapper {
-		    position: relative;
-		    background-color: #e5e5e5;
-		    padding: 10px;
-		    border-radius: 8px;
-		}
-		
-		.new-window-button {
-		    position: absolute;
-		    bottom: 10px;
-		    right: 10px;
-		    background-color: rgba(0, 0, 0, 0.5);
-		    color: white;
-		    padding: 5px 10px;
-		    border: none;
-		    border-radius: 5px;
-		    cursor: pointer;
-		    font-size: 14px;
-		    z-index: 10;
-		}
-		
-		.new-window-button:hover {
-		    background-color: rgba(0, 0, 0, 0.7);
-		}
+
+        .video-wrapper {
+            position: relative;
+            background-color: #e5e5e5;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .new-window-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .new-window-button:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        #pauseAllButton {
+            background-color: #d9534f;
+        }
+
+        #pauseAllButton:hover {
+            background-color: #c9302c;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>통합 카메라 조회<br><span id="selectedSiteID"></span></h1>
+        <h1><span id="selectedSiteID"></span></h1>
 
         <div class="form-container">
             <div>
@@ -212,7 +222,7 @@
 					<option value="jungdawoon_yoonseul" data-site="jungdawoon_yoonseul">71. LGD정다운 어린이집-윤슬: 월, 수</option>
 					<option value="jungdawoon_chanseul" data-site="jungdawoon_chanseul">72. LGD정다운 어린이집-찬슬: 월, 수</option>
 					<option value="haengbokhan_hanbit" data-site="haengbokhan_hanbit">73. LGD행복한 어린이집-한빛: 월, 수</option>
-                    <!-- 더 많은 옵션 추가 -->
+                    <!-- 교실 선택 옵션들 -->
                 </select>
             </div>
 
@@ -220,6 +230,12 @@
                 <label for="date">날짜 선택:</label>
                 <input type="date" id="date" onchange="updateWeekday()">
                 <span id="weekday" class="weekday"></span>
+            </div>
+
+            <div>
+				<!-- 버튼들에 sync-button 클래스 추가 -->
+				<button id="pauseAllButton" class="sync-button" onclick="pauseAllVideos()">일괄 일시정지</button>
+				<button id="playAllButton" class="sync-button" onclick="playAllVideos()">일괄 재생시작</button>
             </div>
         </div>
 
@@ -254,49 +270,46 @@
             document.getElementById('selectedSiteID').textContent = `${siteID} (${weekdaysText})`;
         }
 
-		function updateWeekday() {
-		    const dateInput = document.getElementById('date').value;
-		    const date = new Date(dateInput);
-		    const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-		    const weekday = weekdays[date.getDay()];
-		    
-		    document.getElementById('weekday').innerHTML = `<span style="color: black; font-weight: normal;">선택된 요일은</span> <span style="font-weight: bold;">${weekday}</span> <span style="color: black; font-weight: normal;">입니다.</span>`;
-		}
+        function updateWeekday() {
+            const dateInput = document.getElementById('date').value;
+            const date = new Date(dateInput);
+            const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+            const weekday = weekdays[date.getDay()];
+            
+            document.getElementById('weekday').innerHTML = `<span style="color: black; font-weight: normal;">선택된 요일은</span> <span style="font-weight: bold;">${weekday}</span> <span style="color: black; font-weight: normal;">입니다.</span>`;
+        }
 
-		// 싱크 버튼 생성 함수
-		function loadSyncButtons() {
-		    const program = document.getElementById('program').value;
-		    const syncContainerTop = document.getElementById('syncContainerTop');
-		    const syncContainerBottom = document.getElementById('syncContainerBottom');
-		    syncContainerTop.innerHTML = '';
-		    syncContainerBottom.innerHTML = '';
-		
-		    const totalSyncs = 42;
-		
-		    // 상단에 Sync 17까지 표시
-		    for (let i = 0; i <= 17; i++) {
-		        const button = document.createElement('button');
-		        button.classList.add('sync-button');
-		        button.textContent = `Sync ${i} (${formatTime(i)})`;
-		        button.onclick = function() {
-		            loadVideos(`sync${String(i).padStart(3, '0')}`, this);
-		        };
-		        syncContainerTop.appendChild(button);
-		    }
-		
-		    // 노블카운티일 경우 하단에 Sync 18부터 42까지 표시
-		    if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
-		        for (let i = 18; i < totalSyncs; i++) {
-		            const button = document.createElement('button');
-		            button.classList.add('sync-button');
-		            button.textContent = `Sync ${i} (${formatTime(i)})`;
-		            button.onclick = function() {
-		                loadVideos(`sync${String(i).padStart(3, '0')}`, this);
-		            };
-		            syncContainerBottom.appendChild(button);
-		        }
-		    }
-		}
+        function loadSyncButtons() {
+            const program = document.getElementById('program').value;
+            const syncContainerTop = document.getElementById('syncContainerTop');
+            const syncContainerBottom = document.getElementById('syncContainerBottom');
+            syncContainerTop.innerHTML = '';
+            syncContainerBottom.innerHTML = '';
+
+            const totalSyncs = 42;
+
+            for (let i = 0; i <= 17; i++) {
+                const button = document.createElement('button');
+                button.classList.add('sync-button');
+                button.textContent = `Sync ${i} (${formatTime(i)})`;
+                button.onclick = function() {
+                    loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+                };
+                syncContainerTop.appendChild(button);
+            }
+
+            if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
+                for (let i = 18; i < totalSyncs; i++) {
+                    const button = document.createElement('button');
+                    button.classList.add('sync-button');
+                    button.textContent = `Sync ${i} (${formatTime(i)})`;
+                    button.onclick = function() {
+                        loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+                    };
+                    syncContainerBottom.appendChild(button);
+                }
+            }
+        }
 
         function formatTime(syncIndex) {
             const startHour = 9;
@@ -306,50 +319,60 @@
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
         }
 
-		function loadVideos(sync, button) {
-		    if (activeButton) {
-		        activeButton.classList.remove('active');
-		    }
-		    button.classList.add('active');
-		    activeButton = button;
+        function loadVideos(sync, button) {
+            if (activeButton) {
+                activeButton.classList.remove('active');
+            }
+            button.classList.add('active');
+            activeButton = button;
+
+            const date = document.getElementById('date').value;
+            const program = document.getElementById('program').value;
+            const container = document.getElementById('videoContainer');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 8; i++) {
+                const videoWrapper = document.createElement('div');
+                videoWrapper.classList.add('video-wrapper');
+
+                const camLabel = document.createElement('div');
+                camLabel.classList.add('cam-label');
+                camLabel.textContent = `CAM0${i}`;
+
+                const video = document.createElement('video');
+                video.controls = true;
+                video.autoplay = true;
+                video.muted = true;
+                video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
+
+                video.onerror = function() {
+                    videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
+                };
+
+                // 새창으로 보기 버튼 생성
+                const newWindowButton = document.createElement('button');
+                newWindowButton.textContent = '새창으로';
+                newWindowButton.classList.add('new-window-button');
+                newWindowButton.onclick = function() {
+                    window.open(video.src, '_blank');
+                };
+
+                // videoWrapper에 CAM 라벨, 비디오, 새창으로 버튼 추가
+                videoWrapper.appendChild(camLabel);
+                videoWrapper.appendChild(video);
+                videoWrapper.appendChild(newWindowButton);
+                container.appendChild(videoWrapper);
+            }
+        }
+
+		function pauseAllVideos() {
+		    const videos = document.querySelectorAll('video');
+		    videos.forEach(video => video.pause());
+		}
 		
-		    const date = document.getElementById('date').value;
-		    const program = document.getElementById('program').value;
-		    const container = document.getElementById('videoContainer');
-		    container.innerHTML = '';
-		
-		    for (let i = 1; i <= 8; i++) {
-		        const videoWrapper = document.createElement('div');
-		        videoWrapper.classList.add('video-wrapper');
-		
-		        const camLabel = document.createElement('div');
-		        camLabel.classList.add('cam-label');
-		        camLabel.textContent = `CAM0${i}`;
-		
-		        const video = document.createElement('video');
-		        video.controls = true;
-		        video.autoplay = true;
-		        video.muted = true;
-		        video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
-		
-		        video.onerror = function() {
-		            videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
-		        };
-		
-		        // 새창으로 보기 버튼 생성
-		        const newWindowButton = document.createElement('button');
-		        newWindowButton.textContent = '새창으로';
-		        newWindowButton.classList.add('new-window-button');
-		        newWindowButton.onclick = function() {
-		            window.open(video.src, '_blank');
-		        };
-		
-		        // videoWrapper에 CAM 라벨, 비디오, 새창으로 버튼 추가
-		        videoWrapper.appendChild(camLabel);
-		        videoWrapper.appendChild(video);
-		        videoWrapper.appendChild(newWindowButton);
-		        container.appendChild(videoWrapper);
-		    }
+		function playAllVideos() {
+		    const videos = document.querySelectorAll('video');
+		    videos.forEach(video => video.play());
 		}
     </script>
 </body>
