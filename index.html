@@ -263,37 +263,40 @@
 		    document.getElementById('weekday').innerHTML = `<span style="color: black; font-weight: normal;">선택된 요일은</span> <span style="font-weight: bold;">${weekday}</span> <span style="color: black; font-weight: normal;">입니다.</span>`;
 		}
 
-        function loadSyncButtons() {
-            const program = document.getElementById('program').value;
-            const syncContainerTop = document.getElementById('syncContainerTop');
-            const syncContainerBottom = document.getElementById('syncContainerBottom');
-            syncContainerTop.innerHTML = '';
-            syncContainerBottom.innerHTML = '';
-
-            const totalSyncs = 42;
-
-            for (let i = 0; i < 17; i++) {
-                const button = document.createElement('button');
-                button.classList.add('sync-button');
-                button.textContent = `Sync ${i} (${formatTime(i)})`;
-                button.onclick = function() {
-                    loadVideos(`sync${String(i).padStart(3, '0')}`, this);
-                };
-                syncContainerTop.appendChild(button);
-            }
-
-            if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
-                for (let i = 17; i < totalSyncs; i++) {
-                    const button = document.createElement('button');
-                    button.classList.add('sync-button');
-                    button.textContent = `Sync ${i} (${formatTime(i)})`;
-                    button.onclick = function() {
-                        loadVideos(`sync${String(i).padStart(3, '0')}`, this);
-                    };
-                    syncContainerBottom.appendChild(button);
-                }
-            }
-        }
+		// 싱크 버튼 생성 함수
+		function loadSyncButtons() {
+		    const program = document.getElementById('program').value;
+		    const syncContainerTop = document.getElementById('syncContainerTop');
+		    const syncContainerBottom = document.getElementById('syncContainerBottom');
+		    syncContainerTop.innerHTML = '';
+		    syncContainerBottom.innerHTML = '';
+		
+		    const totalSyncs = 42;
+		
+		    // 상단에 Sync 17까지 표시
+		    for (let i = 0; i <= 17; i++) {
+		        const button = document.createElement('button');
+		        button.classList.add('sync-button');
+		        button.textContent = `Sync ${i} (${formatTime(i)})`;
+		        button.onclick = function() {
+		            loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+		        };
+		        syncContainerTop.appendChild(button);
+		    }
+		
+		    // 노블카운티일 경우 하단에 Sync 18부터 42까지 표시
+		    if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
+		        for (let i = 18; i < totalSyncs; i++) {
+		            const button = document.createElement('button');
+		            button.classList.add('sync-button');
+		            button.textContent = `Sync ${i} (${formatTime(i)})`;
+		            button.onclick = function() {
+		                loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+		            };
+		            syncContainerBottom.appendChild(button);
+		        }
+		    }
+		}
 
         function formatTime(syncIndex) {
             const startHour = 9;
