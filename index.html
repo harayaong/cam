@@ -260,6 +260,9 @@
         <div class="sync-container top" id="syncContainerTop"></div>
 
         <div class="video-container" id="videoContainer"></div>
+		<p style="font-size: 12px; text-align: start; color: #888; margin-top: 0px;">
+		    # 단축키: 스페이스바(일괄정지/일괄재생) 1(-3분) 2(-3초) 3(+3초) 4(+3분)
+		</p>
 
         <div class="sync-container bottom" id="syncContainerBottom"></div>
     </div>
@@ -404,6 +407,37 @@
 		        video.currentTime = Math.min(video.currentTime + seconds, video.duration); // 비디오 길이를 넘지 않게 설정
 		    });
 		}
+			document.addEventListener('keydown', function(event) {
+	    switch(event.key) {
+	        case '1':
+	            rewindVideos(180); // -3분
+	            break;
+	        case '2':
+	            rewindVideos(3); // -3초
+	            break;
+	        case '3':
+	            forwardVideos(3); // +3초
+	            break;
+	        case '4':
+	            forwardVideos(180); // +3분
+	            break;
+	        case ' ': // 스페이스바로 재생/일시정지
+	            event.preventDefault(); // 스페이스바 기본 동작 방지
+	            togglePlayPause();
+	            break;
+	    }
+	});
+	
+	function togglePlayPause() {
+	    const videos = document.querySelectorAll('video');
+	    const anyPlaying = Array.from(videos).some(video => !video.paused);
+	    
+	    if (anyPlaying) {
+	        pauseAllVideos();
+	    } else {
+	        playAllVideos();
+	    }
+	}
     </script>
 </body>
 </html>
