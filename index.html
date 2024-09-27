@@ -1,50 +1,514 @@
-document.addEventListener('keydown', function(event) {
-    switch(event.key) {
-        case '1':
-            rewindVideos(180); // -3분
-            break;
-        case '2':
-            rewindVideos(3); // -3초
-            break;
-        case '3':
-            forwardVideos(3); // +3초
-            break;
-        case '4':
-            forwardVideos(180); // +3분
-            break;
-        case ' ': // 스페이스바로 재생/일시정지
-            event.preventDefault(); // 스페이스바 기본 동작 방지
-            togglePlayPause();
-            break;
-        case 'e':
-        case 'E':
-        case 'ㅁ': // 이전 싱크
-            navigateSync(-1);
-            break;
-        case 'r':
-        case 'R':
-        case 'ㄱ': // 다음 싱크
-            navigateSync(1);
-            break;
-        case 'y':
-        case 'Y':
-        case 'ㅛ': // 교실 상
-            changeProgramSelection(-1);
-            break;
-        case 't':
-        case 'T':
-        case 'ㅅ': // 교실 하
-            changeProgramSelection(1);
-            break;
-        case 'w':
-        case 'W':
-        case 'ㅈ': // 하루 전
-            changeDateSelection(-1);
-            break;
-        case 's':
-        case 'S':
-        case 'ㄴ': // 싱크 0 선택
-            loadVideos('sync000');
-            break;
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통합 카메라 조회</title>
+    <style>
+        body {
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sync-container {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-gap: 10px;
+            margin-top: 10px;
+        }
+
+        .sync-container.top {
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            text-align: start;
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container label {
+            font-size: 20px;
+        }
+
+        select, input[type="date"] {
+            font-size: 20px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-left: 10px;
+        }
+
+        .weekday {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff6347;
+        }
+
+        .sync-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .sync-button.active {
+            background-color: #ff6347;
+        }
+
+        .sync-button:hover {
+            background-color: #0056b3;
+        }
+
+        .video-container {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            background-color: #e5e5e5;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .cam-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        video {
+            width: 100%;
+            border-radius: 5px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            background-color: #e5e5e5;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .new-window-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 10;
+        }
+
+        .new-window-button:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        #pauseAllButton {
+            background-color: #d9534f;
+        }
+
+        #pauseAllButton:hover {
+            background-color: #c9302c;
+        }
+		.small-button {
+		    padding: 5px 8px;
+		    margin-left: 5px;
+		    margin-right: 5px;
+		}
+		#rewind3secButton, #rewind3minButton {
+		    background-color: #d9534f;
+		}
+		
+		#rewind3secButton:hover, #rewind3minButton:hover {
+		    background-color: #c9302c;
+		}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span id="selectedSiteID"></span></h1>
+
+        <div class="form-container">
+            <div>
+                <label for="program">교실 선택:</label>
+                <select id="program" onchange="changeProgram()">
+					<option value="gangseogeullo_kotip" data-site="gangseogeullo_kotip">1. 강서근로복지공단 어린이집-꽃잎반: 월, 수</option>
+					<option value="gangseogeullo_namu" data-site="gangseogeullo_namu">2. 강서근로복지공단 어린이집-나무반: 화, 목</option>
+					<option value="gangseogeullo_hyanggi" data-site="gangseogeullo_hyanggi">3. 강서근로복지공단 어린이집-향기반: 화, 목</option>
+					<option value="geumgang_uram" data-site="geumgang_uram">4. 금강 어린이집-우람반: 월, 수</option>
+					<option value="namcheonsyap_kkumbyeol" data-site="namcheonsyap_kkumbyeol">5. 남천더샵 어린이집-꿈별: 화, 목</option>
+					<option value="namcheonsyap_chambyeol" data-site="namcheonsyap_chambyeol">6. 남천더샵 어린이집-참별: 화, 목</option>
+					<option value="noblecounty_program" data-site="noblecounty_program">7. 노블카운티-프로그램: 월, 화, 수, 목, 금</option>
+					<option value="noblecounty_healthcare" data-site="noblecounty_healthcare">8. 노블카운티-헬스케어: 월, 화, 수, 목, 금</option>
+					<option value="dongnaekkume_gamsahae" data-site="dongnaekkume_gamsahae">9. 동래꿈에그린 어린이집-감사해: 월, 목</option>
+					<option value="dongnaekkume_saranghae" data-site="dongnaekkume_saranghae">10. 동래꿈에그린 어린이집-사랑해: 월, 목</option>
+					<option value="dongnaekkume_sojunghae" data-site="dongnaekkume_sojunghae">11. 동래꿈에그린 어린이집-소중해: 월, 목</option>
+					<option value="dongnaekkume_joahae" data-site="dongnaekkume_joahae">12. 동래꿈에그린 어린이집-좋아해: 월, 목</option>
+					<option value="dongnaekkume_chingchanhae" data-site="dongnaekkume_chingchanhae">13. 동래꿈에그린 어린이집-칭찬해: 월, 목</option>
+					<option value="dongnaekkume_haengbokhae" data-site="dongnaekkume_haengbokhae">14. 동래꿈에그린 어린이집-행복해: 월, 목</option>
+					<option value="dongnaehaengbok_dal" data-site="dongnaehaengbok_dal">15. 동래행복주택 어린이집-달밝은: 월, 목</option>
+					<option value="dongnaehaengbok_baram" data-site="dongnaehaengbok_baram">16. 동래행복주택 어린이집-바람솔솔: 월, 목</option>
+					<option value="malgeunnae_naraewool" data-site="malgeunnae_naraewool">17. 맑은내 어린이집-나래울: 화, 목</option>
+					<option value="myeonil_haneul" data-site="myeonil_haneul">18. 면일 어린이집-하늘: 월, 수</option>
+					<option value="myeongryunjai_dalnim" data-site="myeongryunjai_dalnim">19. 명륜자이 어린이집-달님: 월, 수</option>
+					<option value="myeongryunjai_haenim" data-site="myeongryunjai_haenim">20. 명륜자이 어린이집-해님: 화, 목</option>
+					<option value="myeongryunjai_haneulwooju" data-site="myeongryunjai_haneulwooju">21. 명륜자이-하늘우주: 목, 금</option>
+					<option value="best_hanareum1-2" data-site="best_hanareum1-2">22. 베스트 어린이집-한아름1-2: 화, 목</option>
+					<option value="best_hanareum3-4" data-site="best_hanareum3-4">23. 베스트 어린이집-한아름3-4: 화, 목</option>
+					<option value="best_hanareum5-6" data-site="best_hanareum5-6">24. 베스트 어린이집-한아름5-6: 화, 목</option>
+					<option value="best_hanareum7" data-site="best_hanareum7">25. 베스트 어린이집-한아름7: 월, 수</option>
+					<option value="bongwha_narae" data-site="bongwha_narae">26. 봉화 어린이집-나래: 월, 수</option>
+					<option value="seosin_sinaetmool" data-site="seosin_sinaetmool">27. 서신 어린이집-고운시냇물: 화, 목</option>
+					<option value="seosin_sammool" data-site="seosin_sammool">28. 서신 어린이집-맑은샘물: 월, 수</option>
+					<option value="seongyeong_ppuri" data-site="seongyeong_ppuri">29. 선경 어린이집-뿌리: 월, 수</option>
+					<option value="geumbithaneul_dodam" data-site="geumbithaneul_dodam">30. 시립금빛하늘 어린이집-도담: 월, 수</option>
+					<option value="geumbithaneul_hangyeol" data-site="geumbithaneul_hangyeol">31. 시립금빛하늘 어린이집-한결: 월, 수</option>
+					<option value="singal_haetsal" data-site="singal_haetsal">32. 시립신갈 어린이집-고은햇살: 월, 수</option>
+					<option value="singal_baram" data-site="singal_baram">33. 시립신갈 어린이집-산들바람: 월, 수</option>
+					<option value="atti_jinsol" data-site="atti_jinsol">34. 아띠 어린이집-진솔: 화, 목</option>
+					<option value="atti_hansol" data-site="atti_hansol">35. 아띠 어린이집-한솔: 화, 목</option>
+					<option value="anrakhyeondae_haengbokhae" data-site="anrakhyeondae_haengbokhae">36. 안락현대 어린이집-행복해: 월, 수</option>
+					<option value="eden_paranghaneul" data-site="eden_paranghaneul">37. 에덴 어린이집-파란하늘: 월, 수</option>
+					<option value="yaedasom_puripiseul" data-site="yaedasom_puripiseul">38. 예다솜 어린이집-맑은샘물: 화, 목</option>
+					<option value="yaedasom_sandeulbaram" data-site="yaedasom_sandeulbaram">39. 예다솜 어린이집-산들바람: 월, 수</option>
+					<option value="yaedasom_paranhaneul" data-site="yaedasom_paranhaneul">40. 예다솜 어린이집-파란하늘: 월, 수</option>
+					<option value="yaedasom_sammool" data-site="yaedasom_sammool">41. 예다솜 어린이집-풀잎이슬: 화, 목</option>
+					<option value="opogaram_nuri" data-site="opogaram_nuri">42. 오포가람 어린이집-누리 (도담): 월, 수</option>
+					<option value="ilsanseoboo_dojeon" data-site="ilsanseoboo_dojeon">43. 일산서부경찰서 어린이집-도전하는반: 화, 목</option>
+					<option value="ilsanseoboo_jihye" data-site="ilsanseoboo_jihye">44. 일산서부경찰서 어린이집-지혜로운반: 월, 수</option>
+					<option value="janghowon_sarang" data-site="janghowon_sarang">45. 장호원 어린이집-사랑: 화, 목</option>
+					<option value="janghowon_yonggi" data-site="janghowon_yonggi">46. 장호원 어린이집-용기: 월, 수</option>
+					<option value="jungang_iseul" data-site="jungang_iseul">47. 중앙 어린이집-이슬: 화, 목</option>
+					<option value="kijeuswema_bora" data-site="kijeuswema_bora">48. 키즈쉐마 어린이집-보라: 월, 수</option>
+					<option value="taejeon_seomchorong" data-site="taejeon_seomchorong">49. 태전 어린이집-섬초롱: 월, 수</option>
+					<option value="taejeon_eunchorong" data-site="taejeon_eunchorong">50. 태전 어린이집-은초롱: 월, 수</option>
+					<option value="taejeon_chamnari" data-site="taejeon_chamnari">51. 태전 어린이집-참나리: 화, 목</option>
+					<option value="taejeon_pureunsup" data-site="taejeon_pureunsup">52. 태전 어린이집-푸른숲: 월, 수</option>
+					<option value="taejeon_pureunhaneul" data-site="taejeon_pureunhaneul">53. 태전 어린이집-푸른하늘: 화, 목</option>
+					<option value="toegyehansup_ssukssuk" data-site="toegyehansup_ssukssuk">54. 퇴계한숲 어린이집-쑥쑥반: 화, 목</option>
+					<option value="parangsae_gaon" data-site="parangsae_gaon">55. 파랑새 어린이집-가온: 화, 목</option>
+					<option value="parangsae_saeron" data-site="parangsae_saeron">56. 파랑새 어린이집-새론: 화, 목</option>
+					<option value="hamchorong_kotip" data-site="hamchorong_kotip">57. 함초롱 어린이집-꽃잎: 월, 수</option>
+					<option value="hamchorong_namu" data-site="hamchorong_namu">58. 함초롱 어린이집-나무: 화, 목</option>
+					<option value="hamchorong_yeolmae" data-site="hamchorong_yeolmae">59. 함초롱 어린이집-열매: 화, 목</option>
+					<option value="haedeun_bareun" data-site="haedeun_bareun">60. 해든 유치원-바른: 월, 수</option>
+					<option value="haedeun_ssukssuk" data-site="haedeun_ssukssuk">61. 해든 유치원-쑥쑥반: 월, 수</option>
+					<option value="haedeun_teunteun" data-site="haedeun_teunteun">62. 해든 유치원-튼튼반: 월, 수</option>
+					<option value="haedeun_himchan" data-site="haedeun_himchan">63. 해든 유치원-힘찬반: 월, 수</option>
+					<option value="harrington_gureumsongyi" data-site="harrington_gureumsongyi">64. 효성해링턴 어린이집-구름송이: 화, 목</option>
+					<option value="harrington_bada" data-site="harrington_bada">65. 효성해링턴 어린이집-바다: 화, 목</option>
+					<option value="harrington_haneul" data-site="harrington_haneul">66. 효성해링턴 어린이집-하늘: 화, 목</option>
+					<option value="haeoreum_bada" data-site="haeoreum_bada">67. 휴먼시아해오름 어린이집-바다: 화, 목</option>
+					<option value="lgcns_dalnim" data-site="lgcns_dalnim">68. LGCNS 어린이집-달님: 화, 목</option>
+					<option value="lgcns_byeolnim" data-site="lgcns_byeolnim">69. LGCNS 어린이집-별님: 화, 목</option>
+					<option value="lgcns_haenim" data-site="lgcns_haenim">70. LGCNS 어린이집-해님: 화, 목</option>
+					<option value="jungdawoon_yoonseul" data-site="jungdawoon_yoonseul">71. LGD정다운 어린이집-윤슬: 월, 수</option>
+					<option value="jungdawoon_chanseul" data-site="jungdawoon_chanseul">72. LGD정다운 어린이집-찬슬: 월, 수</option>
+					<option value="haengbokhan_hanbit" data-site="haengbokhan_hanbit">73. LGD행복한 어린이집-한빛: 월, 수</option>
+                    <!-- 교실 선택 옵션들 -->
+                </select>
+            </div>
+
+            <div>
+                <label for="date">날짜 선택:</label>
+                <input type="date" id="date" onchange="updateWeekday()">
+                <span id="weekday" class="weekday"></span>
+            </div>
+
+            <div>
+<!-- 여기에 문구 추가 -->
+<p style="font-size: 10px; color: #555; margin-top: 1px;">
+    #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-3초), 숫자3(+3초), 숫자4(+3분), E(이전싱크), R(다음싱크)
+</p>
+<p style="font-size: 10px; color: #555; margin-top: 1px;">
+#Tip. 일시정지 후 영상에 마우스 커서를 갖다대어 [전체화면]으로 바꾸면 태깅하기 편합니다.
+</p>
+			</div>
+            </div>
+        </div>
+
+        <div class="sync-container top" id="syncContainerTop"></div>
+
+<div class="video-container" id="videoContainer"></div>
+
+        <div class="sync-container bottom" id="syncContainerBottom"></div>
+    </div>
+
+    <script>
+        let activeButton = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            updateWeekday();
+            loadSyncButtons();
+            updateSiteID();
+        });
+
+        function changeProgram() {
+            loadSyncButtons();
+            updateSiteID();
+        }
+
+        function updateSiteID() {
+            const programSelect = document.getElementById('program');
+            const selectedOption = programSelect.options[programSelect.selectedIndex];
+            const siteID = selectedOption.getAttribute('data-site');
+            const weekdaysText = selectedOption.textContent.split(": ")[1]; // 요일 정보 추출
+            document.getElementById('selectedSiteID').textContent = `${siteID} (${weekdaysText})`;
+        }
+
+        function updateWeekday() {
+            const dateInput = document.getElementById('date').value;
+            const date = new Date(dateInput);
+            const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+            const weekday = weekdays[date.getDay()];
+            
+            document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
+        }
+
+        function loadSyncButtons() {
+            const program = document.getElementById('program').value;
+            const syncContainerTop = document.getElementById('syncContainerTop');
+            const syncContainerBottom = document.getElementById('syncContainerBottom');
+            syncContainerTop.innerHTML = '';
+            syncContainerBottom.innerHTML = '';
+
+            const totalSyncs = 42;
+
+            for (let i = 0; i <= 17; i++) {
+                const button = document.createElement('button');
+                button.classList.add('sync-button');
+                button.textContent = `Sync ${i} (${formatTime(i)})`;
+                button.onclick = function() {
+                    loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+                };
+                syncContainerTop.appendChild(button);
+            }
+
+            if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
+                for (let i = 18; i < totalSyncs; i++) {
+                    const button = document.createElement('button');
+                    button.classList.add('sync-button');
+                    button.textContent = `Sync ${i} (${formatTime(i)})`;
+                    button.onclick = function() {
+                        loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+                    };
+                    syncContainerBottom.appendChild(button);
+                }
+            }
+        }
+
+        function formatTime(syncIndex) {
+            const startHour = 9;
+            const totalMinutes = syncIndex * 10;
+            const hours = Math.floor((startHour * 60 + totalMinutes) / 60);
+            const minutes = totalMinutes % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        }
+
+        function loadVideos(sync, button) {
+            if (activeButton) {
+                activeButton.classList.remove('active');
+            }
+            button.classList.add('active');
+            activeButton = button;
+
+            const date = document.getElementById('date').value;
+            const program = document.getElementById('program').value;
+            const container = document.getElementById('videoContainer');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 8; i++) {
+                const videoWrapper = document.createElement('div');
+                videoWrapper.classList.add('video-wrapper');
+
+                const camLabel = document.createElement('div');
+                camLabel.classList.add('cam-label');
+                camLabel.textContent = `CAM0${i}`;
+
+                const video = document.createElement('video');
+                video.controls = true;
+                video.autoplay = true;
+                video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
+
+                video.onerror = function() {
+                    videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
+                };
+
+                // 새창으로 보기 버튼 생성
+                const newWindowButton = document.createElement('button');
+                newWindowButton.textContent = '새창으로';
+                newWindowButton.classList.add('new-window-button');
+                newWindowButton.onclick = function() {
+                    window.open(video.src, '_blank');
+                };
+
+                // videoWrapper에 CAM 라벨, 비디오, 새창으로 버튼 추가
+                videoWrapper.appendChild(camLabel);
+                videoWrapper.appendChild(video);
+                videoWrapper.appendChild(newWindowButton);
+                container.appendChild(videoWrapper);
+            }
+        }
+
+		function pauseAllVideos() {
+		    const videos = document.querySelectorAll('video');
+		    videos.forEach(video => video.pause());
+		}
+		
+		function playAllVideos() {
+		    const videos = document.querySelectorAll('video');
+		    videos.forEach(video => video.play());
+		}
+		function rewindVideos(seconds) {
+		    const videos = document.querySelectorAll('video');
+		    videos.forEach(video => {
+		        video.currentTime = Math.max(video.currentTime - seconds, 0); // 0 이하로 가지 않게 설정
+		    });
+		}
+		
+		function forwardVideos(seconds) {
+		    const videos = document.querySelectorAll('video');
+		    videos.forEach(video => {
+		        video.currentTime = Math.min(video.currentTime + seconds, video.duration); // 비디오 길이를 넘지 않게 설정
+		    });
+		}
+		
+		// 키보드 입력 감지 이벤트
+		document.addEventListener('keydown', function(event) {
+		    const key = event.key.toLowerCase();  // 모든 키 입력을 소문자로 변환하여 처리
+		    
+		    // 숫자 단축키 1, 2, 3, 4
+		    switch (key) {
+		        case '1':  // -3분
+		            rewindVideos(180);
+		            break;
+		        case '2':  // -3초
+		            rewindVideos(3);
+		            break;
+		        case '3':  // +3초
+		            forwardVideos(3);
+		            break;
+		        case '4':  // +3분
+		            forwardVideos(180);
+		            break;
+		        case ' ':  // 스페이스바로 재생/일시정지
+		            event.preventDefault();  // 스페이스바 기본 동작 방지
+		            togglePlayPause();
+		            break;
+		    }
+		
+		    // 싱크 이동 단축키 e, r
+		    if (key === 'e' || key === 'ㅁ') {
+		        navigateSync(-1);  // 이전 싱크
+		    } else if (key === 'r' || key === 'ㄱ') {
+		        navigateSync(1);   // 다음 싱크
+		    }
+		
+		    // 교실 선택 상/하 이동 단축키 g, f
+		    if (key === 'g' || key === 'ㅎ') {
+		        changeProgramSelection(-1);  // 상
+		    } else if (key === 'f' || key === 'ㄹ') {
+		        changeProgramSelection(1);   // 하
+		    }
+		
+		    // 날짜 선택 하루 전/후 단축키 a, d
+		    if (key === 'a' || key === 'ㅁ') {
+		        changeDateSelection(-1);  // 하루 전
+		    } else if (key === 'd' || key === 'ㅇ') {
+		        changeDateSelection(1);   // 하루 후
+		    }
+		
+		    // Sync 0 선택 단축키 s, S, ㄴ
+		    if (key === 's' || key === 'ㄴ') {
+		        const sync0Button = document.querySelector('.sync-button:first-child');  // 첫 번째 sync 버튼 선택
+		        if (sync0Button) {
+		            sync0Button.click();  // 버튼 클릭 이벤트 트리거
+		        }
+		    }
+		});
+		
+		function changeDateSelection(direction) {
+		    const dateInput = document.getElementById('date');
+		    const currentDate = new Date(dateInput.value);
+		    currentDate.setDate(currentDate.getDate() + direction); // 날짜 이동
+		    dateInput.value = currentDate.toISOString().split('T')[0];
+		    updateWeekday(); // 요일 업데이트
+		}
+		
+		function togglePlayPause() {
+		    const videos = document.querySelectorAll('video');
+		    const anyPlaying = Array.from(videos).some(video => !video.paused);
+		
+		    if (anyPlaying) {
+		        pauseAllVideos();
+		    } else {
+		        playAllVideos();
+		    }
+		}
+		
+		function changeProgramSelection(direction) {
+		    const programSelect = document.getElementById('program');
+		    const currentIndex = programSelect.selectedIndex;
+		    const newIndex = currentIndex + direction;
+		
+		    if (newIndex >= 0 && newIndex < programSelect.options.length) {
+		        programSelect.selectedIndex = newIndex;
+		        changeProgram(); // 프로그램 변경 함수 호출
+		    }
+		}
+		
+		function navigateSync(direction) {
+		    const syncButtons = document.querySelectorAll('.sync-button');
+		    if (activeButton) {
+		        let currentIndex = Array.from(syncButtons).indexOf(activeButton);
+		        let newIndex = currentIndex + direction;
+		        if (newIndex >= 0 && newIndex < syncButtons.length) {
+		            syncButtons[newIndex].click();
+		        }
+		    }
+		}
+
+function navigateSync(direction) {
+    const syncButtons = document.querySelectorAll('.sync-button');
+    if (activeButton) {
+        let currentIndex = Array.from(syncButtons).indexOf(activeButton);
+        let newIndex = currentIndex + direction;
+        if (newIndex >= 0 && newIndex < syncButtons.length) {
+            syncButtons[newIndex].click();
+        }
     }
-});
+}
+
+    </script>
+</body>
+</html>
