@@ -422,13 +422,23 @@
 		            break;
 		        case 'e':
 		        case 'E':
-		        case 'ㄷ':
-		            navigateSync(-1);  // 이전 싱크
+		        case 'ㅁ': // 이전 싱크
+		            navigateSync(-1);
 		            break;
 		        case 'r':
 		        case 'R':
-		        case 'ㄱ':		
-		            navigateSync(1);   // 다음 싱크
+		        case 'ㄱ': // 다음 싱크
+		            navigateSync(1);
+		            break;
+		        case 'd':
+		        case 'D':
+		        case 'ㅇ': // 교실 상
+		            changeProgramSelection(-1);
+		            break;
+		        case 'f':
+		        case 'F':
+		        case 'ㄹ': // 교실 하
+		            changeProgramSelection(1);
 		            break;
 		    }
 		});
@@ -436,11 +446,22 @@
 		function togglePlayPause() {
 		    const videos = document.querySelectorAll('video');
 		    const anyPlaying = Array.from(videos).some(video => !video.paused);
-		    
+		
 		    if (anyPlaying) {
 		        pauseAllVideos();
 		    } else {
 		        playAllVideos();
+		    }
+		}
+		
+		function changeProgramSelection(direction) {
+		    const programSelect = document.getElementById('program');
+		    const currentIndex = programSelect.selectedIndex;
+		    const newIndex = currentIndex + direction;
+		
+		    if (newIndex >= 0 && newIndex < programSelect.options.length) {
+		        programSelect.selectedIndex = newIndex;
+		        changeProgram(); // 프로그램 변경 함수 호출
 		    }
 		}
 		
@@ -465,6 +486,7 @@ function navigateSync(direction) {
         }
     }
 }
+
     </script>
 </body>
 </html>
