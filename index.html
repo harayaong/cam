@@ -244,25 +244,20 @@
             </div>
 
             <div>
-				<!-- 버튼들에 sync-button 클래스 추가 -->
-				<div class="button-group">
-			    <button id="rewind3secButton" class="sync-button small-button" onclick="rewindVideos(3)">-3초</button>
-			    <button id="rewind3minButton" class="sync-button small-button" onclick="rewindVideos(180)">-3분</button>
-			    <button id="forward3secButton" class="sync-button small-button" onclick="forwardVideos(3)">+3초</button>
-			    <button id="forward3minButton" class="sync-button small-button" onclick="forwardVideos(180)">+3분</button>
-				<button id="pauseAllButton" class="sync-button" onclick="pauseAllVideos()">일괄정지</button>
-				<button id="playAllButton" class="sync-button" onclick="playAllVideos()">일괄재생</button>
-
+<!-- 여기에 문구 추가 -->
+<p style="font-size: 10px; color: #555; margin-top: 1px;">
+    #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-3초), 숫자3(+3초), 숫자4(+3분)
+</p>
+<p style="font-size: 10px; color: #555; margin-top: 1px;">
+#Tip. 일시정지 후 영상에 마우스 커서를 갖다대어 [전체화면]으로 바꾸면 태깅하기 편합니다.
+</p>
 			</div>
             </div>
         </div>
 
         <div class="sync-container top" id="syncContainerTop"></div>
 
-        <div class="video-container" id="videoContainer"></div>
-		<p style="font-size: 12px; text-align: start; color: #888; margin-top: 0px;">
-		    # 단축키: 스페이스바(일괄정지/일괄재생) 1(-3분) 2(-3초) 3(+3초) 4(+3분)
-		</p>
+<div class="video-container" id="videoContainer"></div>
 
         <div class="sync-container bottom" id="syncContainerBottom"></div>
     </div>
