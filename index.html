@@ -402,44 +402,58 @@
 		        video.currentTime = Math.min(video.currentTime + seconds, video.duration); // 비디오 길이를 넘지 않게 설정
 		    });
 		}
-			document.addEventListener('keydown', function(event) {
-	    switch(event.key) {
-	        case '1':
-	            rewindVideos(180); // -3분
-	            break;
-	        case '2':
-	            rewindVideos(3); // -3초
-	            break;
-	        case '3':
-	            forwardVideos(3); // +3초
-	            break;
-	        case '4':
-	            forwardVideos(180); // +3분
-	            break;
-	        case ' ': // 스페이스바로 재생/일시정지
-	            event.preventDefault(); // 스페이스바 기본 동작 방지
-	            togglePlayPause();
-	            break;
-	    }
-	});
-	
-	function togglePlayPause() {
-	    const videos = document.querySelectorAll('video');
-	    const anyPlaying = Array.from(videos).some(video => !video.paused);
-	    
-	    if (anyPlaying) {
-	        pauseAllVideos();
-	    } else {
-	        playAllVideos();
-	    }
-	}
-	document.addEventListener('keydown', function(event) {
-    if (event.key === 'e' || event.key === 'E') {
-        navigateSync(-1);  // 이전 싱크
-    } else if (event.key === 'r' || event.key === 'R') {
-        navigateSync(1);   // 다음 싱크
-    }
-});
+		document.addEventListener('keydown', function(event) {
+		    switch(event.key) {
+		        case '1':
+		            rewindVideos(180); // -3분
+		            break;
+		        case '2':
+		            rewindVideos(3); // -3초
+		            break;
+		        case '3':
+		            forwardVideos(3); // +3초
+		            break;
+		        case '4':
+		            forwardVideos(180); // +3분
+		            break;
+		        case ' ': // 스페이스바로 재생/일시정지
+		            event.preventDefault(); // 스페이스바 기본 동작 방지
+		            togglePlayPause();
+		            break;
+		        case 'e':
+		        case 'E':
+		        case 'ㄷ':
+		            navigateSync(-1);  // 이전 싱크
+		            break;
+		        case 'r':
+		        case 'R':
+		        case 'ㄱ':		
+		            navigateSync(1);   // 다음 싱크
+		            break;
+		    }
+		});
+		
+		function togglePlayPause() {
+		    const videos = document.querySelectorAll('video');
+		    const anyPlaying = Array.from(videos).some(video => !video.paused);
+		    
+		    if (anyPlaying) {
+		        pauseAllVideos();
+		    } else {
+		        playAllVideos();
+		    }
+		}
+		
+		function navigateSync(direction) {
+		    const syncButtons = document.querySelectorAll('.sync-button');
+		    if (activeButton) {
+		        let currentIndex = Array.from(syncButtons).indexOf(activeButton);
+		        let newIndex = currentIndex + direction;
+		        if (newIndex >= 0 && newIndex < syncButtons.length) {
+		            syncButtons[newIndex].click();
+		        }
+		    }
+		}
 
 function navigateSync(direction) {
     const syncButtons = document.querySelectorAll('.sync-button');
