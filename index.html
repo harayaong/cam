@@ -434,9 +434,9 @@
 	    }
 	}
 	document.addEventListener('keydown', function(event) {
-    if (event.key === 'E') {
+    if (event.key === 'e' || event.key === 'E') {
         navigateSync(-1);  // 이전 싱크
-    } else if (event.key === 'R') {
+    } else if (event.key === 'r' || event.key === 'R') {
         navigateSync(1);   // 다음 싱크
     }
 });
