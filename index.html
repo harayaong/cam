@@ -435,13 +435,31 @@
 		        case 'ㅇ': // 교실 상
 		            changeProgramSelection(-1);
 		            break;
+		        case 'c':
+		        case 'C':
+		        case 'ㅊ': // 교실 하
+		            changeProgramSelection(1);
+		            break;
 		        case 'f':
 		        case 'F':
-		        case 'ㄹ': // 교실 하
-		            changeProgramSelection(1);
+		        case 'ㄹ': // 하루 전
+		            changeDateSelection(-1);
+		            break;
+		        case 'v':
+		        case 'V':
+		        case 'ㅍ': // 하루 뒤
+		            changeDateSelection(1);
 		            break;
 		    }
 		});
+		
+		function changeDateSelection(direction) {
+		    const dateInput = document.getElementById('date');
+		    const currentDate = new Date(dateInput.value);
+		    currentDate.setDate(currentDate.getDate() + direction); // 날짜 이동
+		    dateInput.value = currentDate.toISOString().split('T')[0];
+		    updateWeekday(); // 요일 업데이트
+		}
 		
 		function togglePlayPause() {
 		    const videos = document.querySelectorAll('video');
