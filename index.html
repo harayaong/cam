@@ -106,13 +106,6 @@
             border-radius: 5px;
         }
 
-        .video-wrapper {
-            position: relative;
-            background-color: #e5e5e5;
-            padding: 10px;
-            border-radius: 8px;
-        }
-
         .new-window-button {
             position: absolute;
             bottom: 10px;
@@ -131,28 +124,64 @@
             background-color: rgba(0, 0, 0, 0.7);
         }
 
-        #pauseAllButton {
-            background-color: #d9534f;
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
         }
 
-        #pauseAllButton:hover {
-            background-color: #c9302c;
-        }
-		.small-button {
-		    padding: 5px 8px;
-		    margin-left: 5px;
-		    margin-right: 5px;
-		}
-		#rewind3secButton, #rewind3minButton {
-		    background-color: #d9534f;
+		.modal-content {
+		    background-color: #fff;
+		    padding: 100px;
+		    border-radius: 10px;
+		    max-width: 300px; /* 크기를 더 좁게 조정 */
+		    width: 100%;
+		    box-sizing: border-box; /* 패딩 포함 */
 		}
 		
-		#rewind3secButton:hover, #rewind3minButton:hover {
-		    background-color: #c9302c;
+		.modal-content input[type="text"] {
+		    width: 100%; /* 입력 필드의 너비를 컨테이너에 맞춤 */
+		    padding: 10px; /* 여백 추가 */
+		    box-sizing: border-box;
 		}
+
+        .modal-header {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .close-btn {
+            background-color: #d9534f;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .pin-video {
+            margin-top: 20px;
+        }
+
     </style>
 </head>
 <body>
+		<!-- PIN 모달 -->
+		<div id="pinModal" class="modal">
+		    <div class="modal-content" style="max-width: 300px;">
+		        <div class="modal-header">비밀번호</div>
+		        <input type="password" id="pinInput" placeholder="PIN 입력" style="width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 10px;">
+		        <button class="close-btn" onclick="verifyPin()">확인</button>
+		    </div>
+		</div>
     <div class="container">
         <h1><span id="selectedSiteID"></span></h1>
 
@@ -244,7 +273,6 @@
             </div>
 
             <div>
-<!-- 여기에 문구 추가 -->
 <p style="font-size: 10px; color: #555; margin-top: 1px;">
     #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-3초), 숫자3(+3초), 숫자4(+3분), E(이전싱크), R(다음싱크)
 </p>
@@ -252,26 +280,35 @@
 #Tip. 일시정지 후 영상에 마우스 커서를 갖다대어 [전체화면]으로 바꾸면 태깅하기 편합니다.
 </p>
 			</div>
-            </div>
         </div>
 
         <div class="sync-container top" id="syncContainerTop"></div>
-
-<div class="video-container" id="videoContainer"></div>
-
+        <div class="video-container" id="videoContainer"></div>
         <div class="sync-container bottom" id="syncContainerBottom"></div>
+    </div>
+
+    <!-- Pin 모달 -->
+    <div id="pinModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">비디오 PIN 설정</div>
+            <video id="pinVideo" controls></video>
+            <button class="close-btn" onclick="closeModal()">닫기</button>
+        </div>
     </div>
 
     <script>
         let activeButton = null;
+        let pinModal = document.getElementById('pinModal');
+        let pinVideoElement = document.getElementById('pinVideo');
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('date').value = today;
-            updateWeekday();
-            loadSyncButtons();
-            updateSiteID();
-        });
+		document.addEventListener('DOMContentLoaded', function() {
+		    pinModal.style.display = 'flex';  // 모달을 처음에 보이게 설정
+		    const today = new Date().toISOString().split('T')[0];
+		    document.getElementById('date').value = today;
+		    updateWeekday();
+		    loadSyncButtons();
+		    updateSiteID();
+		});
 
         function changeProgram() {
             loadSyncButtons();
@@ -282,7 +319,7 @@
             const programSelect = document.getElementById('program');
             const selectedOption = programSelect.options[programSelect.selectedIndex];
             const siteID = selectedOption.getAttribute('data-site');
-            const weekdaysText = selectedOption.textContent.split(": ")[1]; // 요일 정보 추출
+            const weekdaysText = selectedOption.textContent.split(": ")[1];
             document.getElementById('selectedSiteID').textContent = `${siteID} (${weekdaysText})`;
         }
 
@@ -291,7 +328,6 @@
             const date = new Date(dateInput);
             const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
             const weekday = weekdays[date.getDay()];
-            
             document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
         }
 
@@ -334,7 +370,6 @@
             const minutes = totalMinutes % 60;
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
         }
-
         function loadVideos(sync, button) {
             if (activeButton) {
                 activeButton.classList.remove('active');
@@ -360,6 +395,10 @@
                 video.autoplay = true;
                 video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
 
+                video.onclick = function() {
+                    openPinModal(video.src); // 모달로 비디오 열기
+                };
+
                 video.onerror = function() {
                     videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
                 };
@@ -372,7 +411,6 @@
                     window.open(video.src, '_blank');
                 };
 
-                // videoWrapper에 CAM 라벨, 비디오, 새창으로 버튼 추가
                 videoWrapper.appendChild(camLabel);
                 videoWrapper.appendChild(video);
                 videoWrapper.appendChild(newWindowButton);
@@ -380,135 +418,147 @@
             }
         }
 
-		function pauseAllVideos() {
-		    const videos = document.querySelectorAll('video');
-		    videos.forEach(video => video.pause());
-		}
-		
-		function playAllVideos() {
-		    const videos = document.querySelectorAll('video');
-		    videos.forEach(video => video.play());
-		}
-		function rewindVideos(seconds) {
-		    const videos = document.querySelectorAll('video');
-		    videos.forEach(video => {
-		        video.currentTime = Math.max(video.currentTime - seconds, 0); // 0 이하로 가지 않게 설정
-		    });
-		}
-		
-		function forwardVideos(seconds) {
-		    const videos = document.querySelectorAll('video');
-		    videos.forEach(video => {
-		        video.currentTime = Math.min(video.currentTime + seconds, video.duration); // 비디오 길이를 넘지 않게 설정
-		    });
-		}
-		
-		// 키보드 입력 감지 이벤트
-		document.addEventListener('keydown', function(event) {
-		    const key = event.key.toLowerCase();  // 모든 키 입력을 소문자로 변환하여 처리
-		    
-		    // 숫자 단축키 1, 2, 3, 4
-		    switch (key) {
-		        case '1':  // -3분
-		            rewindVideos(180);
-		            break;
-		        case '2':  // -3초
-		            rewindVideos(3);
-		            break;
-		        case '3':  // +3초
-		            forwardVideos(3);
-		            break;
-		        case '4':  // +3분
-		            forwardVideos(180);
-		            break;
-		        case ' ':  // 스페이스바로 재생/일시정지
-		            event.preventDefault();  // 스페이스바 기본 동작 방지
-		            togglePlayPause();
-		            break;
-		    }
-		
-		    // 싱크 이동 단축키 e, r
-		    if (key === 'e' || key === 'ㅁ') {
-		        navigateSync(-1);  // 이전 싱크
-		    } else if (key === 'r' || key === 'ㄱ') {
-		        navigateSync(1);   // 다음 싱크
-		    }
-		
-		    // 교실 선택 상/하 이동 단축키 g, f
-		    if (key === 'g' || key === 'ㅎ') {
-		        changeProgramSelection(-1);  // 상
-		    } else if (key === 'f' || key === 'ㄹ') {
-		        changeProgramSelection(1);   // 하
-		    }
-		
-		    // 날짜 선택 하루 전/후 단축키 a, d
-		    if (key === 'a' || key === 'ㅁ') {
-		        changeDateSelection(-1);  // 하루 전
-		    } else if (key === 'd' || key === 'ㅇ') {
-		        changeDateSelection(1);   // 하루 후
-		    }
-		
-		    // Sync 0 선택 단축키 s, S, ㄴ
-		    if (key === 's' || key === 'ㄴ') {
-		        const sync0Button = document.querySelector('.sync-button:first-child');  // 첫 번째 sync 버튼 선택
-		        if (sync0Button) {
-		            sync0Button.click();  // 버튼 클릭 이벤트 트리거
-		        }
-		    }
-		});
-		
-		function changeDateSelection(direction) {
-		    const dateInput = document.getElementById('date');
-		    const currentDate = new Date(dateInput.value);
-		    currentDate.setDate(currentDate.getDate() + direction); // 날짜 이동
-		    dateInput.value = currentDate.toISOString().split('T')[0];
-		    updateWeekday(); // 요일 업데이트
-		}
-		
-		function togglePlayPause() {
-		    const videos = document.querySelectorAll('video');
-		    const anyPlaying = Array.from(videos).some(video => !video.paused);
-		
-		    if (anyPlaying) {
-		        pauseAllVideos();
-		    } else {
-		        playAllVideos();
-		    }
-		}
-		
-		function changeProgramSelection(direction) {
-		    const programSelect = document.getElementById('program');
-		    const currentIndex = programSelect.selectedIndex;
-		    const newIndex = currentIndex + direction;
-		
-		    if (newIndex >= 0 && newIndex < programSelect.options.length) {
-		        programSelect.selectedIndex = newIndex;
-		        changeProgram(); // 프로그램 변경 함수 호출
-		    }
-		}
-		
-		function navigateSync(direction) {
-		    const syncButtons = document.querySelectorAll('.sync-button');
-		    if (activeButton) {
-		        let currentIndex = Array.from(syncButtons).indexOf(activeButton);
-		        let newIndex = currentIndex + direction;
-		        if (newIndex >= 0 && newIndex < syncButtons.length) {
-		            syncButtons[newIndex].click();
-		        }
-		    }
-		}
-
-function navigateSync(direction) {
-    const syncButtons = document.querySelectorAll('.sync-button');
-    if (activeButton) {
-        let currentIndex = Array.from(syncButtons).indexOf(activeButton);
-        let newIndex = currentIndex + direction;
-        if (newIndex >= 0 && newIndex < syncButtons.length) {
-            syncButtons[newIndex].click();
+        // 모달을 열어서 비디오를 표시하는 함수
+        function openPinModal(videoSrc) {
+            pinVideoElement.src = videoSrc;
+            pinModal.style.display = 'flex';
         }
-    }
-}
 
+        // 모달 닫기
+        function closeModal() {
+            pinModal.style.display = 'none';
+            pinVideoElement.src = ''; // 비디오 재생 종료
+        }
+
+        function pauseAllVideos() {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => video.pause());
+        }
+
+        function playAllVideos() {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => video.play());
+        }
+
+        function rewindVideos(seconds) {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.currentTime = Math.max(video.currentTime - seconds, 0); // 0 이하로 가지 않게 설정
+            });
+        }
+
+        function forwardVideos(seconds) {
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                video.currentTime = Math.min(video.currentTime + seconds, video.duration); // 비디오 길이를 넘지 않게 설정
+            });
+        }
+
+        // 키보드 입력 감지 이벤트
+        document.addEventListener('keydown', function(event) {
+            const key = event.key.toLowerCase();  // 모든 키 입력을 소문자로 변환하여 처리
+            
+            // 숫자 단축키 1, 2, 3, 4
+            switch (key) {
+                case '1':  // -3분
+                    rewindVideos(180);
+                    break;
+                case '2':  // -3초
+                    rewindVideos(3);
+                    break;
+                case '3':  // +3초
+                    forwardVideos(3);
+                    break;
+                case '4':  // +3분
+                    forwardVideos(180);
+                    break;
+                case ' ':  // 스페이스바로 재생/일시정지
+                    event.preventDefault();  // 스페이스바 기본 동작 방지
+                    togglePlayPause();
+                    break;
+            }
+
+            // 싱크 이동 단축키 e, r
+            if (key === 'e' || key === 'ㅁ') {
+                navigateSync(-1);  // 이전 싱크
+            } else if (key === 'r' || key === 'ㄱ') {
+                navigateSync(1);   // 다음 싱크
+            }
+
+            // 교실 선택 상/하 이동 단축키 g, f
+            if (key === 'g' || key === 'ㅎ') {
+                changeProgramSelection(-1);  // 상
+            } else if (key === 'f' || key === 'ㄹ') {
+                changeProgramSelection(1);   // 하
+            }
+
+            // 날짜 선택 하루 전/후 단축키 a, d
+            if (key === 'a' || key === 'ㅁ') {
+                changeDateSelection(-1);  // 하루 전
+            } else if (key === 'd' || key === 'ㅇ') {
+                changeDateSelection(1);   // 하루 후
+            }
+
+            // Sync 0 선택 단축키 s, S, ㄴ
+            if (key === 's' || key === 'ㄴ') {
+                const sync0Button = document.querySelector('.sync-button:first-child');  // 첫 번째 sync 버튼 선택
+                if (sync0Button) {
+                    sync0Button.click();  // 버튼 클릭 이벤트 트리거
+                }
+            }
+        });
+
+        function changeDateSelection(direction) {
+            const dateInput = document.getElementById('date');
+            const currentDate = new Date(dateInput.value);
+            currentDate.setDate(currentDate.getDate() + direction); // 날짜 이동
+            dateInput.value = currentDate.toISOString().split('T')[0];
+            updateWeekday(); // 요일 업데이트
+        }
+
+        function togglePlayPause() {
+            const videos = document.querySelectorAll('video');
+            const anyPlaying = Array.from(videos).some(video => !video.paused);
+
+            if (anyPlaying) {
+                pauseAllVideos();
+            } else {
+                playAllVideos();
+            }
+        }
+
+        function changeProgramSelection(direction) {
+            const programSelect = document.getElementById('program');
+            const currentIndex = programSelect.selectedIndex;
+            const newIndex = currentIndex + direction;
+
+            if (newIndex >= 0 && newIndex < programSelect.options.length) {
+                programSelect.selectedIndex = newIndex;
+                changeProgram(); // 프로그램 변경 함수 호출
+            }
+        }
+
+        function navigateSync(direction) {
+            const syncButtons = document.querySelectorAll('.sync-button');
+            if (activeButton) {
+                let currentIndex = Array.from(syncButtons).indexOf(activeButton);
+                let newIndex = currentIndex + direction;
+                if (newIndex >= 0 && newIndex < syncButtons.length) {
+                    syncButtons[newIndex].click();
+                }
+            }
+        }
+		// PIN 검증 함수
+		function verifyPin() {
+		    const inputPin = document.getElementById('pinInput').value;
+		    const correctPin = '1240'; // 올바른 PIN을 여기에 설정
+		
+		    if (inputPin === correctPin) {
+		        pinModal.style.display = 'none'; // PIN이 올바르면 모달을 닫음
+		    } else {
+		        alert('PIN이 잘못되었습니다.'); // 잘못된 PIN 경고창 표시
+		    }
+		}
     </script>
 </body>
 </html>
