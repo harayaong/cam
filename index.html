@@ -255,7 +255,7 @@
 
             <div>
 <p style="font-size: 10px; color: #555; margin-top: 1px;">
-    #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-3초), 숫자3(+3초), 숫자4(+3분), E(이전싱크), R(다음싱크)
+    #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-30초), 숫자3(+30초), 숫자4(+3분), E(이전싱크), R(다음싱크)
 </p>
 <p style="font-size: 10px; color: #555; margin-top: 1px;">
 #Tip. 일시정지 후 영상에 마우스 커서를 갖다대어 [전체화면]으로 바꾸면 태깅하기 편합니다.
@@ -445,10 +445,10 @@
                     rewindVideos(180);
                     break;
                 case '2':  // -3초
-                    rewindVideos(3);
+                    rewindVideos(30);
                     break;
                 case '3':  // +3초
-                    forwardVideos(3);
+                    forwardVideos(30);
                     break;
                 case '4':  // +3분
                     forwardVideos(180);
