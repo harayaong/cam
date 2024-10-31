@@ -189,6 +189,11 @@
             <div>
                 <label for="program">교실 선택:</label>
                 <select id="program" onchange="changeProgram()">
+					<option value="sanseongsam_1x1" data-site="sanseongsam_1x1(꽃잎)">예정. 산성삼 어린이집-꽃잎: 주3회/미정</option>
+					<option value="sanseongsam_1x2" data-site="sanseongsam_1x2(열매)">예정. 산성삼 어린이집-열매: 주3회/미정</option>
+					<option value="sarangsaem_2x3" data-site="sarangsaem_2x3(하나울)">예정. 사랑샘 유치원-하나울: 월, 화, 수, 목, 금</option>
+					<option value="sarangsaem_2x5" data-site="sarangsaem_2x5(솔나리)">예정. 사랑샘 유치원-솔나리: 월, 화, 수, 목, 금</option>
+					<option value="sarangsaem_3x3" data-site="sarangsaem_3x3(아리솔)">예정. 사랑샘 유치원-아리솔: 월, 화, 수, 목, 금</option>
 					<option value="gangseogeullo_kotip" data-site="gangseogeullo_kotip">1. 강서근로복지공단 어린이집-꽃잎반: 월, 수</option>
 					<option value="gangseogeullo_namu" data-site="gangseogeullo_namu">2. 강서근로복지공단 어린이집-나무반: 화, 목</option>
 					<option value="gangseogeullo_hyanggi" data-site="gangseogeullo_hyanggi">3. 강서근로복지공단 어린이집-향기반: 화, 목</option>
@@ -383,13 +388,54 @@
                     videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
                 };
 
-                // 새창으로 보기 버튼 생성
-                const newWindowButton = document.createElement('button');
-                newWindowButton.textContent = '새창으로';
-                newWindowButton.classList.add('new-window-button');
-                newWindowButton.onclick = function() {
-                    window.open(video.src, '_blank');
-                };
+		// 새창으로 보기 버튼 생성
+		const newWindowButton = document.createElement('button');
+		newWindowButton.textContent = '새창';
+		newWindowButton.classList.add('new-window-button');
+		
+		// 스타일을 추가하여 위치와 크기 조정
+		newWindowButton.style.position = 'absolute';
+		newWindowButton.style.top = '10px';
+		newWindowButton.style.right = '10px';
+		newWindowButton.style.padding = '2px 5px';
+		newWindowButton.style.height = '20px';
+		newWindowButton.style.fontSize = '14px';
+		newWindowButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+		newWindowButton.style.borderRadius = '5px';
+		
+		newWindowButton.onclick = function() {
+		    window.open(video.src, '_blank');
+		};
+		
+		videoWrapper.appendChild(newWindowButton);
+
+		// 전체 화면 버튼 생성
+		const fullscreenButton = document.createElement('button');
+		fullscreenButton.textContent = '전체';
+		fullscreenButton.classList.add('new-window-button');
+		
+		// 스타일을 설정하여 새창 버튼과 동일하게 만듭니다.
+		fullscreenButton.style.position = 'absolute';
+		fullscreenButton.style.top = '10px';
+		fullscreenButton.style.right = '50px'; // 새창 버튼과 겹치지 않도록 위치 조정
+		fullscreenButton.style.padding = '2px 5px';
+		fullscreenButton.style.height = '20px';
+		fullscreenButton.style.fontSize = '14px';
+		fullscreenButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+		fullscreenButton.style.borderRadius = '5px';
+		
+		// 전체 화면 모드로 전환하는 이벤트 추가
+		fullscreenButton.onclick = function() {
+		    if (video.requestFullscreen) {
+		        video.requestFullscreen();
+		    } else if (video.webkitRequestFullscreen) {
+		        video.webkitRequestFullscreen();
+		    } else if (video.msRequestFullscreen) {
+		        video.msRequestFullscreen();
+		    }
+		};
+		
+		videoWrapper.appendChild(fullscreenButton);
 
                 videoWrapper.appendChild(camLabel);
                 videoWrapper.appendChild(video);
@@ -465,10 +511,10 @@
                 navigateSync(1);   // 다음 싱크
             }
 
-            // 교실 선택 상/하 이동 단축키 g, f
-            if (key === 'g' || key === 'ㅎ') {
+            // 교실 선택 상/하 이동 단축키 q,w
+            if (key === 'q' || key === 'ㅂ') {
                 changeProgramSelection(-1);  // 상
-            } else if (key === 'f' || key === 'ㄹ') {
+            } else if (key === 'w' || key === 'ㅈ') {
                 changeProgramSelection(1);   // 하
             }
 
