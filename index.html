@@ -3,177 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <title>통합 카메라 조회</title>
-    <style>
-        body {
-            font-size: 24px;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
 
-        .sync-container {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            grid-gap: 10px;
-            margin-top: 10px;
-        }
 
-        .sync-container.top {
-            margin-bottom: 10px;
-        }
 
-        h1 {
-            text-align: start;
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: #007bff;
-        }
 
-        .form-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
 
-        .form-container label {
-            font-size: 20px;
-        }
+<style>
+    body {
+        font-size: 24px;
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
 
-        select, input[type="date"] {
-            font-size: 20px;
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-left: 10px;
-        }
+    .top-section {
+        display: flex;
+        align-items: center;
+    }
 
-        .weekday {
-            font-size: 20px;
-            font-weight: bold;
-            color: #ff6347;
-        }
+    .sync-container {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-gap: 10px;
+        margin-top: 10px;
+    }
 
-        .sync-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    .sync-container.top {
+        margin-bottom: 10px;
+    }
 
-        .sync-button.active {
-            background-color: #ff6347;
-        }
+    h1 {
+        text-align: start;
+        font-size: 28px;
+        margin-bottom: 10px;
+        color: #007bff;
+    }
 
-        .sync-button:hover {
-            background-color: #0056b3;
-        }
+    .form-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-        .video-container {
-            margin-top: 10px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-gap: 10px;
-        }
+    .form-container label {
+        font-size: 20px;
+    }
 
-        .video-wrapper {
-            position: relative;
-            background-color: #e5e5e5;
-            padding: 10px;
-            border-radius: 8px;
-        }
+    select, input[type="date"] {
+        font-size: 20px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-left: 10px;
+    }
 
-        .cam-label {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 5px;
-            font-size: 16px;
-        }
+    .weekday {
+        font-size: 20px;
+        font-weight: bold;
+        color: #ff6347;
+    }
 
-        video {
-            width: 100%;
-            border-radius: 5px;
-        }
+    .sync-button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
 
-        .new-window-button {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            z-index: 10;
-        }
+    .sync-button.active {
+        background-color: #ff6347;
+    }
 
-        .new-window-button:hover {
-            background-color: rgba(0, 0, 0, 0.7);
-        }
+    .sync-button:hover {
+        background-color: #0056b3;
+    }
 
-        /* 모달 스타일 */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
+    .video-container {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-gap: 10px;
+    }
 
-		.modal-content {
-		    background-color: #fff;
-		    padding: 100px;
-		    border-radius: 10px;
-		    max-width: 300px; /* 크기를 더 좁게 조정 */
-		    width: 100%;
-		    box-sizing: border-box; /* 패딩 포함 */
-		}
-		
-		.modal-content input[type="text"] {
-		    width: 100%; /* 입력 필드의 너비를 컨테이너에 맞춤 */
-		    padding: 10px; /* 여백 추가 */
-		    box-sizing: border-box;
-		}
+    .video-wrapper {
+        position: relative;
+        background-color: #e5e5e5;
+        padding: 10px;
+        border-radius: 8px;
+    }
 
-        .modal-header {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
+    .cam-label {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 5px;
+        font-size: 16px;
+    }
 
-        .close-btn {
-            background-color: #d9534f;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    video {
+        width: 100%;
+        border-radius: 5px;
+    }
 
-        .pin-video {
-            margin-top: 20px;
-        }
+    .new-window-button {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        z-index: 10;
+    }
 
-    </style>
+    .new-window-button:hover {
+        background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    /* 모달 스타일 */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: #fff;
+        padding: 100px;
+        border-radius: 10px;
+        max-width: 300px; /* 크기를 더 좁게 조정 */
+        width: 100%;
+        box-sizing: border-box; /* 패딩 포함 */
+    }
+    
+    .modal-content input[type="text"] {
+        width: 100%; /* 입력 필드의 너비를 컨테이너에 맞춤 */
+        padding: 10px; /* 여백 추가 */
+        box-sizing: border-box;
+    }
+
+    .modal-header {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .close-btn {
+        background-color: #d9534f;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .pin-video {
+        margin-top: 20px;
+    }
+</style>
 </head>
+
+
+
+
+
+
 <body>
+<div class="top-section">
+    <h1><span id="selectedSiteID"></span></h1>
+<button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 16px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">기능추가예정</button></div>
 		<!-- PIN 모달 -->
 		<div id="pinModal" class="modal">
 		    <div class="modal-content" style="max-width: 300px;">
@@ -248,343 +266,339 @@
 					<option value="jungdawoon_chanseul" data-site="jungdawoon_chanseul">72. LGD정다운 어린이집-찬슬: 월, 수</option>
 					<option value="haengbokhan_hanbit" data-site="haengbokhan_hanbit">73. LGD행복한 어린이집-한빛: 월, 수</option>
                     <!-- 교실 선택 옵션들 -->
-                </select>
-            </div>
-
-            <div>
-                <label for="date">날짜 선택:</label>
-                <input type="date" id="date" onchange="updateWeekday()">
-                <span id="weekday" class="weekday"></span>
-            </div>
-
-            <div>
-<p style="font-size: 10px; color: #555; margin-top: 1px;">
-    #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-30초), 숫자3(+30초), 숫자4(+3분), E(이전싱크), R(다음싱크)
-</p>
-<p style="font-size: 10px; color: #555; margin-top: 1px;">
-#Tip. 일시정지 후 영상에 마우스 커서를 갖다대어 [전체화면]으로 바꾸면 태깅하기 편합니다.
-</p>
-			</div>
+            </select>
         </div>
 
-        <div class="sync-container top" id="syncContainerTop"></div>
-        <div class="video-container" id="videoContainer"></div>
-        <div class="sync-container bottom" id="syncContainerBottom"></div>
-    </div>
+        <div>
+            <label for="date">날짜 선택:</label>
+            <input type="date" id="date" onchange="updateWeekday()">
+            <span id="weekday" class="weekday"></span>
+        </div>
 
-    <!-- Pin 모달 -->
-    <div id="pinModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">비디오 PIN 설정</div>
-            <video id="pinVideo" controls></video>
-            <button class="close-btn" onclick="closeModal()">닫기</button>
+        <div>
+            <p style="font-size: 10px; color: #555; margin-top: 1px;">
+                #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-30초), 숫자3(+30초), 숫자4(+3분), E(이전싱크), R(다음싱크)
+            </p>
+            <p style="font-size: 10px; color: #555; margin-top: 1px;">
+                #Tip. [전체]버튼으로 화면 전환 후 스페이스바를 누르면 일괄정지/일괄재생 됩니다. (241031 Update)
+            </p>
         </div>
     </div>
 
-    <script>
-        let activeButton = null;
-        let pinModal = document.getElementById('pinModal');
-        let pinVideoElement = document.getElementById('pinVideo');
+    <div class="sync-container top" id="syncContainerTop"></div>
+    <div class="video-container" id="videoContainer"></div>
+    <div class="sync-container bottom" id="syncContainerBottom"></div>
+</div>
 
-		document.addEventListener('DOMContentLoaded', function() {
-		    pinModal.style.display = 'flex';  // 모달을 처음에 보이게 설정
-		    const today = new Date().toISOString().split('T')[0];
-		    document.getElementById('date').value = today;
-		    updateWeekday();
-		    loadSyncButtons();
-		    updateSiteID();
-		});
+<!-- Pin 모달 -->
+<div id="pinModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">비디오 PIN 설정</div>
+        <video id="pinVideo" controls></video>
+        <button class="close-btn" onclick="closeModal()">닫기</button>
+    </div>
+</div>
 
-        function changeProgram() {
-            loadSyncButtons();
-            updateSiteID();
+
+
+
+
+<script>
+    let activeButton = null;
+    let pinModal = document.getElementById('pinModal');
+    let pinVideoElement = document.getElementById('pinVideo');
+
+    document.addEventListener('DOMContentLoaded', function() {
+        pinModal.style.display = 'flex';  // 모달을 처음에 보이게 설정
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+        updateWeekday();
+        loadSyncButtons();
+        updateSiteID();
+    });
+
+    function changeProgram() {
+        loadSyncButtons();
+        updateSiteID();
+        const button = document.getElementById("taggingSlideButton");
+        button.style.display = "block"; // 버튼 보이기
+    }
+
+    function updateSiteID() {
+        const programSelect = document.getElementById('program');
+        const selectedOption = programSelect.options[programSelect.selectedIndex];
+        const siteID = selectedOption.getAttribute('data-site');
+        const weekdaysText = selectedOption.textContent.split(": ")[1];
+        document.getElementById('selectedSiteID').textContent = `${siteID} (${weekdaysText})`;
+    }
+
+    function updateWeekday() {
+        const dateInput = document.getElementById('date').value;
+        const date = new Date(dateInput);
+        const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+        const weekday = weekdays[date.getDay()];
+        document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
+    }
+
+    function loadSyncButtons() {
+        const program = document.getElementById('program').value;
+        const syncContainerTop = document.getElementById('syncContainerTop');
+        const syncContainerBottom = document.getElementById('syncContainerBottom');
+        syncContainerTop.innerHTML = '';
+        syncContainerBottom.innerHTML = '';
+
+        const totalSyncs = 42;
+
+        for (let i = 0; i <= 17; i++) {
+            const button = document.createElement('button');
+            button.classList.add('sync-button');
+            button.textContent = `Sync ${i} (${formatTime(i)})`;
+            button.onclick = function() {
+                loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+            };
+            syncContainerTop.appendChild(button);
         }
 
-        function updateSiteID() {
-            const programSelect = document.getElementById('program');
-            const selectedOption = programSelect.options[programSelect.selectedIndex];
-            const siteID = selectedOption.getAttribute('data-site');
-            const weekdaysText = selectedOption.textContent.split(": ")[1];
-            document.getElementById('selectedSiteID').textContent = `${siteID} (${weekdaysText})`;
-        }
-
-        function updateWeekday() {
-            const dateInput = document.getElementById('date').value;
-            const date = new Date(dateInput);
-            const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-            const weekday = weekdays[date.getDay()];
-            document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
-        }
-
-        function loadSyncButtons() {
-            const program = document.getElementById('program').value;
-            const syncContainerTop = document.getElementById('syncContainerTop');
-            const syncContainerBottom = document.getElementById('syncContainerBottom');
-            syncContainerTop.innerHTML = '';
-            syncContainerBottom.innerHTML = '';
-
-            const totalSyncs = 42;
-
-            for (let i = 0; i <= 17; i++) {
+        if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
+            for (let i = 18; i < totalSyncs; i++) {
                 const button = document.createElement('button');
                 button.classList.add('sync-button');
                 button.textContent = `Sync ${i} (${formatTime(i)})`;
                 button.onclick = function() {
                     loadVideos(`sync${String(i).padStart(3, '0')}`, this);
                 };
-                syncContainerTop.appendChild(button);
+                syncContainerBottom.appendChild(button);
             }
+        }
+    }
 
-            if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
-                for (let i = 18; i < totalSyncs; i++) {
-                    const button = document.createElement('button');
-                    button.classList.add('sync-button');
-                    button.textContent = `Sync ${i} (${formatTime(i)})`;
-                    button.onclick = function() {
-                        loadVideos(`sync${String(i).padStart(3, '0')}`, this);
-                    };
-                    syncContainerBottom.appendChild(button);
+    function formatTime(syncIndex) {
+        const startHour = 9;
+        const totalMinutes = syncIndex * 10;
+        const hours = Math.floor((startHour * 60 + totalMinutes) / 60);
+        const minutes = totalMinutes % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+
+    function loadVideos(sync, button) {
+        if (activeButton) {
+            activeButton.classList.remove('active');
+        }
+        button.classList.add('active');
+        activeButton = button;
+
+        const date = document.getElementById('date').value;
+        const program = document.getElementById('program').value;
+        const container = document.getElementById('videoContainer');
+        container.innerHTML = '';
+
+        for (let i = 1; i <= 8; i++) {
+            const videoWrapper = document.createElement('div');
+            videoWrapper.classList.add('video-wrapper');
+
+            const camLabel = document.createElement('div');
+            camLabel.classList.add('cam-label');
+            camLabel.textContent = `CAM0${i}`;
+
+            const video = document.createElement('video');
+            video.controls = true;
+            video.autoplay = true;
+            video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
+
+            video.onclick = function() {
+                openPinModal(video.src); // 모달로 비디오 열기
+            };
+
+            video.onerror = function() {
+                videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
+            };
+
+            // 새창으로 보기 버튼 생성
+            const newWindowButton = document.createElement('button');
+            newWindowButton.textContent = '새창';
+            newWindowButton.classList.add('new-window-button');
+            newWindowButton.style.position = 'absolute';
+            newWindowButton.style.top = '10px';
+            newWindowButton.style.right = '10px';
+            newWindowButton.style.padding = '2px 5px';
+            newWindowButton.style.height = '20px';
+            newWindowButton.style.fontSize = '14px';
+            newWindowButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            newWindowButton.style.borderRadius = '5px';
+            newWindowButton.onclick = function() {
+                window.open(video.src, '_blank');
+            };
+
+            // 전체 화면 버튼 생성
+            const fullscreenButton = document.createElement('button');
+            fullscreenButton.textContent = '전체';
+            fullscreenButton.classList.add('new-window-button');
+            fullscreenButton.style.position = 'absolute';
+            fullscreenButton.style.top = '10px';
+            fullscreenButton.style.right = '50px';
+            fullscreenButton.style.padding = '2px 5px';
+            fullscreenButton.style.height = '20px';
+            fullscreenButton.style.fontSize = '14px';
+            fullscreenButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+            fullscreenButton.style.borderRadius = '5px';
+            fullscreenButton.onclick = function() {
+                if (video.requestFullscreen) {
+                    video.requestFullscreen();
+                } else if (video.webkitRequestFullscreen) {
+                    video.webkitRequestFullscreen();
+                } else if (video.msRequestFullscreen) {
+                    video.msRequestFullscreen();
                 }
-            }
+            };
+
+            videoWrapper.appendChild(camLabel);
+            videoWrapper.appendChild(video);
+            videoWrapper.appendChild(newWindowButton);
+            videoWrapper.appendChild(fullscreenButton);
+            container.appendChild(videoWrapper);
         }
+    }
 
-        function formatTime(syncIndex) {
-            const startHour = 9;
-            const totalMinutes = syncIndex * 10;
-            const hours = Math.floor((startHour * 60 + totalMinutes) / 60);
-            const minutes = totalMinutes % 60;
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-        }
-        function loadVideos(sync, button) {
-            if (activeButton) {
-                activeButton.classList.remove('active');
-            }
-            button.classList.add('active');
-            activeButton = button;
+    function openPinModal(videoSrc) {
+        pinVideoElement.src = videoSrc;
+        pinModal.style.display = 'flex';
+    }
 
-            const date = document.getElementById('date').value;
-            const program = document.getElementById('program').value;
-            const container = document.getElementById('videoContainer');
-            container.innerHTML = '';
+    function closeModal() {
+        pinModal.style.display = 'none';
+        pinVideoElement.src = ''; // 비디오 재생 종료
+    }
 
-            for (let i = 1; i <= 8; i++) {
-                const videoWrapper = document.createElement('div');
-                videoWrapper.classList.add('video-wrapper');
+    function pauseAllVideos() {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => video.pause());
+    }
 
-                const camLabel = document.createElement('div');
-                camLabel.classList.add('cam-label');
-                camLabel.textContent = `CAM0${i}`;
+    function playAllVideos() {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => video.play());
+    }
 
-                const video = document.createElement('video');
-                video.controls = true;
-                video.autoplay = true;
-                video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
-
-                video.onclick = function() {
-                    openPinModal(video.src); // 모달로 비디오 열기
-                };
-
-                video.onerror = function() {
-                    videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
-                };
-
-		// 새창으로 보기 버튼 생성
-		const newWindowButton = document.createElement('button');
-		newWindowButton.textContent = '새창';
-		newWindowButton.classList.add('new-window-button');
-		
-		// 스타일을 추가하여 위치와 크기 조정
-		newWindowButton.style.position = 'absolute';
-		newWindowButton.style.top = '10px';
-		newWindowButton.style.right = '10px';
-		newWindowButton.style.padding = '2px 5px';
-		newWindowButton.style.height = '20px';
-		newWindowButton.style.fontSize = '14px';
-		newWindowButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-		newWindowButton.style.borderRadius = '5px';
-		
-		newWindowButton.onclick = function() {
-		    window.open(video.src, '_blank');
-		};
-		
-		videoWrapper.appendChild(newWindowButton);
-
-		// 전체 화면 버튼 생성
-		const fullscreenButton = document.createElement('button');
-		fullscreenButton.textContent = '전체';
-		fullscreenButton.classList.add('new-window-button');
-		
-		// 스타일을 설정하여 새창 버튼과 동일하게 만듭니다.
-		fullscreenButton.style.position = 'absolute';
-		fullscreenButton.style.top = '10px';
-		fullscreenButton.style.right = '50px'; // 새창 버튼과 겹치지 않도록 위치 조정
-		fullscreenButton.style.padding = '2px 5px';
-		fullscreenButton.style.height = '20px';
-		fullscreenButton.style.fontSize = '14px';
-		fullscreenButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-		fullscreenButton.style.borderRadius = '5px';
-		
-		// 전체 화면 모드로 전환하는 이벤트 추가
-		fullscreenButton.onclick = function() {
-		    if (video.requestFullscreen) {
-		        video.requestFullscreen();
-		    } else if (video.webkitRequestFullscreen) {
-		        video.webkitRequestFullscreen();
-		    } else if (video.msRequestFullscreen) {
-		        video.msRequestFullscreen();
-		    }
-		};
-		
-		videoWrapper.appendChild(fullscreenButton);
-
-                videoWrapper.appendChild(camLabel);
-                videoWrapper.appendChild(video);
-                videoWrapper.appendChild(newWindowButton);
-                container.appendChild(videoWrapper);
-            }
-        }
-
-        // 모달을 열어서 비디오를 표시하는 함수
-        function openPinModal(videoSrc) {
-            pinVideoElement.src = videoSrc;
-            pinModal.style.display = 'flex';
-        }
-
-        // 모달 닫기
-        function closeModal() {
-            pinModal.style.display = 'none';
-            pinVideoElement.src = ''; // 비디오 재생 종료
-        }
-
-        function pauseAllVideos() {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => video.pause());
-        }
-
-        function playAllVideos() {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => video.play());
-        }
-
-        function rewindVideos(seconds) {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-                video.currentTime = Math.max(video.currentTime - seconds, 0); // 0 이하로 가지 않게 설정
-            });
-        }
-
-        function forwardVideos(seconds) {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(video => {
-                video.currentTime = Math.min(video.currentTime + seconds, video.duration); // 비디오 길이를 넘지 않게 설정
-            });
-        }
-
-        // 키보드 입력 감지 이벤트
-        document.addEventListener('keydown', function(event) {
-            const key = event.key.toLowerCase();  // 모든 키 입력을 소문자로 변환하여 처리
-            
-            // 숫자 단축키 1, 2, 3, 4
-            switch (key) {
-                case '1':  // -3분
-                    rewindVideos(180);
-                    break;
-                case '2':  // -3초
-                    rewindVideos(30);
-                    break;
-                case '3':  // +3초
-                    forwardVideos(30);
-                    break;
-                case '4':  // +3분
-                    forwardVideos(180);
-                    break;
-                case ' ':  // 스페이스바로 재생/일시정지
-                    event.preventDefault();  // 스페이스바 기본 동작 방지
-                    togglePlayPause();
-                    break;
-            }
-
-            // 싱크 이동 단축키 e, r
-            if (key === 'e' || key === 'ㄷ') {
-                navigateSync(-1);  // 이전 싱크
-            } else if (key === 'r' || key === 'ㄱ') {
-                navigateSync(1);   // 다음 싱크
-            }
-
-            // 교실 선택 상/하 이동 단축키 q,w
-            if (key === 'q' || key === 'ㅂ') {
-                changeProgramSelection(-1);  // 상
-            } else if (key === 'w' || key === 'ㅈ') {
-                changeProgramSelection(1);   // 하
-            }
-
-            // 날짜 선택 하루 전/후 단축키 a, d
-            if (key === 'a' || key === 'ㅁ') {
-                changeDateSelection(-1);  // 하루 전
-            } else if (key === 'd' || key === 'ㅇ') {
-                changeDateSelection(1);   // 하루 후
-            }
-
-            // Sync 0 선택 단축키 s, S, ㄴ
-            if (key === 's' || key === 'ㄴ') {
-                const sync0Button = document.querySelector('.sync-button:first-child');  // 첫 번째 sync 버튼 선택
-                if (sync0Button) {
-                    sync0Button.click();  // 버튼 클릭 이벤트 트리거
-                }
-            }
+    function rewindVideos(seconds) {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+            video.currentTime = Math.max(video.currentTime - seconds, 0); // 0 이하로 가지 않게 설정
         });
+    }
 
-        function changeDateSelection(direction) {
-            const dateInput = document.getElementById('date');
-            const currentDate = new Date(dateInput.value);
-            currentDate.setDate(currentDate.getDate() + direction); // 날짜 이동
-            dateInput.value = currentDate.toISOString().split('T')[0];
-            updateWeekday(); // 요일 업데이트
+    function forwardVideos(seconds) {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+            video.currentTime = Math.min(video.currentTime + seconds, video.duration); // 비디오 길이를 넘지 않게 설정
+        });
+    }
+
+    document.addEventListener('keydown', function(event) {
+        const key = event.key.toLowerCase();
+
+        // 숫자 단축키 1, 2, 3, 4
+        switch (key) {
+            case '1':
+                rewindVideos(180);  // -3분
+                break;
+            case '2':
+                rewindVideos(30);   // -30초
+                break;
+            case '3':
+                forwardVideos(30);  // +30초
+                break;
+            case '4':
+                forwardVideos(180); // +3분
+                break;
+            case ' ':
+                event.preventDefault();  // 스페이스바 기본 동작 방지
+                togglePlayPause();
+                break;
         }
 
-        function togglePlayPause() {
-            const videos = document.querySelectorAll('video');
-            const anyPlaying = Array.from(videos).some(video => !video.paused);
+        // 싱크 이동 단축키 e, r
+        if (key === 'e' || key === 'ㄷ') {
+            navigateSync(-1);  // 이전 싱크
+        } else if (key === 'r' || key === 'ㄱ') {
+            navigateSync(1);   // 다음 싱크
+        }
 
-            if (anyPlaying) {
-                pauseAllVideos();
-            } else {
-                playAllVideos();
+        // 교실 선택 상/하 이동 단축키 q,w
+        if (key === 'q' || key === 'ㅂ') {
+            changeProgramSelection(-1);  // 상
+        } else if (key === 'w' || key === 'ㅈ') {
+            changeProgramSelection(1);   // 하
+        }
+
+        // 날짜 선택 하루 전/후 단축키 a, d
+        if (key === 'a' || key === 'ㅁ') {
+            changeDateSelection(-1);  // 하루 전
+        } else if (key === 'd' || key === 'ㅇ') {
+            changeDateSelection(1);   // 하루 후
+        }
+
+        // Sync 0 선택 단축키 s, S, ㄴ
+        if (key === 's' || key === 'ㄴ') {
+            const sync0Button = document.querySelector('.sync-button:first-child');
+            if (sync0Button) {
+                sync0Button.click();
             }
         }
+    });
 
-        function changeProgramSelection(direction) {
-            const programSelect = document.getElementById('program');
-            const currentIndex = programSelect.selectedIndex;
-            const newIndex = currentIndex + direction;
+    function changeDateSelection(direction) {
+        const dateInput = document.getElementById('date');
+        const currentDate = new Date(dateInput.value);
+        currentDate.setDate(currentDate.getDate() + direction); // 날짜 이동
+        dateInput.value = currentDate.toISOString().split('T')[0];
+        updateWeekday(); // 요일 업데이트
+    }
 
-            if (newIndex >= 0 && newIndex < programSelect.options.length) {
-                programSelect.selectedIndex = newIndex;
-                changeProgram(); // 프로그램 변경 함수 호출
+    function togglePlayPause() {
+        const videos = document.querySelectorAll('video');
+        const anyPlaying = Array.from(videos).some(video => !video.paused);
+
+        if (anyPlaying) {
+            pauseAllVideos();
+        } else {
+            playAllVideos();
+        }
+    }
+
+    function changeProgramSelection(direction) {
+        const programSelect = document.getElementById('program');
+        const currentIndex = programSelect.selectedIndex;
+        const newIndex = currentIndex + direction;
+
+        if (newIndex >= 0 && newIndex < programSelect.options.length) {
+            programSelect.selectedIndex = newIndex;
+            changeProgram();
+        }
+    }
+
+    function navigateSync(direction) {
+        const syncButtons = document.querySelectorAll('.sync-button');
+        if (activeButton) {
+            let currentIndex = Array.from(syncButtons).indexOf(activeButton);
+            let newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < syncButtons.length) {
+                syncButtons[newIndex].click();
             }
         }
+    }
 
-        function navigateSync(direction) {
-            const syncButtons = document.querySelectorAll('.sync-button');
-            if (activeButton) {
-                let currentIndex = Array.from(syncButtons).indexOf(activeButton);
-                let newIndex = currentIndex + direction;
-                if (newIndex >= 0 && newIndex < syncButtons.length) {
-                    syncButtons[newIndex].click();
-                }
-            }
+    function verifyPin() {
+        const inputPin = document.getElementById('pinInput').value;
+        const correctPin = '1240'; // 올바른 PIN 설정
+
+        if (inputPin === correctPin) {
+            pinModal.style.display = 'none';
+        } else {
+            alert('PIN이 잘못되었습니다.');
         }
-		// PIN 검증 함수
-		function verifyPin() {
-		    const inputPin = document.getElementById('pinInput').value;
-		    const correctPin = '1240'; // 올바른 PIN을 여기에 설정
-		
-		    if (inputPin === correctPin) {
-		        pinModal.style.display = 'none'; // PIN이 올바르면 모달을 닫음
-		    } else {
-		        alert('PIN이 잘못되었습니다.'); // 잘못된 PIN 경고창 표시
-		    }
-		}
-    </script>
+    }
+</script>
 </body>
 </html>
+
+
