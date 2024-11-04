@@ -189,9 +189,11 @@
 
 
 <body>
-<div class="top-section">
+	<div class="top-section">
     <h1><span id="selectedSiteID"></span></h1>
-<button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 16px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">기능추가예정</button></div>
+	<button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 16px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">기능추가예정</button>
+	</div>
+
 		<!-- PIN 모달 -->
 		<div id="pinModal" class="modal">
 		    <div class="modal-content" style="max-width: 300px;">
@@ -200,8 +202,6 @@
 		        <button class="close-btn" onclick="verifyPin()">확인</button>
 		    </div>
 		</div>
-    <div class="container">
-        <h1><span id="selectedSiteID"></span></h1>
 
         <div class="form-container">
             <div>
@@ -265,6 +265,8 @@
 					<option value="jungdawoon_yoonseul" data-site="jungdawoon_yoonseul">71. LGD정다운 어린이집-윤슬: 월, 수</option>
 					<option value="jungdawoon_chanseul" data-site="jungdawoon_chanseul">72. LGD정다운 어린이집-찬슬: 월, 수</option>
 					<option value="haengbokhan_hanbit" data-site="haengbokhan_hanbit">73. LGD행복한 어린이집-한빛: 월, 수</option>
+					<option value="therapyeunpyeong_jageunnori" data-site="therapyeunpyeong_jageunnori">poc. 은평마을건간심터-작은놀이방: 월,화,수,목,금,토</option>
+
                     <!-- 교실 선택 옵션들 -->
             </select>
         </div>
@@ -290,14 +292,7 @@
     <div class="sync-container bottom" id="syncContainerBottom"></div>
 </div>
 
-<!-- Pin 모달 -->
-<div id="pinModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">비디오 PIN 설정</div>
-        <video id="pinVideo" controls></video>
-        <button class="close-btn" onclick="closeModal()">닫기</button>
-    </div>
-</div>
+
 
 
 
@@ -597,6 +592,8 @@
             alert('PIN이 잘못되었습니다.');
         }
     }
+
+
 </script>
 </body>
 </html>
