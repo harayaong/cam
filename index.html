@@ -606,16 +606,23 @@ async function loadClassroomData() {
 // 기능추가예정 버튼 클릭 이벤트 추가
 document.getElementById('taggingSlideButton').addEventListener('click', function() {
     const programSelect = document.getElementById('program');
-    const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').split('(')[0].trim();
+    const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').trim();
 
     // 선택된 SITE_ID에 해당하는 URL 찾기
     const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
 
-    if (classroom && classroom.태깅슬라이드URL) {
-        // URL이 있는 경우 새 창으로 열기
-        window.open(classroom.태깅슬라이드URL, '_blank');
+    if (classroom) {
+        console.log("선택된 SITE_ID:", selectedSiteID);  // 디버그용
+        console.log("매칭된 classroom 객체:", classroom);  // 디버그용
+
+        if (classroom.태깅슬라이드URL) {
+            // URL이 있는 경우 새 창으로 열기
+            window.open(classroom.태깅슬라이드URL, '_blank');
+        } else {
+            alert('선택된 교실에 대한 URL이 없습니다.');
+        }
     } else {
-        alert('선택된 교실에 대한 URL이 없습니다.');
+        alert('해당 SITE_ID에 대한 매칭 항목을 찾을 수 없습니다.');
     }
 });
 
