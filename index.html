@@ -593,35 +593,26 @@
         }
     }
 
-	// JSON 데이터를 전역 변수에 저장
-	let classroomData = [];
+	document.getElementById("taggingSlideButton").onclick = function() {
+	    const programSelect = document.getElementById("program");
+	    const selectedOption = programSelect.options[programSelect.selectedIndex];
+	    const siteID = selectedOption.getAttribute("data-site");
 	
-	// JSON 파일을 로드하는 함수
-	async function loadClassroomData() {
-	    const response = await fetch('classroom.json'); // JSON 파일 경로
-	    classroomData = await response.json();
-	}
-	
-	// 기능추가예정 버튼 클릭 이벤트 추가
-	document.getElementById('taggingSlideButton').addEventListener('click', function() {
-	    const programSelect = document.getElementById('program');
-	    const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').split('(')[0];
-	
-	    // 선택된 SITE ID에 해당하는 URL 찾기
-	    const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
-	
-	    if (classroom && classroom.태깅슬라이드URL) {
-	        // URL이 있는 경우 새 창으로 열기
-	        window.open(classroom.태깅슬라이드URL, '_blank');
-	    } else {
-	        alert('선택된 교실에 대한 URL이 없습니다.');
-	    }
-	});
-	
-	// 페이지 로드 시 JSON 데이터 로드
-	document.addEventListener('DOMContentLoaded', function() {
-	    loadClassroomData();
-	});
+	    // classroom.json 데이터를 로드하고 매핑된 URL 열기
+	    fetch("classroom.json")
+	        .then(response => response.json())
+	        .then(data => {
+	            const classroom = data.find(item => item.SITE_ID === siteID);
+	            if (classroom && classroom.태깅슬라이드URL) {
+	                window.open(classroom.태깅슬라이드URL, "_blank");
+	            } else {
+	                alert("해당 교실에 대한 URL을 찾을 수 없습니다.");
+	            }
+	        })
+	        .catch(error => {
+	            console.error("Error loading classroom.json:", error);
+	        });
+	};
 
 
 
