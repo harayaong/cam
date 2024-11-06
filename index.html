@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>통합 카메라 조회 v1106.1</title>
+    <title>통합 카메라 조회 v1106.2</title>
 
 
 <style>
@@ -209,11 +209,11 @@
             <div>
                 <label for="program">교실 선택:</label>
                 <select id="program" onchange="changeProgram()">
-					<option value="sanseongsam_1x1" data-site="sanseongsam_1x1(꽃잎)">예정. 산성삼 어린이집-꽃잎: 주3회/미정</option>
-					<option value="sanseongsam_1x2" data-site="sanseongsam_1x2(열매)">예정. 산성삼 어린이집-열매: 주3회/미정</option>
-					<option value="sarangsaem_2x3" data-site="sarangsaem_2x3(하나울)">예정. 사랑샘 유치원-하나울: 월, 화, 수, 목, 금</option>
-					<option value="sarangsaem_2x5" data-site="sarangsaem_2x5(솔나리)">예정. 사랑샘 유치원-솔나리: 월, 화, 수, 목, 금</option>
-					<option value="sarangsaem_3x3" data-site="sarangsaem_3x3(아리솔)">예정. 사랑샘 유치원-아리솔: 월, 화, 수, 목, 금</option>
+					<option value="sanseongsam_1x1" data-site="sanseongsam_1x1">예정. 산성삼 어린이집-꽃잎: 주3회/미정</option>
+					<option value="sanseongsam_1x2" data-site="sanseongsam_1x2">예정. 산성삼 어린이집-열매: 주3회/미정</option>
+					<option value="sarangsaem_2x3" data-site="sarangsaem_2x3">예정. 사랑샘 유치원-하나울: 월, 화, 수, 목, 금</option>
+					<option value="sarangsaem_2x5" data-site="sarangsaem_2x5">예정. 사랑샘 유치원-솔나리: 월, 화, 수, 목, 금</option>
+					<option value="sarangsaem_3x3" data-site="sarangsaem_3x3">예정. 사랑샘 유치원-아리솔: 월, 화, 수, 목, 금</option>
 					<option value="gangseogeullo_kotip" data-site="gangseogeullo_kotip">1. 강서근로복지공단 어린이집-꽃잎반: 월, 수</option>
 					<option value="gangseogeullo_namu" data-site="gangseogeullo_namu">2. 강서근로복지공단 어린이집-나무반: 화, 목</option>
 					<option value="gangseogeullo_hyanggi" data-site="gangseogeullo_hyanggi">3. 강서근로복지공단 어린이집-향기반: 화, 목</option>
@@ -596,42 +596,42 @@
     }
 
 
-// JSON 데이터를 전역 변수에 저장
-let classroomData = [];
-
-// JSON 파일을 로드하는 함수
-async function loadClassroomData() {
-    const response = await fetch('classroom.json'); // JSON 파일 경로
-    classroomData = await response.json();
-}
-
-// 기능추가예정 버튼 클릭 이벤트 추가
-document.getElementById('taggingSlideButton').addEventListener('click', function() {
-    const programSelect = document.getElementById('program');
-    const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').trim();
-
-    // 선택된 SITE_ID에 해당하는 URL 찾기
-    const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
-
-    if (classroom) {
-        console.log("선택된 SITE_ID:", selectedSiteID);  // 디버그용
-        console.log("매칭된 classroom 객체:", classroom);  // 디버그용
-
-        if (classroom.태깅슬라이드URL) {
-            // URL이 있는 경우 새 창으로 열기
-            window.open(classroom.태깅슬라이드URL, '_blank');
-        } else {
-            alert('선택된 교실에 대한 URL이 없습니다.');
-        }
-    } else {
-        alert('해당 SITE_ID에 대한 매칭 항목을 찾을 수 없습니다.');
-    }
-});
-
-// 페이지 로드 시 JSON 데이터 로드
-document.addEventListener('DOMContentLoaded', function() {
-    loadClassroomData();
-});
+	// JSON 데이터를 전역 변수에 저장
+	let classroomData = [];
+	
+	// JSON 파일을 로드하는 함수
+	async function loadClassroomData() {
+	    const response = await fetch('classroom.json'); // JSON 파일 경로
+	    classroomData = await response.json();
+	}
+	
+	// 기능추가예정 버튼 클릭 이벤트 추가
+	document.getElementById('taggingSlideButton').addEventListener('click', function() {
+	    const programSelect = document.getElementById('program');
+	    const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').trim();
+	
+	    // 선택된 SITE_ID에 해당하는 URL 찾기
+	    const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
+	
+	    if (classroom) {
+	        console.log("선택된 SITE_ID:", selectedSiteID);  // 디버그용
+	        console.log("매칭된 classroom 객체:", classroom);  // 디버그용
+	
+	        if (classroom.태깅슬라이드URL) {
+	            // URL이 있는 경우 새 창으로 열기
+	            window.open(classroom.태깅슬라이드URL, '_blank');
+	        } else {
+	            alert('선택된 교실에 대한 URL이 없습니다.');
+	        }
+	    } else {
+	        alert('해당 SITE_ID에 대한 매칭 항목을 찾을 수 없습니다.');
+	    }
+	});
+	
+	// 페이지 로드 시 JSON 데이터 로드
+	document.addEventListener('DOMContentLoaded', function() {
+	    loadClassroomData();
+	});
 
 
 
