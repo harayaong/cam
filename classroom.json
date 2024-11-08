@@ -1068,9 +1068,11 @@
     "SITE_ID": "sanseongsam_1x2",
     "한글교실명": "산성삼 어린이집-열매",
     "서비스요일": [
-      "Waiting for service"
+      "화",
+      "수",
+      "목"
     ],
-    "서비스시작일": "2024-10-31",
+    "서비스시작일": "2024-11-12",
     "서비스종료일": null,
     "태깅슬라이드URL": "https://docs.google.com/presentation/d/1gbIruBbITdZwy4Dsf27uaEijSLalCjGO"
   },
@@ -1079,9 +1081,11 @@
     "SITE_ID": "sanseongsam_1x1",
     "한글교실명": "산성삼 어린이집-꽃잎",
     "서비스요일": [
-      "Waiting for service"
+      "화",
+      "수",
+      "목"
     ],
-    "서비스시작일": "2024-10-31",
+    "서비스시작일": "2024-11-12",
     "서비스종료일": null,
     "태깅슬라이드URL": "https://docs.google.com/presentation/d/16V-m1NMZWii21veA0HmiTN5TyQ2xYl9V"
   }
