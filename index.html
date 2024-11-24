@@ -6,6 +6,7 @@
 
 
 <style>
+    /* 기본 스타일: 전체 페이지의 텍스트 크기 및 배경 설정 */
     body {
         font-size: 24px;
         font-family: Arial, sans-serif;
@@ -14,27 +15,32 @@
         padding: 0;
     }
 
+    /* 상단 섹션 스타일: 제목 및 버튼 컨테이너 */
     .top-section {
         display: flex;
         align-items: center;
     }
 
-	.sub-text {
-	    font-size: 12px;
-	    color: #888;
-	}
+    /* 추가 설명 텍스트: 보조 설명 문구 */
+    .sub-text {
+        font-size: 12px;
+        color: #888;
+    }
 
+    /* 동기화 버튼 컨테이너 스타일: 버튼 배열 */
     .sync-container {
         display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        grid-gap: 10px;
+        grid-template-columns: repeat(10, 1fr); /* 10개 버튼씩 정렬 */
+        grid-gap: 10px; /* 버튼 간격 */
         margin-top: 10px;
     }
 
+    /* 상단 동기화 버튼 컨테이너 */
     .sync-container.top {
         margin-bottom: 10px;
     }
 
+    /* 제목 스타일: 페이지 상단 제목 설정 */
     h1 {
         text-align: start;
         font-size: 28px;
@@ -42,6 +48,7 @@
         color: #007bff;
     }
 
+    /* 폼 컨테이너: 프로그램 선택 및 날짜 선택 영역 */
     .form-container {
         display: flex;
         justify-content: space-between;
@@ -52,10 +59,12 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
+    /* 폼 레이블 텍스트 스타일 */
     .form-container label {
         font-size: 20px;
     }
 
+    /* 선택 박스 및 날짜 입력 필드 스타일 */
     select, input[type="date"] {
         font-size: 20px;
         padding: 8px;
@@ -64,12 +73,14 @@
         margin-left: 10px;
     }
 
+    /* 요일 텍스트 스타일 */
     .weekday {
         font-size: 20px;
         font-weight: bold;
         color: #ff6347;
     }
 
+    /* 동기화 버튼 스타일 */
     .sync-button {
         background-color: #007bff;
         color: white;
@@ -78,67 +89,75 @@
         border-radius: 5px;
         font-size: 12px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease; /* 배경색 전환 효과 */
     }
 
+    /* 활성화된 동기화 버튼 스타일 */
     .sync-button.active {
         background-color: #ff6347;
     }
 
+    /* 동기화 버튼 호버 스타일 */
     .sync-button:hover {
         background-color: #0056b3;
     }
 
+    /* 동영상 컨테이너: 4개의 열로 구성된 그리드 */
     .video-container {
         margin-top: 10px;
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(4, 1fr); /* 4개 열 */
         grid-gap: 10px;
     }
 
+    /* 개별 동영상 래퍼 스타일 */
     .video-wrapper {
-        position: relative;
+        position: relative; /* 위치 기준 설정 */
         background-color: #e5e5e5;
         padding: 10px;
         border-radius: 8px;
     }
 
+    /* 카메라 레이블 스타일 */
     .cam-label {
-        position: absolute;
+        position: absolute; /* 절대 위치 */
         top: 10px;
         left: 10px;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.5); /* 투명 검정 배경 */
         color: white;
         padding: 5px;
         font-size: 16px;
     }
 
+    /* 동영상 스타일: 둥근 모서리 */
     video {
         width: 100%;
         border-radius: 5px;
     }
 
+    /* 새 창 보기 버튼 스타일 */
     .new-window-button {
-        position: absolute;
+        position: absolute; /* 절대 위치 */
         bottom: 10px;
         right: 10px;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.5); /* 투명 검정 배경 */
         color: white;
         padding: 5px 10px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
         font-size: 14px;
-        z-index: 10;
+        z-index: 10; /* 버튼 우선 순위 */
     }
 
+    /* 새 창 보기 버튼 호버 스타일 */
     .new-window-button:hover {
-        background-color: rgba(0, 0, 0, 0.7);
+        background-color: rgba(0, 0, 0, 0.7); /* 호버 시 배경 진하게 */
     }
 
-    /* 모달 스타일 */
+    /* 모달 스타일: 전체 화면 덮는 투명 검정 배경 */
     .modal {
-        display: none;
+        display: none; /* 기본적으로 숨김 */
         position: fixed;
         z-index: 999;
         left: 0;
@@ -150,6 +169,7 @@
         align-items: center;
     }
 
+    /* 모달 내용 스타일 */
     .modal-content {
         background-color: #fff;
         padding: 100px;
@@ -158,18 +178,21 @@
         width: 100%;
         box-sizing: border-box; /* 패딩 포함 */
     }
-    
+
+    /* 모달 입력 필드 스타일 */
     .modal-content input[type="text"] {
         width: 100%; /* 입력 필드의 너비를 컨테이너에 맞춤 */
         padding: 10px; /* 여백 추가 */
         box-sizing: border-box;
     }
 
+    /* 모달 헤더 스타일 */
     .modal-header {
         font-size: 20px;
         margin-bottom: 10px;
     }
 
+    /* 모달 닫기 버튼 스타일 */
     .close-btn {
         background-color: #d9534f;
         color: white;
@@ -179,6 +202,7 @@
         cursor: pointer;
     }
 
+    /* 모달 내 추가 핀 비디오 영역 */
     .pin-video {
         margin-top: 20px;
     }
