@@ -215,24 +215,34 @@
 
 
 <body>
-	<div class="top-section">
-    <h1><span id="selectedSiteID"></span></h1>
-	<button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 16px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">태깅슬라이드</button>
-	</div>
+    <!-- 상단 섹션 -->
+    <div class="top-section">
+        <!-- 선택된 교실 ID 및 태깅 슬라이드 버튼 -->
+        <h1><span id="selectedSiteID"></span></h1>
+        <button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 16px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">
+            태깅슬라이드
+        </button>
+    </div>
 
-		<!-- PIN 모달 -->
-		<div id="pinModal" class="modal">
-		    <div class="modal-content" style="max-width: 300px;">
-		        <div class="modal-header">비밀번호</div>
-		        <input type="password" id="pinInput" placeholder="PIN 입력" style="width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 10px;">
-		        <button class="close-btn" onclick="verifyPin()">확인</button>
-		    </div>
-		</div>
+    <!-- PIN 모달 -->
+    <div id="pinModal" class="modal">
+        <div class="modal-content" style="max-width: 300px;">
+            <!-- 모달 헤더 -->
+            <div class="modal-header">비밀번호</div>
+            <!-- PIN 입력 필드 -->
+            <input type="password" id="pinInput" placeholder="PIN 입력" style="width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 10px;">
+            <!-- PIN 확인 버튼 -->
+            <button class="close-btn" onclick="verifyPin()">확인</button>
+        </div>
+    </div>
 
-        <div class="form-container">
-            <div>
-                <label for="program">교실 선택:</label>
-                <select id="program" onchange="changeProgram()">
+    <!-- 폼 섹션 -->
+    <div class="form-container">
+        <!-- 프로그램 선택 -->
+        <div>
+            <label for="program">교실 선택:</label>
+            <select id="program" onchange="changeProgram()">
+                <!-- 교실 선택 옵션 리스트 -->
 					<option value="baycent_1x1" data-site="baycent_1x1">예정. 광양베이센트-행복가득: 월, 화, 수, 목, 금</option>
 					<option value="baycent_1x3" data-site="baycent_1x3">예정. 광양베이센트-기쁨가득: 월, 화, 수, 목, 금</option>
 					<option value="poseung_1x4" data-site="poseung_1x4">예정. 시립포승-파랑: 월, 화, 수, 목, 금</option>
@@ -294,18 +304,18 @@
 					<option value="sanseongsam_1x2" data-site="sanseongsam_1x2">75. 산성삼 어린이집-열매: 화, 수, 목</option>
 					<option value="sarangsaem_2x3" data-site="sarangsaem_2x3">76. 사랑샘 유치원-하나울: 월, 화, 수, 목, 금</option>
 					<option value="sarangsaem_2x5" data-site="sarangsaem_2x5">77. 사랑샘 유치원-솔나리: 월, 화, 수, 목, 금</option>
-					<option value="sarangsaem_3x3" data-site="sarangsaem_3x3">78. 사랑샘 유치원-아리솔: 월, 화, 수, 목, 금</option>
-
-                    <!-- 교실 선택 옵션들 -->
+					<option value="sarangsaem_3x3" data-site="sarangsaem_3x3">78. 사랑샘 유치원-아리솔: 월, 화, 수, 목, 금</option>                <!-- 추가 옵션 생략 -->
             </select>
         </div>
 
+        <!-- 날짜 선택 -->
         <div>
             <label for="date">날짜 선택:</label>
             <input type="date" id="date" onchange="updateWeekday()">
             <span id="weekday" class="weekday"></span>
         </div>
 
+        <!-- 단축키 및 사용 팁 -->
         <div>
             <p style="font-size: 10px; color: #555; margin-top: 1px;">
                 #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-30초), 숫자3(+30초), 숫자4(+3분), E(이전싱크), R(다음싱크)
@@ -316,11 +326,15 @@
         </div>
     </div>
 
+    <!-- 동기화 버튼 컨테이너 (상단) -->
     <div class="sync-container top" id="syncContainerTop"></div>
+    
+    <!-- 동영상 컨테이너 -->
     <div class="video-container" id="videoContainer"></div>
+    
+    <!-- 동기화 버튼 컨테이너 (하단) -->
     <div class="sync-container bottom" id="syncContainerBottom"></div>
-</div>
-
+</body>
 
 
 
@@ -328,34 +342,39 @@
 
 
 <script>
+    // 1. 전역 변수 정의
     let activeButton = null;
     let pinModal = document.getElementById('pinModal');
     let pinVideoElement = document.getElementById('pinVideo');
 
+    // 2. DOMContentLoaded 이벤트 리스너: 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', function() {
-        pinModal.style.display = 'flex';  // 모달을 처음에 보이게 설정
+        pinModal.style.display = 'flex';  // PIN 모달 표시
         const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date').value = today;
-        updateWeekday();
-        loadSyncButtons();
-        updateSiteID();
+        document.getElementById('date').value = today;  // 오늘 날짜 설정
+        updateWeekday();  // 요일 업데이트
+        loadSyncButtons();  // 싱크 버튼 로드
+        updateSiteID();  // 사이트 ID 업데이트
     });
 
+    // 3. 프로그램 변경 이벤트: 교실 선택 변경 시 호출
     function changeProgram() {
-        loadSyncButtons();
-        updateSiteID();
+        loadSyncButtons();  // 싱크 버튼 업데이트
+        updateSiteID();  // 사이트 ID 갱신
         const button = document.getElementById("taggingSlideButton");
-        button.style.display = "block"; // 버튼 보이기
+        button.style.display = "block";  // 태깅 슬라이드 버튼 표시
     }
 
+    // 4. 사이트 ID 및 요일 업데이트 함수
     function updateSiteID() {
         const programSelect = document.getElementById('program');
         const selectedOption = programSelect.options[programSelect.selectedIndex];
-        const siteID = selectedOption.getAttribute('data-site');
-        const weekdaysText = selectedOption.textContent.split(": ")[1];
+        const siteID = selectedOption.getAttribute('data-site');  // 선택된 사이트 ID
+        const weekdaysText = selectedOption.textContent.split(": ")[1];  // 요일 정보
         document.getElementById('selectedSiteID').textContent = `${siteID} (${weekdaysText})`;
     }
 
+    // 5. 날짜 입력값으로 요일 업데이트
     function updateWeekday() {
         const dateInput = document.getElementById('date').value;
         const date = new Date(dateInput);
@@ -364,107 +383,97 @@
         document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
     }
 
+    // 6. 싱크 버튼 로드 함수
     function loadSyncButtons() {
         const program = document.getElementById('program').value;
         const syncContainerTop = document.getElementById('syncContainerTop');
         const syncContainerBottom = document.getElementById('syncContainerBottom');
-        syncContainerTop.innerHTML = '';
-        syncContainerBottom.innerHTML = '';
+        syncContainerTop.innerHTML = '';  // 상단 싱크 버튼 초기화
+        syncContainerBottom.innerHTML = '';  // 하단 싱크 버튼 초기화
 
-        const totalSyncs = 42;
+        const totalSyncs = 42;  // 총 싱크 수
 
+        // 상단 싱크 버튼 (0~17번)
         for (let i = 0; i <= 17; i++) {
             const button = document.createElement('button');
             button.classList.add('sync-button');
-            button.textContent = `Sync ${i} (${formatTime(i)})`;
+            button.textContent = `Sync ${i} (${formatTime(i)})`;  // 버튼 텍스트 설정
             button.onclick = function() {
-                loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+                loadVideos(`sync${String(i).padStart(3, '0')}`, this);  // 동영상 로드
             };
             syncContainerTop.appendChild(button);
         }
 
+        // 하단 싱크 버튼 (18~41번), 특정 프로그램에서만 표시
         if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
             for (let i = 18; i < totalSyncs; i++) {
                 const button = document.createElement('button');
                 button.classList.add('sync-button');
-                button.textContent = `Sync ${i} (${formatTime(i)})`;
+                button.textContent = `Sync ${i} (${formatTime(i)})`;  // 버튼 텍스트 설정
                 button.onclick = function() {
-                    loadVideos(`sync${String(i).padStart(3, '0')}`, this);
+                    loadVideos(`sync${String(i).padStart(3, '0')}`, this);  // 동영상 로드
                 };
                 syncContainerBottom.appendChild(button);
             }
         }
     }
 
+    // 7. 싱크 번호를 시간으로 변환하는 함수
     function formatTime(syncIndex) {
-        const startHour = 9;
-        const totalMinutes = syncIndex * 10;
+        const startHour = 9;  // 시작 시간
+        const totalMinutes = syncIndex * 10;  // 10분 단위
         const hours = Math.floor((startHour * 60 + totalMinutes) / 60);
         const minutes = totalMinutes % 60;
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
+    // 8. 선택된 싱크의 동영상 로드
     function loadVideos(sync, button) {
         if (activeButton) {
-            activeButton.classList.remove('active');
+            activeButton.classList.remove('active');  // 이전 활성화 버튼 비활성화
         }
-        button.classList.add('active');
+        button.classList.add('active');  // 현재 버튼 활성화
         activeButton = button;
 
         const date = document.getElementById('date').value;
         const program = document.getElementById('program').value;
         const container = document.getElementById('videoContainer');
-        container.innerHTML = '';
+        container.innerHTML = '';  // 기존 동영상 삭제
 
+        // 8개의 동영상을 생성 및 추가
         for (let i = 1; i <= 8; i++) {
             const videoWrapper = document.createElement('div');
             videoWrapper.classList.add('video-wrapper');
 
             const camLabel = document.createElement('div');
             camLabel.classList.add('cam-label');
-            camLabel.textContent = `CAM0${i}`;
+            camLabel.textContent = `CAM0${i}`;  // 카메라 레이블 설정
 
             const video = document.createElement('video');
             video.controls = true;
             video.autoplay = true;
-            video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
+            video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;  // 동영상 소스
 
             video.onclick = function() {
-                openPinModal(video.src); // 모달로 비디오 열기
+                openPinModal(video.src);  // 클릭 시 모달 열기
             };
 
             video.onerror = function() {
-                videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';
+                videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';  // 에러 시 메시지 표시
             };
 
-            // 새창으로 보기 버튼 생성
+            // 새 창 보기 버튼
             const newWindowButton = document.createElement('button');
             newWindowButton.textContent = '새창';
             newWindowButton.classList.add('new-window-button');
-            newWindowButton.style.position = 'absolute';
-            newWindowButton.style.top = '10px';
-            newWindowButton.style.right = '10px';
-            newWindowButton.style.padding = '2px 5px';
-            newWindowButton.style.height = '20px';
-            newWindowButton.style.fontSize = '14px';
-            newWindowButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-            newWindowButton.style.borderRadius = '5px';
             newWindowButton.onclick = function() {
-                window.open(video.src, '_blank');
+                window.open(video.src, '_blank');  // 새 창으로 열기
             };
 
-            // 전체 화면 버튼 생성
+            // 전체 화면 보기 버튼
             const fullscreenButton = document.createElement('button');
             fullscreenButton.textContent = '전체';
             fullscreenButton.classList.add('new-window-button');
-            fullscreenButton.style.position = 'absolute';
-            fullscreenButton.style.top = '10px';
-            fullscreenButton.style.right = '50px';
-            fullscreenButton.style.padding = '2px 5px';
-            fullscreenButton.style.height = '20px';
-            fullscreenButton.style.fontSize = '14px';
-            fullscreenButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-            fullscreenButton.style.borderRadius = '5px';
             fullscreenButton.onclick = function() {
                 if (video.requestFullscreen) {
                     video.requestFullscreen();
@@ -475,196 +484,202 @@
                 }
             };
 
-            videoWrapper.appendChild(camLabel);
-            videoWrapper.appendChild(video);
-            videoWrapper.appendChild(newWindowButton);
-            videoWrapper.appendChild(fullscreenButton);
-            container.appendChild(videoWrapper);
+            videoWrapper.appendChild(camLabel);  // 레이블 추가
+            videoWrapper.appendChild(video);  // 동영상 추가
+            videoWrapper.appendChild(newWindowButton);  // 새 창 버튼 추가
+            videoWrapper.appendChild(fullscreenButton);  // 전체 화면 버튼 추가
+            container.appendChild(videoWrapper);  // 컨테이너에 추가
         }
     }
 
+    // 9. PIN 모달 열기
     function openPinModal(videoSrc) {
         pinVideoElement.src = videoSrc;
         pinModal.style.display = 'flex';
     }
 
+    // 10. PIN 모달 닫기
     function closeModal() {
         pinModal.style.display = 'none';
-        pinVideoElement.src = ''; // 비디오 재생 종료
+        pinVideoElement.src = '';  // 비디오 정지
     }
 
+    // 11. 모든 동영상 일시정지
     function pauseAllVideos() {
         const videos = document.querySelectorAll('video');
         videos.forEach(video => video.pause());
     }
 
+    // 12. 모든 동영상 재생
     function playAllVideos() {
         const videos = document.querySelectorAll('video');
         videos.forEach(video => video.play());
     }
 
+    // 13. 동영상 재생 시간 되감기
     function rewindVideos(seconds) {
         const videos = document.querySelectorAll('video');
         videos.forEach(video => {
-            video.currentTime = Math.max(video.currentTime - seconds, 0); // 0 이하로 가지 않게 설정
+            video.currentTime = Math.max(video.currentTime - seconds, 0);  // 0초 이하 방지
         });
     }
 
+    // 14. 동영상 재생 시간 앞으로 이동
     function forwardVideos(seconds) {
         const videos = document.querySelectorAll('video');
         videos.forEach(video => {
-            video.currentTime = Math.min(video.currentTime + seconds, video.duration); // 비디오 길이를 넘지 않게 설정
+            video.currentTime = Math.min(video.currentTime + seconds, video.duration);  // 최대 길이 초과 방지
         });
     }
 
-    document.addEventListener('keydown', function(event) {
-        const key = event.key.toLowerCase();
+// 1. 키보드 이벤트 리스너 추가
+document.addEventListener('keydown', function(event) {
+    // 입력 필드 또는 텍스트 영역에 포커스가 있을 경우 단축키 비활성화
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+        return; // 입력 필드에 포커스가 있을 경우 종료
+    }
 
-        // 숫자 단축키 1, 2, 3, 4
-        switch (key) {
-            case '1':
-                rewindVideos(180);  // -3분
-                break;
-            case '2':
-                rewindVideos(30);   // -30초
-                break;
-            case '3':
-                forwardVideos(30);  // +30초
-                break;
-            case '4':
-                forwardVideos(180); // +3분
-                break;
-            case ' ':
-                event.preventDefault();  // 스페이스바 기본 동작 방지
-                togglePlayPause();
-                break;
+    // 2. 입력된 키를 소문자로 변환
+    const key = event.key.toLowerCase();
+
+    // 숫자 단축키 1, 2, 3, 4 처리
+    switch (key) {
+        case '1':
+            rewindVideos(180); // 3분 되감기
+            break;
+        case '2':
+            rewindVideos(30); // 30초 되감기
+            break;
+        case '3':
+            forwardVideos(30); // 30초 앞으로 이동
+            break;
+        case '4':
+            forwardVideos(180); // 3분 앞으로 이동
+            break;
+        case ' ':
+            console.log('Spacebar pressed'); // 디버깅: 스페이스바 입력 감지
+            event.preventDefault();         // 스페이스바 기본 동작 방지
+            togglePlayPause();              // 재생/정지 토글
+            break;
+    }
+/**
+ * 모든 비디오의 재생 상태를 토글하는 함수
+ * - 재생 중인 비디오가 하나라도 있으면 모두 정지
+ * - 정지 상태라면 모두 재생
+ */
+function togglePlayPause() {
+    // 현재 문서에서 모든 <video> 요소를 가져옵니다.
+    const videos = document.querySelectorAll('video');
+
+    // 비디오 배열에서 하나라도 재생 중인지 확인
+    // - video.paused가 false인 경우 해당 비디오는 재생 중임
+    const anyPlaying = Array.from(videos).some(video => !video.paused);
+
+    if (anyPlaying) {
+        // 하나라도 재생 중인 경우: 모든 비디오를 정지
+        videos.forEach(video => video.pause());
+    } else {
+        // 모든 비디오가 정지 상태인 경우: 모든 비디오를 재생
+        videos.forEach(video => video.play());
+    }
+}
+
+    // 4. 싱크 이동 단축키 e(이전)와 r(다음) 처리
+    if (key === 'e' || key === 'ㄷ') {
+        navigateSync(-1);  // 이전 싱크로 이동
+    } else if (key === 'r' || key === 'ㄱ') {
+        navigateSync(1);   // 다음 싱크로 이동
+    }
+
+    // 5. 교실 선택 단축키 q(위로)와 w(아래로) 처리
+    if (key === 'q' || key === 'ㅂ') {
+        changeProgramSelection(-1);  // 교실 선택 상으로 이동
+    } else if (key === 'w' || key === 'ㅈ') {
+        changeProgramSelection(1);   // 교실 선택 하로 이동
+    }
+
+    // 6. 날짜 선택 단축키 a(하루 전)와 d(하루 후) 처리
+    if (key === 'a' || key === 'ㅁ') {
+        changeDateSelection(-1);  // 하루 전으로 이동
+    } else if (key === 'd' || key === 'ㅇ') {
+        changeDateSelection(1);   // 하루 후로 이동
+    }
+
+    // 7. Sync 0 단축키 s를 눌렀을 때 첫 번째 싱크 버튼 선택
+    if (key === 's' || key === 'ㄴ') {
+        const sync0Button = document.querySelector('.sync-button:first-child'); // 첫 번째 싱크 버튼 가져오기
+        if (sync0Button) {
+            sync0Button.click(); // 버튼 클릭
         }
+    }
+});
 
-        // 싱크 이동 단축키 e, r
-        if (key === 'e' || key === 'ㄷ') {
-            navigateSync(-1);  // 이전 싱크
-        } else if (key === 'r' || key === 'ㄱ') {
-            navigateSync(1);   // 다음 싱크
+// 8. 교실 선택 옵션을 위/아래로 이동시키는 함수
+function changeProgramSelection(direction) {
+    const programSelect = document.getElementById('program'); // 교실 선택 드롭다운 가져오기
+    const currentIndex = programSelect.selectedIndex; // 현재 선택된 옵션의 인덱스
+    const newIndex = currentIndex + direction; // 이동할 새로운 인덱스 계산
+
+    // 유효한 인덱스 범위 확인
+    if (newIndex >= 0 && newIndex < programSelect.options.length) {
+        programSelect.selectedIndex = newIndex; // 새로운 옵션 선택
+        changeProgram(); // 선택 변경 후 프로그램 갱신
+    }
+}
+
+// 9. 싱크 버튼을 이전/다음으로 이동시키는 함수
+function navigateSync(direction) {
+    const syncButtons = document.querySelectorAll('.sync-button'); // 모든 싱크 버튼 가져오기
+    if (activeButton) { // 현재 활성화된 버튼이 있는지 확인
+        let currentIndex = Array.from(syncButtons).indexOf(activeButton); // 현재 활성 버튼의 인덱스 가져오기
+        let newIndex = currentIndex + direction; // 이동할 새로운 인덱스 계산
+
+        // 유효한 범위 내 인덱스인지 확인
+        if (newIndex >= 0 && newIndex < syncButtons.length) {
+            syncButtons[newIndex].click(); // 새 버튼 클릭
         }
+    }
+}
 
-        // 교실 선택 상/하 이동 단축키 q,w
-        if (key === 'q' || key === 'ㅂ') {
-            changeProgramSelection(-1);  // 상
-        } else if (key === 'w' || key === 'ㅈ') {
-            changeProgramSelection(1);   // 하
-        }
+// 10. 날짜 선택 필드를 하루 전/후로 이동시키는 함수
+function changeDateSelection(direction) {
+    const dateInput = document.getElementById('date'); // 날짜 입력 필드 가져오기
+    const currentDate = new Date(dateInput.value); // 현재 날짜 가져오기
+    currentDate.setDate(currentDate.getDate() + direction); // 날짜를 direction만큼 이동
 
-        // 날짜 선택 하루 전/후 단축키 a, d
-        if (key === 'a' || key === 'ㅁ') {
-            changeDateSelection(-1);  // 하루 전
-        } else if (key === 'd' || key === 'ㅇ') {
-            changeDateSelection(1);   // 하루 후
-        }
+    dateInput.value = currentDate.toISOString().split('T')[0]; // 이동된 날짜를 필드에 설정
+    updateWeekday(); // 요일 갱신 함수 호출
+}
 
-        // Sync 0 선택 단축키 s, S, ㄴ
-        if (key === 's' || key === 'ㄴ') {
-            const sync0Button = document.querySelector('.sync-button:first-child');
-            if (sync0Button) {
-                sync0Button.click();
-            }
+    // 16. 태깅 슬라이드 버튼 클릭 이벤트
+    document.getElementById('taggingSlideButton').addEventListener('click', function() {
+        const programSelect = document.getElementById('program');
+        const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').trim();
+        const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
+
+        if (classroom && classroom.태깅슬라이드URL) {
+            window.open(classroom.태깅슬라이드URL, '_blank');
+        } else {
+            alert('URL이 없습니다.');
         }
     });
 
-    function changeDateSelection(direction) {
-        const dateInput = document.getElementById('date');
-        const currentDate = new Date(dateInput.value);
-        currentDate.setDate(currentDate.getDate() + direction); // 날짜 이동
-        dateInput.value = currentDate.toISOString().split('T')[0];
-        updateWeekday(); // 요일 업데이트
+    // 17. JSON 데이터 로드
+    async function loadClassroomData() {
+        const response = await fetch('classroom.json');
+        classroomData = await response.json();
     }
 
-    function togglePlayPause() {
-        const videos = document.querySelectorAll('video');
-        const anyPlaying = Array.from(videos).some(video => !video.paused);
+function verifyPin() {
+    const inputPin = document.getElementById('pinInput').value;
+    const correctPin = '1240'; // 올바른 PIN 설정
 
-        if (anyPlaying) {
-            pauseAllVideos();
-        } else {
-            playAllVideos();
-        }
+    if (inputPin === correctPin) {
+        pinModal.style.display = 'none';
+    } else {
+        alert('PIN이 잘못되었습니다.');
     }
-
-    function changeProgramSelection(direction) {
-        const programSelect = document.getElementById('program');
-        const currentIndex = programSelect.selectedIndex;
-        const newIndex = currentIndex + direction;
-
-        if (newIndex >= 0 && newIndex < programSelect.options.length) {
-            programSelect.selectedIndex = newIndex;
-            changeProgram();
-        }
-    }
-
-    function navigateSync(direction) {
-        const syncButtons = document.querySelectorAll('.sync-button');
-        if (activeButton) {
-            let currentIndex = Array.from(syncButtons).indexOf(activeButton);
-            let newIndex = currentIndex + direction;
-            if (newIndex >= 0 && newIndex < syncButtons.length) {
-                syncButtons[newIndex].click();
-            }
-        }
-    }
-
-    function verifyPin() {
-        const inputPin = document.getElementById('pinInput').value;
-        const correctPin = '1240'; // 올바른 PIN 설정
-
-        if (inputPin === correctPin) {
-            pinModal.style.display = 'none';
-        } else {
-            alert('PIN이 잘못되었습니다.');
-        }
-    }
-
-
-	// JSON 데이터를 전역 변수에 저장
-	let classroomData = [];
-	
-	// JSON 파일을 로드하는 함수
-	async function loadClassroomData() {
-	    const response = await fetch('classroom.json'); // JSON 파일 경로
-	    classroomData = await response.json();
-	}
-	
-	// 기능추가예정 버튼 클릭 이벤트 추가
-	document.getElementById('taggingSlideButton').addEventListener('click', function() {
-	    const programSelect = document.getElementById('program');
-	    const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').trim();
-	
-	    // 선택된 SITE_ID에 해당하는 URL 찾기
-	    const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
-	
-	    if (classroom) {
-	        console.log("선택된 SITE_ID:", selectedSiteID);  // 디버그용
-	        console.log("매칭된 classroom 객체:", classroom);  // 디버그용
-	
-	        if (classroom.태깅슬라이드URL) {
-	            // URL이 있는 경우 새 창으로 열기
-	            window.open(classroom.태깅슬라이드URL, '_blank');
-	        } else {
-	            alert('선택된 교실에 대한 URL이 없습니다.');
-	        }
-	    } else {
-	        alert('해당 SITE_ID에 대한 매칭 항목을 찾을 수 없습니다.');
-	    }
-	});
-	
-	// 페이지 로드 시 JSON 데이터 로드
-	document.addEventListener('DOMContentLoaded', function() {
-	    loadClassroomData();
-	});
-
-
-
-
+}
 </script>
 </body>
 </html>
-
-
