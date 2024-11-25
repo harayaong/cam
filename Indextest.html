@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>통합 카메라 조회 v1124</title>
+
+
+<style>
+/* 공통 스타일: 텍스트 및 기본 레이아웃 */
+body {
+    font-size: 15px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* 제목 및 섹션 스타일 */
+h1 {
+    text-align: start;
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+/* 상단 섹션 스타일: 제목, 버튼 등 */
+.top-section {
+    display: flex;
+    align-items: center;
+}
+
+/* 설명 텍스트 스타일 */
+.sub-text {
+    font-size: 12px;
+    color: #888;
+}
+
+/* 버튼 컨테이너 및 버튼 스타일 */
+.sync-container {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); /* 10개 버튼씩 정렬 */
+    grid-gap: 10px; /* 버튼 간격 */
+    margin-top: 10px;
+}
+
+.sync-container.top {
+    margin-bottom: 10px;
+}
+
+
+
+    /* 폼 컨테이너: 프로그램 선택 및 날짜 선택 영역 */
+.form-container {
+    display: flex;
+    flex-wrap: wrap; /* 줄 바꿈 허용 */
+    justify-content: space-between; /* 아이템 간 간격 균일 */
+    align-items: center; /* 세로 정렬 중앙 */
+    background-color: white; /* 하얀 배경 */
+    padding: 15px; /* 상하좌우 동일한 여백 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+    gap: 10px; /* 내부 아이템 간 간격 */
+}
+
+    /* 폼 레이블 텍스트 스타일 */
+.form-container div {
+    flex: 1 1 300px; /* 아이템 크기를 균등 분배, 최소 300px */
+    min-width: 150px; /* 최소 너비 지정 */
+}
+
+    /* 선택 박스 및 날짜 입력 필드 스타일 */
+    select, input[type="date"] {
+        font-size: 15px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-left: 10px;
+    }
+
+    /* 요일 텍스트 스타일 */
+    .weekday {
+        font-size: 15px;
+        font-weight: bold;
+        color: #ff6347;
+    }
+
+    /* 동기화 버튼 스타일 */
+    .sync-button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: background-color 0.3s ease; /* 배경색 전환 효과 */
+    }
+
+    /* 활성화된 동기화 버튼 스타일 */
+    .sync-button.active {
+        background-color: #ff6347;
+    }
+
+    /* 동기화 버튼 호버 스타일 */
+    .sync-button:hover {
+        background-color: #0056b3;
+    }
+
+    /* 동영상 컨테이너: 4개의 열로 구성된 그리드 */
+    .video-container {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); /* 4개 열 */
+        grid-gap: 10px;
+    }
+
+    /* 개별 동영상 래퍼 스타일 */
+    .video-wrapper {
+        position: relative; /* 위치 기준 설정 */
+        background-color: #e5e5e5;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    /* 카메라 레이블 스타일 */
+    .cam-label {
+        position: absolute; /* 절대 위치 */
+        top: 10px;
+        left: 10px;
+        background-color: rgba(0, 0, 0, 0.5); /* 투명 검정 배경 */
+        color: white;
+        padding: 5px;
+        font-size: 15px;
+    }
+
+    /* 동영상 스타일: 둥근 모서리 */
+    video {
+        width: 100%;
+        border-radius: 5px;
+    }
+
+.new-window-button:hover,
+.fullscreen-button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+    /* 모달 스타일: 전체 화면 덮는 투명 검정 배경 */
+    .modal {
+        display: none; /* 기본적으로 숨김 */
+        position: fixed;
+        z-index: 999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* 모달 내용 스타일 */
+    .modal-content {
+        background-color: #fff;
+        padding: 100px;
+        border-radius: 10px;
+        max-width: 300px; /* 크기를 더 좁게 조정 */
+        width: 100%;
+        box-sizing: border-box; /* 패딩 포함 */
+    }
+
+    /* 모달 입력 필드 스타일 */
+    .modal-content input[type="text"] {
+        width: 100%; /* 입력 필드의 너비를 컨테이너에 맞춤 */
+        padding: 10px; /* 여백 추가 */
+        box-sizing: border-box;
+    }
+
+    /* 모달 헤더 스타일 */
+    .modal-header {
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+    /* 모달 닫기 버튼 스타일 */
+    .close-btn {
+        background-color: #d9534f;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    /* 모달 내 추가 핀 비디오 영역 */
+    .pin-video {
+        margin-top: 20px;
+    }
+
+/* 버튼 컨테이너 스타일 */
+.button-container {
+    position: absolute; /* 동영상 상단 우측에 고정 */
+    top: 10px; /* 위쪽 여백 */
+    right: 10px; /* 오른쪽 여백 */
+    display: flex; /* 버튼을 가로로 정렬 */
+    gap: 5px; /* 버튼 간 간격 */
+}
+
+/* 공통 버튼 스타일 */
+.video-button {
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정 배경 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    z-index: 10;
+}
+
+/* 버튼 호버 스타일 */
+.video-button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+</style>
+</head>
+
+
+
+
+
+
+<body>
+    <!-- 상단 섹션 -->
+    <div class="top-section">
+        <!-- 선택된 교실 ID 및 태깅 슬라이드 버튼 -->
+        <h1><span id="selectedSiteID"></span></h1>
+        <button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 15px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">
+            태깅슬라이드
+        </button>
+    </div>
+
+    <!-- PIN 모달 -->
+    <div id="pinModal" class="modal">
+        <div class="modal-content" style="max-width: 300px;">
+            <!-- 모달 헤더 -->
+            <div class="modal-header">비밀번호</div>
+            <!-- PIN 입력 필드 -->
+            <input type="password" id="pinInput" placeholder="PIN 입력" style="width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 10px;">
+            <!-- PIN 확인 버튼 -->
+            <button class="close-btn" onclick="verifyPin()">확인</button>
+        </div>
+    </div>
+
+    <!-- 폼 섹션 -->
+    <div class="form-container">
+
+        <!-- 프로그램 선택 -->
+<div class="form-container" style="display: flex; align-items: center; gap: 10px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="program">교실:</label>
+        <select id="program" onchange="changeProgram()">
+
+                <!-- 교실 선택 옵션 리스트 -->
+					<option value="baycent_1x1" data-site="baycent_1x1">예정. 광양베이센트-행복가득: 월, 화, 수, 목, 금</option>
+					<option value="baycent_1x3" data-site="baycent_1x3">예정. 광양베이센트-기쁨가득: 월, 화, 수, 목, 금</option>
+					<option value="poseung_1x4" data-site="poseung_1x4">예정. 시립포승-파랑: 월, 화, 수, 목, 금</option>
+
+					<option value="gangseogeullo_kotip" data-site="gangseogeullo_kotip">1. 강서근로복지공단 어린이집-꽃잎반: 월, 수</option>
+					<option value="gangseogeullo_namu" data-site="gangseogeullo_namu">2. 강서근로복지공단 어린이집-나무반: 화, 목</option>
+					<option value="gangseogeullo_hyanggi" data-site="gangseogeullo_hyanggi">3. 강서근로복지공단 어린이집-향기반: 화, 목</option>
+					<option value="namcheonsyap_kkumbyeol" data-site="namcheonsyap_kkumbyeol">5. 남천더샵 어린이집-꿈별: 월, 화, 목</option>
+					<option value="namcheonsyap_chambyeol" data-site="namcheonsyap_chambyeol">6. 남천더샵 어린이집-참별: 월, 화, 목</option>
+					<option value="noblecounty_program" data-site="noblecounty_program">7. 노블카운티-프로그램: 월, 화, 수, 목, 금</option>
+					<option value="noblecounty_healthcare" data-site="noblecounty_healthcare">8. 노블카운티-헬스케어: 월, 화, 수, 목, 금</option>
+					<option value="dongnaekkume_gamsahae" data-site="dongnaekkume_gamsahae">9. 동래꿈에그린 어린이집-감사해: 월, 목</option>
+					<option value="dongnaekkume_saranghae" data-site="dongnaekkume_saranghae">10. 동래꿈에그린 어린이집-사랑해: 월, 목</option>
+					<option value="dongnaekkume_sojunghae" data-site="dongnaekkume_sojunghae">11. 동래꿈에그린 어린이집-소중해: 월, 목</option>
+					<option value="dongnaekkume_joahae" data-site="dongnaekkume_joahae">12. 동래꿈에그린 어린이집-좋아해: 월, 목</option>
+					<option value="dongnaekkume_chingchanhae" data-site="dongnaekkume_chingchanhae">13. 동래꿈에그린 어린이집-칭찬해: 월, 목</option>
+					<option value="dongnaekkume_haengbokhae" data-site="dongnaekkume_haengbokhae">14. 동래꿈에그린 어린이집-행복해: 월, 목</option>
+					<option value="dongnaehaengbok_dal" data-site="dongnaehaengbok_dal">15. 동래행복주택 어린이집-달밝은: 월, 목</option>
+					<option value="dongnaehaengbok_baram" data-site="dongnaehaengbok_baram">16. 동래행복주택 어린이집-바람솔솔: 월, 목</option>
+					<option value="myeonil_haneul" data-site="myeonil_haneul">18. 면일 어린이집-하늘: 월, 수</option>
+					<option value="myeongryunjai_dalnim" data-site="myeongryunjai_dalnim">19. 명륜자이 어린이집-달님: 월, 수</option>
+					<option value="myeongryunjai_haenim" data-site="myeongryunjai_haenim">20. 명륜자이 어린이집-해님: 화, 목</option>
+					<option value="myeongryunjai_haneulwooju" data-site="myeongryunjai_haneulwooju">21. 명륜자이-하늘우주: 목, 금</option>
+					<option value="best_hanareum1-2" data-site="best_hanareum1-2">22. 베스트 어린이집-한아름1-2: 화, 목</option>
+					<option value="best_hanareum5-6" data-site="best_hanareum5-6">24. 베스트 어린이집-한아름5-6: 화, 목</option>
+					<option value="best_hanareum7" data-site="best_hanareum7">25. 베스트 어린이집-한아름7: 월, 수</option>
+					<option value="seosin_sinaetmool" data-site="seosin_sinaetmool">27. 서신 어린이집-고운시냇물: 화, 목</option>
+					<option value="seosin_sammool" data-site="seosin_sammool">28. 서신 어린이집-맑은샘물: 월, 수</option>
+					<option value="geumbithaneul_dodam" data-site="geumbithaneul_dodam">30. 시립금빛하늘 어린이집-도담: 월, 수</option>
+					<option value="geumbithaneul_hangyeol" data-site="geumbithaneul_hangyeol">31. 시립금빛하늘 어린이집-한결: 월, 수</option>
+					<option value="singal_haetsal" data-site="singal_haetsal">32. 시립신갈 어린이집-고은햇살: 월, 수</option>
+					<option value="singal_baram" data-site="singal_baram">33. 시립신갈 어린이집-산들바람: 월, 수</option>
+					<option value="atti_jinsol" data-site="atti_jinsol">34. 아띠 어린이집-진솔: 화, 목</option>
+					<option value="atti_hansol" data-site="atti_hansol">35. 아띠 어린이집-한솔: 화, 목</option>
+					<option value="anrakhyeondae_haengbokhae" data-site="anrakhyeondae_haengbokhae">36. 안락현대 어린이집-행복해: 월, 수</option>
+					<option value="eden_paranghaneul" data-site="eden_paranghaneul">37. 에덴 어린이집-파란하늘: 월, 수</option>
+					<option value="yaedasom_puripiseul" data-site="yaedasom_puripiseul">38. 예다솜 어린이집-맑은샘물: 화, 목</option>
+					<option value="yaedasom_sandeulbaram" data-site="yaedasom_sandeulbaram">39. 예다솜 어린이집-산들바람: 월, 수</option>
+					<option value="yaedasom_paranhaneul" data-site="yaedasom_paranhaneul">40. 예다솜 어린이집-파란하늘: 월, 수</option>
+					<option value="yaedasom_sammool" data-site="yaedasom_sammool">41. 예다솜 어린이집-풀잎이슬: 화, 목</option>
+					<option value="janghowon_sarang" data-site="janghowon_sarang">45. 장호원 어린이집-사랑: 화, 목</option>
+					<option value="janghowon_yonggi" data-site="janghowon_yonggi">46. 장호원 어린이집-용기: 월, 수</option>
+					<option value="parangsae_gaon" data-site="parangsae_gaon">55. 파랑새 어린이집-가온: 화, 목</option>
+					<option value="parangsae_saeron" data-site="parangsae_saeron">56. 파랑새 어린이집-새론: 화, 목</option>
+					<option value="haedeun_bareun" data-site="haedeun_bareun">60. 해든 유치원-바른: 월, 수</option>
+					<option value="haedeun_ssukssuk" data-site="haedeun_ssukssuk">61. 해든 유치원-쑥쑥반: 월, 수</option>
+					<option value="haedeun_teunteun" data-site="haedeun_teunteun">62. 해든 유치원-튼튼반: 월, 수</option>
+					<option value="haedeun_himchan" data-site="haedeun_himchan">63. 해든 유치원-힘찬반: 월, 수</option>
+					<option value="harrington_gureumsongyi" data-site="harrington_gureumsongyi">64. 효성해링턴 어린이집-구름송이: 화, 목</option>
+					<option value="harrington_bada" data-site="harrington_bada">65. 효성해링턴 어린이집-바다: 화, 목</option>
+					<option value="harrington_haneul" data-site="harrington_haneul">66. 효성해링턴 어린이집-하늘: 화, 목</option>
+					<option value="lgcns_dalnim" data-site="lgcns_dalnim">68. LGCNS 어린이집-달님: 화, 목</option>
+					<option value="lgcns_byeolnim" data-site="lgcns_byeolnim">69. LGCNS 어린이집-별님: 화, 목</option>
+					<option value="lgcns_haenim" data-site="lgcns_haenim">70. LGCNS 어린이집-해님: 화, 목</option>
+					<option value="jungdawoon_yoonseul" data-site="jungdawoon_yoonseul">71. LGD정다운 어린이집-윤슬: 월, 수</option>
+					<option value="jungdawoon_chanseul" data-site="jungdawoon_chanseul">72. LGD정다운 어린이집-찬슬: 월, 수</option>
+					<option value="haengbokhan_hanbit" data-site="haengbokhan_hanbit">73. LGD행복한 어린이집-한빛: 월, 수</option>
+					<option value="sanseongsam_1x1" data-site="sanseongsam_1x1">74. 산성삼 어린이집-꽃잎: 화, 수, 목</option>
+					<option value="sanseongsam_1x2" data-site="sanseongsam_1x2">75. 산성삼 어린이집-열매: 화, 수, 목</option>
+					<option value="sarangsaem_2x3" data-site="sarangsaem_2x3">76. 사랑샘 유치원-하나울: 월, 화, 수, 목, 금</option>
+					<option value="sarangsaem_2x5" data-site="sarangsaem_2x5">77. 사랑샘 유치원-솔나리: 월, 화, 수, 목, 금</option>
+					<option value="sarangsaem_3x3" data-site="sarangsaem_3x3">78. 사랑샘 유치원-아리솔: 월, 화, 수, 목, 금</option>                <!-- 추가 옵션 생략 -->
+            </select>
+
+        <!-- 검색 입력창 -->
+        <input type="text" id="searchInput" placeholder="검색어"
+            style="padding: 5px; font-size: 15px; width: 100px;" oninput="filterPrograms()">
+    </div>
+
+    <!-- 날짜 선택 -->
+    <div style="display: flex; align-items: center; gap: 5px;">
+        <label for="date">날짜:</label>
+        <input type="date" id="date" onchange="updateWeekday()">
+        <span id="weekday" class="weekday"></span>
+    </div>
+</div>
+    </div>
+
+        <!-- 단축키 및 사용 팁 -->
+        <div>
+            <p style="font-size: 10px; color: #555; margin-top: 1px;">
+                #단축키: 스페이스바(일괄정지/재생),숫자1234(-3분,-30초,+30초,+3분), E(이전싱크), R(다음싱크)     #Tip. [전체]버튼으로 화면 전환 후 스페이스바를 누르면 일괄정지/일괄재생 됩니다. (241031 Update)
+            </p>
+        </div>
+
+    <!-- 동기화 버튼 컨테이너 (상단) -->
+    <div class="sync-container top" id="syncContainerTop"></div>
+    
+    <!-- 동영상 컨테이너 -->
+    <div class="video-container" id="videoContainer"></div>
+    
+    <!-- 동기화 버튼 컨테이너 (하단) -->
+    <div class="sync-container bottom" id="syncContainerBottom"></div>
+
+</body>
+
+
+
+
+
+
+<script>
+    /**
+     * 검색 기능: 검색창 입력값과 일치하거나 포함된 옵션만 표시
+     */
+    function filterPrograms() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase(); // 검색 입력값
+        const programSelect = document.getElementById('program'); // select 요소
+        const options = programSelect.options; // select의 옵션 리스트
+
+        // 모든 옵션을 반복하며 필터링
+        for (let i = 0; i < options.length; i++) {
+            const optionText = options[i].textContent.toLowerCase(); // 옵션의 텍스트
+            if (optionText.includes(searchInput)) {
+                options[i].style.display = ''; // 검색어와 일치하면 표시
+            } else {
+                options[i].style.display = 'none'; // 일치하지 않으면 숨김
+            }
+        }
+    }
+
+    // 1. 전역 변수 정의
+    let activeButton = null;
+    let pinModal = document.getElementById('pinModal');
+    let pinVideoElement = document.getElementById('pinVideo');
+
+    // 2. DOMContentLoaded 이벤트 리스너: 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+        pinModal.style.display = 'flex';  // PIN 모달 표시
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;  // 오늘 날짜 설정
+        updateWeekday();  // 요일 업데이트
+        loadSyncButtons();  // 싱크 버튼 로드
+        updateSiteID();  // 사이트 ID 업데이트
+    });
+
+    // 3. 프로그램 변경 이벤트: 교실 선택 변경 시 호출
+    function changeProgram() {
+        loadSyncButtons();  // 싱크 버튼 업데이트
+        updateSiteID();  // 사이트 ID 갱신
+        const button = document.getElementById("taggingSlideButton");
+        button.style.display = "block";  // 태깅 슬라이드 버튼 표시
+    }
+
+    // 4. 사이트 ID 및 요일 업데이트 함수
+    function updateSiteID() {
+        const programSelect = document.getElementById('program');
+        const selectedOption = programSelect.options[programSelect.selectedIndex];
+        const siteID = selectedOption.getAttribute('data-site');  // 선택된 사이트 ID
+        const weekdaysText = selectedOption.textContent.split(": ")[1];  // 요일 정보
+        document.getElementById('selectedSiteID').textContent = `${siteID} (${weekdaysText})`;
+    }
+
+    // 5. 날짜 입력값으로 요일 업데이트
+    function updateWeekday() {
+        const dateInput = document.getElementById('date').value;
+        const date = new Date(dateInput);
+        const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+        const weekday = weekdays[date.getDay()];
+        document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
+    }
+
+    // 6. 싱크 버튼 로드 함수
+    function loadSyncButtons() {
+        const program = document.getElementById('program').value;
+        const syncContainerTop = document.getElementById('syncContainerTop');
+        const syncContainerBottom = document.getElementById('syncContainerBottom');
+        syncContainerTop.innerHTML = '';  // 상단 싱크 버튼 초기화
+        syncContainerBottom.innerHTML = '';  // 하단 싱크 버튼 초기화
+
+        const totalSyncs = 42;  // 총 싱크 수
+
+        // 상단 싱크 버튼 (0~17번)
+        for (let i = 0; i <= 17; i++) {
+            const button = document.createElement('button');
+            button.classList.add('sync-button');
+            button.textContent = `Sync ${i} (${formatTime(i)})`;  // 버튼 텍스트 설정
+            button.onclick = function() {
+                loadVideos(`sync${String(i).padStart(3, '0')}`, this);  // 동영상 로드
+            };
+            syncContainerTop.appendChild(button);
+        }
+
+        // 하단 싱크 버튼 (18~41번), 특정 프로그램에서만 표시
+        if (program === 'noblecounty_program' || program === 'noblecounty_healthcare') {
+            for (let i = 18; i < totalSyncs; i++) {
+                const button = document.createElement('button');
+                button.classList.add('sync-button');
+                button.textContent = `Sync ${i} (${formatTime(i)})`;  // 버튼 텍스트 설정
+                button.onclick = function() {
+                    loadVideos(`sync${String(i).padStart(3, '0')}`, this);  // 동영상 로드
+                };
+                syncContainerBottom.appendChild(button);
+            }
+        }
+    }
+
+    // 7. 싱크 번호를 시간으로 변환하는 함수
+    function formatTime(syncIndex) {
+        const startHour = 9;  // 시작 시간
+        const totalMinutes = syncIndex * 10;  // 10분 단위
+        const hours = Math.floor((startHour * 60 + totalMinutes) / 60);
+        const minutes = totalMinutes % 60;
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+
+// 동영상마다 [새창] 및 [전체] 버튼 추가
+function addVideoButtons(videoWrapper, video) {
+    // 새 창 보기 버튼
+    const newWindowButton = document.createElement('button');
+    newWindowButton.textContent = '새창';
+    newWindowButton.classList.add('video-button', 'new-window-button');
+    newWindowButton.onclick = function() {
+        window.open(video.src, '_blank'); // 새 창으로 열기
+    };
+
+    // 전체 화면 보기 버튼
+    const fullscreenButton = document.createElement('button');
+    fullscreenButton.textContent = '전체';
+    fullscreenButton.classList.add('video-button', 'fullscreen-button');
+    fullscreenButton.onclick = function() {
+        if (video.requestFullscreen) {
+            video.requestFullscreen();
+        } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+        } else if (video.msRequestFullscreen) {
+            video.msRequestFullscreen();
+        }
+    };
+
+    // 버튼 컨테이너 추가
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+    buttonContainer.appendChild(newWindowButton);
+    buttonContainer.appendChild(fullscreenButton);
+
+    // 버튼 컨테이너를 동영상 래퍼에 추가
+    videoWrapper.appendChild(buttonContainer);
+}
+
+// 동영상 생성 및 버튼 추가 호출
+function loadVideos(sync, button) {
+    if (activeButton) {
+        activeButton.classList.remove('active'); // 이전 활성화 버튼 비활성화
+    }
+    button.classList.add('active'); // 현재 버튼 활성화
+    activeButton = button;
+
+    const date = document.getElementById('date').value;
+    const program = document.getElementById('program').value;
+    const container = document.getElementById('videoContainer');
+    container.innerHTML = ''; // 기존 동영상 삭제
+
+    // 동영상 8개 생성
+    for (let i = 1; i <= 8; i++) {
+        const videoWrapper = document.createElement('div');
+        videoWrapper.classList.add('video-wrapper');
+
+        const camLabel = document.createElement('div');
+        camLabel.classList.add('cam-label');
+        camLabel.textContent = `CAM0${i}`;
+
+        const video = document.createElement('video');
+        video.controls = true;
+        video.autoplay = true;
+video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
+
+
+        // 동영상 로드 실패 시 메시지 표시
+        video.onerror = function () {
+            videoWrapper.innerHTML = '<p style="color: red; text-align: center;">동영상이 없습니다.</p>';
+        };
+
+        videoWrapper.appendChild(camLabel);
+        videoWrapper.appendChild(video);
+        addVideoButtons(videoWrapper, video); // 새 버튼 추가 함수 호출
+        container.appendChild(videoWrapper);
+    }
+}
+
+    // 9. PIN 모달 열기
+    function openPinModal(videoSrc) {
+        pinVideoElement.src = videoSrc;
+        pinModal.style.display = 'flex';
+    }
+
+    // 10. PIN 모달 닫기
+    function closeModal() {
+        pinModal.style.display = 'none';
+        pinVideoElement.src = '';  // 비디오 정지
+    }
+
+    // 11. 모든 동영상 일시정지
+    function pauseAllVideos() {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => video.pause());
+    }
+
+    // 12. 모든 동영상 재생
+    function playAllVideos() {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => video.play());
+    }
+
+    // 13. 동영상 재생 시간 되감기
+    function rewindVideos(seconds) {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+            video.currentTime = Math.max(video.currentTime - seconds, 0);  // 0초 이하 방지
+        });
+    }
+
+    // 14. 동영상 재생 시간 앞으로 이동
+    function forwardVideos(seconds) {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+            video.currentTime = Math.min(video.currentTime + seconds, video.duration);  // 최대 길이 초과 방지
+        });
+    }
+
+// 1. 키보드 이벤트 리스너 추가
+document.addEventListener('keydown', function(event) {
+    // 입력 필드 또는 텍스트 영역에 포커스가 있을 경우 단축키 비활성화
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+        return; // 입력 필드에 포커스가 있을 경우 종료
+    }
+
+    // 2. 입력된 키를 소문자로 변환
+    const key = event.key.toLowerCase();
+
+    // 숫자 단축키 1, 2, 3, 4 처리
+    switch (key) {
+        case '1':
+            rewindVideos(180); // 3분 되감기
+            break;
+        case '2':
+            rewindVideos(30); // 30초 되감기
+            break;
+        case '3':
+            forwardVideos(30); // 30초 앞으로 이동
+            break;
+        case '4':
+            forwardVideos(180); // 3분 앞으로 이동
+            break;
+        case ' ':
+            console.log('Spacebar pressed'); // 디버깅: 스페이스바 입력 감지
+            event.preventDefault();         // 스페이스바 기본 동작 방지
+            togglePlayPause();              // 재생/정지 토글
+            break;
+    }
+/**
+ * 모든 비디오의 재생 상태를 토글하는 함수
+ * - 재생 중인 비디오가 하나라도 있으면 모두 정지
+ * - 정지 상태라면 모두 재생
+ */
+function togglePlayPause() {
+    // 현재 문서에서 모든 <video> 요소를 가져옵니다.
+    const videos = document.querySelectorAll('video');
+
+    // 비디오 배열에서 하나라도 재생 중인지 확인
+    // - video.paused가 false인 경우 해당 비디오는 재생 중임
+    const anyPlaying = Array.from(videos).some(video => !video.paused);
+
+    if (anyPlaying) {
+        // 하나라도 재생 중인 경우: 모든 비디오를 정지
+        videos.forEach(video => video.pause());
+    } else {
+        // 모든 비디오가 정지 상태인 경우: 모든 비디오를 재생
+        videos.forEach(video => video.play());
+    }
+}
+
+    // 4. 싱크 이동 단축키 e(이전)와 r(다음) 처리
+    if (key === 'e' || key === 'ㄷ') {
+        navigateSync(-1);  // 이전 싱크로 이동
+    } else if (key === 'r' || key === 'ㄱ') {
+        navigateSync(1);   // 다음 싱크로 이동
+    }
+
+    // 5. 교실 선택 단축키 q(위로)와 w(아래로) 처리
+    if (key === 'q' || key === 'ㅂ') {
+        changeProgramSelection(-1);  // 교실 선택 상으로 이동
+    } else if (key === 'w' || key === 'ㅈ') {
+        changeProgramSelection(1);   // 교실 선택 하로 이동
+    }
+
+    // 6. 날짜 선택 단축키 a(하루 전)와 d(하루 후) 처리
+    if (key === 'a' || key === 'ㅁ') {
+        changeDateSelection(-1);  // 하루 전으로 이동
+    } else if (key === 'd' || key === 'ㅇ') {
+        changeDateSelection(1);   // 하루 후로 이동
+    }
+
+    // 7. Sync 0 단축키 s를 눌렀을 때 첫 번째 싱크 버튼 선택
+    if (key === 's' || key === 'ㄴ') {
+        const sync0Button = document.querySelector('.sync-button:first-child'); // 첫 번째 싱크 버튼 가져오기
+        if (sync0Button) {
+            sync0Button.click(); // 버튼 클릭
+        }
+    }
+});
+
+// 8. 교실 선택 옵션을 위/아래로 이동시키는 함수
+function changeProgramSelection(direction) {
+    const programSelect = document.getElementById('program'); // 교실 선택 드롭다운 가져오기
+    const currentIndex = programSelect.selectedIndex; // 현재 선택된 옵션의 인덱스
+    const newIndex = currentIndex + direction; // 이동할 새로운 인덱스 계산
+
+    // 유효한 인덱스 범위 확인
+    if (newIndex >= 0 && newIndex < programSelect.options.length) {
+        programSelect.selectedIndex = newIndex; // 새로운 옵션 선택
+        changeProgram(); // 선택 변경 후 프로그램 갱신
+    }
+}
+
+// 9. 싱크 버튼을 이전/다음으로 이동시키는 함수
+function navigateSync(direction) {
+    const syncButtons = document.querySelectorAll('.sync-button'); // 모든 싱크 버튼 가져오기
+    if (activeButton) { // 현재 활성화된 버튼이 있는지 확인
+        let currentIndex = Array.from(syncButtons).indexOf(activeButton); // 현재 활성 버튼의 인덱스 가져오기
+        let newIndex = currentIndex + direction; // 이동할 새로운 인덱스 계산
+
+        // 유효한 범위 내 인덱스인지 확인
+        if (newIndex >= 0 && newIndex < syncButtons.length) {
+            syncButtons[newIndex].click(); // 새 버튼 클릭
+        }
+    }
+}
+
+// 10. 날짜 선택 필드를 하루 전/후로 이동시키는 함수
+function changeDateSelection(direction) {
+    const dateInput = document.getElementById('date'); // 날짜 입력 필드 가져오기
+    const currentDate = new Date(dateInput.value); // 현재 날짜 가져오기
+    currentDate.setDate(currentDate.getDate() + direction); // 날짜를 direction만큼 이동
+
+    dateInput.value = currentDate.toISOString().split('T')[0]; // 이동된 날짜를 필드에 설정
+    updateWeekday(); // 요일 갱신 함수 호출
+}
+
+    // 17. JSON 데이터 로드
+async function loadClassroomData() {
+    try {
+        const response = await fetch('/path/to/classroom.json'); // JSON 파일 경로 확인
+        classroomData = await response.json();
+    } catch (error) {
+        console.error('classroom.json 파일 로드 실패:', error);
+    }
+}
+
+    // 16. 태깅 슬라이드 버튼 클릭 이벤트
+    document.getElementById('taggingSlideButton').addEventListener('click', function() {
+        const programSelect = document.getElementById('program');
+        const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').trim();
+        const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
+
+        if (classroom && classroom.태깅슬라이드URL) {
+            window.open(classroom.태깅슬라이드URL, '_blank');
+        } else {
+            alert('URL이 없습니다.');
+        }
+    });
+
+function verifyPin() {
+    const inputPin = document.getElementById('pinInput').value;
+    const correctPin = '1240'; // 올바른 PIN 설정
+
+    if (inputPin === correctPin) {
+        pinModal.style.display = 'none';
+    } else {
+        alert('PIN이 잘못되었습니다.');
+    }
+}
+
+</script>
+</body>
+</html>
