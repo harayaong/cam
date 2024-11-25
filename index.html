@@ -238,6 +238,14 @@
 
     <!-- 폼 섹션 -->
     <div class="form-container">
+
+<!-- 검색창 추가 -->
+<div style="margin: 10px 0;">
+    <input type="text" id="searchInput" placeholder="입력하고 교실선택 해보세요." 
+        style="padding: 5px; font-size: 14px; width: 100%;" 
+        oninput="filterPrograms()"> <!-- oninput 이벤트로 실시간 검색 -->
+</div>
+
         <!-- 프로그램 선택 -->
         <div>
             <label for="program">교실 선택:</label>
@@ -342,6 +350,25 @@
 
 
 <script>
+    /**
+     * 검색 기능: 검색창 입력값과 일치하거나 포함된 옵션만 표시
+     */
+    function filterPrograms() {
+        const searchInput = document.getElementById('searchInput').value.toLowerCase(); // 검색 입력값
+        const programSelect = document.getElementById('program'); // select 요소
+        const options = programSelect.options; // select의 옵션 리스트
+
+        // 모든 옵션을 반복하며 필터링
+        for (let i = 0; i < options.length; i++) {
+            const optionText = options[i].textContent.toLowerCase(); // 옵션의 텍스트
+            if (optionText.includes(searchInput)) {
+                options[i].style.display = ''; // 검색어와 일치하면 표시
+            } else {
+                options[i].style.display = 'none'; // 일치하지 않으면 숨김
+            }
+        }
+    }
+
     // 1. 전역 변수 정의
     let activeButton = null;
     let pinModal = document.getElementById('pinModal');
