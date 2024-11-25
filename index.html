@@ -481,6 +481,12 @@
             video.autoplay = true;
             video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;  // 동영상 소스
 
+
+	// 동영상 로드 실패 시 메시지 표시
+        video.onerror = function () {
+            videoWrapper.innerHTML = '<p style="color: red; text-align: center;">동영상이 없습니다.</p>';
+            };
+		
             video.onclick = function() {
                 openPinModal(video.src);  // 클릭 시 모달 열기
             };
