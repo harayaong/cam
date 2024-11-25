@@ -364,6 +364,56 @@ h1 {
 
 
 <script>
+let classroomData = []; // JSON 데이터를 저장할 전역 변수 선언
+
+async function loadClassroomData() {
+    try {
+        const response = await fetch('./path/to/classroom.json'); // JSON 파일 경로 수정 필요
+        classroomData = await response.json(); // JSON 데이터를 전역 변수에 저장
+        console.log("classroomData 로드 성공:", classroomData); // 로드 성공 시 확인용 로그
+    } catch (error) {
+        console.error('JSON 데이터 로드 실패:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadClassroomData(); // JSON 데이터 로드
+});
+
+document.getElementById('taggingSlideButton').addEventListener('click', function () {
+    // JSON 데이터 로드 여부 확인
+    if (!classroomData || classroomData.length === 0) {
+        alert('JSON 데이터가 로드되지 않았습니다. 잠시 후 다시 시도하세요.');
+        return;
+    }
+
+    const programSelect = document.getElementById('program');
+    const selectedSiteID = programSelect.options[programSelect.selectedIndex]?.getAttribute('data-site')?.trim();
+
+    if (!selectedSiteID) {
+        alert('선택된 교실의 SITE_ID를 찾을 수 없습니다.');
+        return;
+    }
+
+    console.log("선택된 SITE_ID:", selectedSiteID);
+
+    const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
+
+    if (!classroom) {
+        console.error(`매칭되지 않은 SITE_ID: ${selectedSiteID}`);
+        alert('해당 교실 정보가 JSON 데이터에 없습니다.');
+        return;
+    }
+
+    console.log("매칭된 classroom 객체:", classroom);
+
+    if (classroom.태깅슬라이드URL) {
+        window.open(classroom.태깅슬라이드URL, '_blank');
+    } else {
+        alert('선택된 교실에 태깅슬라이드 URL이 없습니다.');
+    }
+});
+
     /**
      * 검색 기능: 검색창 입력값과 일치하거나 포함된 옵션만 표시
      */
@@ -704,36 +754,12 @@ function changeDateSelection(direction) {
     // 17. JSON 데이터 로드
 async function loadClassroomData() {
     try {
-        const response = await fetch('/path/to/classroom.json'); // JSON 파일 경로 확인
+        const response = await fetch('./classroom.json'); // JSON 파일 경로 확인
         classroomData = await response.json();
     } catch (error) {
         console.error('classroom.json 파일 로드 실패:', error);
     }
 }
-
-// 태깅 슬라이드 버튼 클릭 이벤트
-document.getElementById('taggingSlideButton').addEventListener('click', function () {
-    const programSelect = document.getElementById('program');
-    const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').trim();
-
-    console.log("선택된 SITE_ID:", selectedSiteID); // 디버깅용
-
-    const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
-
-    if (!classroom) {
-        console.error(`매칭되지 않은 SITE_ID: ${selectedSiteID}`);
-        alert('해당 교실 정보가 JSON 데이터에 없습니다.');
-        return;
-    }
-
-    console.log("매칭된 classroom 객체:", classroom); // 디버깅용
-
-    if (classroom.태깅슬라이드URL) {
-        window.open(classroom.태깅슬라이드URL, '_blank');
-    } else {
-        alert('선택된 교실에 태깅슬라이드 URL이 없습니다.');
-    }
-});
 
 function verifyPin() {
     const inputPin = document.getElementById('pinInput').value;
