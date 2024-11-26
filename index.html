@@ -2,71 +2,75 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>통합 카메라 조회 v1124</title>
+    <title>통합 카메라 조회 v1125</title>
 
 
 <style>
-    /* 기본 스타일: 전체 페이지의 텍스트 크기 및 배경 설정 */
-    body {
-        font-size: 24px;
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-    }
+/* 공통 스타일: 텍스트 및 기본 레이아웃 */
+body {
+    font-size: 15px;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
 
-    /* 상단 섹션 스타일: 제목 및 버튼 컨테이너 */
-    .top-section {
-        display: flex;
-        align-items: center;
-    }
+/* 제목 및 섹션 스타일 */
+h1 {
+    text-align: start;
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #007bff;
+}
 
-    /* 추가 설명 텍스트: 보조 설명 문구 */
-    .sub-text {
-        font-size: 12px;
-        color: #888;
-    }
+/* 상단 섹션 스타일: 제목, 버튼 등 */
+.top-section {
+    display: flex;
+    align-items: center;
+}
 
-    /* 동기화 버튼 컨테이너 스타일: 버튼 배열 */
-    .sync-container {
-        display: grid;
-        grid-template-columns: repeat(10, 1fr); /* 10개 버튼씩 정렬 */
-        grid-gap: 10px; /* 버튼 간격 */
-        margin-top: 10px;
-    }
+/* 설명 텍스트 스타일 */
+.sub-text {
+    font-size: 12px;
+    color: #888;
+}
 
-    /* 상단 동기화 버튼 컨테이너 */
-    .sync-container.top {
-        margin-bottom: 10px;
-    }
+/* 버튼 컨테이너 및 버튼 스타일 */
+.sync-container {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr); /* 10개 버튼씩 정렬 */
+    grid-gap: 10px; /* 버튼 간격 */
+    margin-top: 10px;
+}
 
-    /* 제목 스타일: 페이지 상단 제목 설정 */
-    h1 {
-        text-align: start;
-        font-size: 28px;
-        margin-bottom: 10px;
-        color: #007bff;
-    }
+.sync-container.top {
+    margin-bottom: 10px;
+}
+
+
 
     /* 폼 컨테이너: 프로그램 선택 및 날짜 선택 영역 */
-    .form-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+.form-container {
+    display: flex;
+    flex-wrap: wrap; /* 줄 바꿈 허용 */
+    justify-content: space-between; /* 아이템 간 간격 균일 */
+    align-items: center; /* 세로 정렬 중앙 */
+    background-color: white; /* 하얀 배경 */
+    padding: 15px; /* 상하좌우 동일한 여백 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+    gap: 10px; /* 내부 아이템 간 간격 */
+}
 
     /* 폼 레이블 텍스트 스타일 */
-    .form-container label {
-        font-size: 20px;
-    }
+.form-container div {
+    flex: 1 1 300px; /* 아이템 크기를 균등 분배, 최소 300px */
+    min-width: 150px; /* 최소 너비 지정 */
+}
 
     /* 선택 박스 및 날짜 입력 필드 스타일 */
     select, input[type="date"] {
-        font-size: 20px;
+        font-size: 15px;
         padding: 8px;
         border-radius: 5px;
         border: 1px solid #ccc;
@@ -75,7 +79,7 @@
 
     /* 요일 텍스트 스타일 */
     .weekday {
-        font-size: 20px;
+        font-size: 15px;
         font-weight: bold;
         color: #ff6347;
     }
@@ -87,7 +91,7 @@
         padding: 10px;
         border: none;
         border-radius: 5px;
-        font-size: 12px;
+        font-size: 15px;
         cursor: pointer;
         transition: background-color 0.3s ease; /* 배경색 전환 효과 */
     }
@@ -126,7 +130,7 @@
         background-color: rgba(0, 0, 0, 0.5); /* 투명 검정 배경 */
         color: white;
         padding: 5px;
-        font-size: 16px;
+        font-size: 15px;
     }
 
     /* 동영상 스타일: 둥근 모서리 */
@@ -135,25 +139,10 @@
         border-radius: 5px;
     }
 
-    /* 새 창 보기 버튼 스타일 */
-    .new-window-button {
-        position: absolute; /* 절대 위치 */
-        bottom: 10px;
-        right: 10px;
-        background-color: rgba(0, 0, 0, 0.5); /* 투명 검정 배경 */
-        color: white;
-        padding: 5px 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        z-index: 10; /* 버튼 우선 순위 */
-    }
-
-    /* 새 창 보기 버튼 호버 스타일 */
-    .new-window-button:hover {
-        background-color: rgba(0, 0, 0, 0.7); /* 호버 시 배경 진하게 */
-    }
+.new-window-button:hover,
+.fullscreen-button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
 
     /* 모달 스타일: 전체 화면 덮는 투명 검정 배경 */
     .modal {
@@ -188,7 +177,7 @@
 
     /* 모달 헤더 스타일 */
     .modal-header {
-        font-size: 20px;
+        font-size: 15px;
         margin-bottom: 10px;
     }
 
@@ -206,6 +195,33 @@
     .pin-video {
         margin-top: 20px;
     }
+
+/* 버튼 컨테이너 스타일 */
+.button-container {
+    position: absolute; /* 동영상 상단 우측에 고정 */
+    top: 10px; /* 위쪽 여백 */
+    right: 10px; /* 오른쪽 여백 */
+    display: flex; /* 버튼을 가로로 정렬 */
+    gap: 5px; /* 버튼 간 간격 */
+}
+
+/* 공통 버튼 스타일 */
+.video-button {
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검정 배경 */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    z-index: 10;
+}
+
+/* 버튼 호버 스타일 */
+.video-button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
 </style>
 </head>
 
@@ -219,7 +235,7 @@
     <div class="top-section">
         <!-- 선택된 교실 ID 및 태깅 슬라이드 버튼 -->
         <h1><span id="selectedSiteID"></span></h1>
-        <button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 16px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">
+        <button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 15px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">
             태깅슬라이드
         </button>
     </div>
@@ -239,17 +255,12 @@
     <!-- 폼 섹션 -->
     <div class="form-container">
 
-<!-- 검색창 추가 -->
-<div style="margin: 10px 0;">
-    <input type="text" id="searchInput" placeholder="입력하고 교실선택 해보세요." 
-        style="padding: 5px; font-size: 14px; width: 100%;" 
-        oninput="filterPrograms()"> <!-- oninput 이벤트로 실시간 검색 -->
-</div>
-
         <!-- 프로그램 선택 -->
-        <div>
-            <label for="program">교실 선택:</label>
-            <select id="program" onchange="changeProgram()">
+<div class="form-container" style="display: flex; align-items: center; gap: 10px;">
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <label for="program">교실:</label>
+        <select id="program" onchange="changeProgram()">
+
                 <!-- 교실 선택 옵션 리스트 -->
 					<option value="baycent_1x1" data-site="baycent_1x1">예정. 광양베이센트-행복가득: 월, 화, 수, 목, 금</option>
 					<option value="baycent_1x3" data-site="baycent_1x3">예정. 광양베이센트-기쁨가득: 월, 화, 수, 목, 금</option>
@@ -314,25 +325,27 @@
 					<option value="sarangsaem_2x5" data-site="sarangsaem_2x5">77. 사랑샘 유치원-솔나리: 월, 화, 수, 목, 금</option>
 					<option value="sarangsaem_3x3" data-site="sarangsaem_3x3">78. 사랑샘 유치원-아리솔: 월, 화, 수, 목, 금</option>                <!-- 추가 옵션 생략 -->
             </select>
-        </div>
 
-        <!-- 날짜 선택 -->
-        <div>
-            <label for="date">날짜 선택:</label>
-            <input type="date" id="date" onchange="updateWeekday()">
-            <span id="weekday" class="weekday"></span>
-        </div>
+        <!-- 검색 입력창 -->
+        <input type="text" id="searchInput" placeholder="검색어"
+            style="padding: 5px; font-size: 15px; width: 100px;" oninput="filterPrograms()">
+    </div>
+
+    <!-- 날짜 선택 -->
+    <div style="display: flex; align-items: center; gap: 5px;">
+        <label for="date">날짜:</label>
+        <input type="date" id="date" onchange="updateWeekday()">
+        <span id="weekday" class="weekday"></span>
+    </div>
+</div>
+    </div>
 
         <!-- 단축키 및 사용 팁 -->
         <div>
             <p style="font-size: 10px; color: #555; margin-top: 1px;">
-                #단축키: 스페이스바 (일괄정지/일괄재생), 숫자1(-3분), 숫자2(-30초), 숫자3(+30초), 숫자4(+3분), E(이전싱크), R(다음싱크)
-            </p>
-            <p style="font-size: 10px; color: #555; margin-top: 1px;">
-                #Tip. [전체]버튼으로 화면 전환 후 스페이스바를 누르면 일괄정지/일괄재생 됩니다. (241031 Update)
+                #단축키: 스페이스바(일괄정지/재생),숫자1234(-3분,-30초,+30초,+3분), E(이전싱크), R(다음싱크)     #Tip. [전체]버튼으로 화면 전환 후 스페이스바를 누르면 일괄정지/일괄재생 됩니다. (241031 Update)
             </p>
         </div>
-    </div>
 
     <!-- 동기화 버튼 컨테이너 (상단) -->
     <div class="sync-container top" id="syncContainerTop"></div>
@@ -342,6 +355,7 @@
     
     <!-- 동기화 버튼 컨테이너 (하단) -->
     <div class="sync-container bottom" id="syncContainerBottom"></div>
+
 </body>
 
 
@@ -350,6 +364,56 @@
 
 
 <script>
+let classroomData = []; // JSON 데이터를 저장할 전역 변수 선언
+
+async function loadClassroomData() {
+    try {
+        const response = await fetch('./path/to/classroom.json'); // JSON 파일 경로 수정 필요
+        classroomData = await response.json(); // JSON 데이터를 전역 변수에 저장
+        console.log("classroomData 로드 성공:", classroomData); // 로드 성공 시 확인용 로그
+    } catch (error) {
+        console.error('JSON 데이터 로드 실패:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadClassroomData(); // JSON 데이터 로드
+});
+
+document.getElementById('taggingSlideButton').addEventListener('click', function () {
+    // JSON 데이터 로드 여부 확인
+    if (!classroomData || classroomData.length === 0) {
+        alert('JSON 데이터가 로드되지 않았습니다. 잠시 후 다시 시도하세요.');
+        return;
+    }
+
+    const programSelect = document.getElementById('program');
+    const selectedSiteID = programSelect.options[programSelect.selectedIndex]?.getAttribute('data-site')?.trim();
+
+    if (!selectedSiteID) {
+        alert('선택된 교실의 SITE_ID를 찾을 수 없습니다.');
+        return;
+    }
+
+    console.log("선택된 SITE_ID:", selectedSiteID);
+
+    const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
+
+    if (!classroom) {
+        console.error(`매칭되지 않은 SITE_ID: ${selectedSiteID}`);
+        alert('해당 교실 정보가 JSON 데이터에 없습니다.');
+        return;
+    }
+
+    console.log("매칭된 classroom 객체:", classroom);
+
+    if (classroom.태깅슬라이드URL) {
+        window.open(classroom.태깅슬라이드URL, '_blank');
+    } else {
+        alert('선택된 교실에 태깅슬라이드 URL이 없습니다.');
+    }
+});
+
     /**
      * 검색 기능: 검색창 입력값과 일치하거나 포함된 옵션만 표시
      */
@@ -454,76 +518,79 @@
         return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     }
 
-    // 8. 선택된 싱크의 동영상 로드
-    function loadVideos(sync, button) {
-        if (activeButton) {
-            activeButton.classList.remove('active');  // 이전 활성화 버튼 비활성화
+// 동영상마다 [새창] 및 [전체] 버튼 추가
+function addVideoButtons(videoWrapper, video) {
+    // 새 창 보기 버튼
+    const newWindowButton = document.createElement('button');
+    newWindowButton.textContent = '새창';
+    newWindowButton.classList.add('video-button', 'new-window-button');
+    newWindowButton.onclick = function() {
+        window.open(video.src, '_blank'); // 새 창으로 열기
+    };
+
+    // 전체 화면 보기 버튼
+    const fullscreenButton = document.createElement('button');
+    fullscreenButton.textContent = '전체';
+    fullscreenButton.classList.add('video-button', 'fullscreen-button');
+    fullscreenButton.onclick = function() {
+        if (video.requestFullscreen) {
+            video.requestFullscreen();
+        } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+        } else if (video.msRequestFullscreen) {
+            video.msRequestFullscreen();
         }
-        button.classList.add('active');  // 현재 버튼 활성화
-        activeButton = button;
+    };
 
-        const date = document.getElementById('date').value;
-        const program = document.getElementById('program').value;
-        const container = document.getElementById('videoContainer');
-        container.innerHTML = '';  // 기존 동영상 삭제
+    // 버튼 컨테이너 추가
+    const buttonContainer = document.createElement('div');
+    buttonContainer.classList.add('button-container');
+    buttonContainer.appendChild(newWindowButton);
+    buttonContainer.appendChild(fullscreenButton);
 
-        // 8개의 동영상을 생성 및 추가
-        for (let i = 1; i <= 8; i++) {
-            const videoWrapper = document.createElement('div');
-            videoWrapper.classList.add('video-wrapper');
+    // 버튼 컨테이너를 동영상 래퍼에 추가
+    videoWrapper.appendChild(buttonContainer);
+}
 
-            const camLabel = document.createElement('div');
-            camLabel.classList.add('cam-label');
-            camLabel.textContent = `CAM0${i}`;  // 카메라 레이블 설정
+// 동영상 생성 및 버튼 추가 호출
+function loadVideos(sync, button) {
+    if (activeButton) {
+        activeButton.classList.remove('active'); // 이전 활성화 버튼 비활성화
+    }
+    button.classList.add('active'); // 현재 버튼 활성화
+    activeButton = button;
 
-            const video = document.createElement('video');
-            video.controls = true;
-            video.autoplay = true;
-            video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;  // 동영상 소스
+    const date = document.getElementById('date').value;
+    const program = document.getElementById('program').value;
+    const container = document.getElementById('videoContainer');
+    container.innerHTML = ''; // 기존 동영상 삭제
+
+    // 동영상 8개 생성
+    for (let i = 1; i <= 8; i++) {
+        const videoWrapper = document.createElement('div');
+        videoWrapper.classList.add('video-wrapper');
+
+        const camLabel = document.createElement('div');
+        camLabel.classList.add('cam-label');
+        camLabel.textContent = `CAM0${i}`;
+
+        const video = document.createElement('video');
+        video.controls = true;
+        video.autoplay = true;
+video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
 
 
-	// 동영상 로드 실패 시 메시지 표시
+        // 동영상 로드 실패 시 메시지 표시
         video.onerror = function () {
             videoWrapper.innerHTML = '<p style="color: red; text-align: center;">동영상이 없습니다.</p>';
-            };
-		
-            video.onclick = function() {
-                openPinModal(video.src);  // 클릭 시 모달 열기
-            };
+        };
 
-            video.onerror = function() {
-                videoWrapper.innerHTML = '<p>저장된 영상이 없습니다.</p>';  // 에러 시 메시지 표시
-            };
-
-            // 새 창 보기 버튼
-            const newWindowButton = document.createElement('button');
-            newWindowButton.textContent = '새창';
-            newWindowButton.classList.add('new-window-button');
-            newWindowButton.onclick = function() {
-                window.open(video.src, '_blank');  // 새 창으로 열기
-            };
-
-            // 전체 화면 보기 버튼
-            const fullscreenButton = document.createElement('button');
-            fullscreenButton.textContent = '전체';
-            fullscreenButton.classList.add('new-window-button');
-            fullscreenButton.onclick = function() {
-                if (video.requestFullscreen) {
-                    video.requestFullscreen();
-                } else if (video.webkitRequestFullscreen) {
-                    video.webkitRequestFullscreen();
-                } else if (video.msRequestFullscreen) {
-                    video.msRequestFullscreen();
-                }
-            };
-
-            videoWrapper.appendChild(camLabel);  // 레이블 추가
-            videoWrapper.appendChild(video);  // 동영상 추가
-            videoWrapper.appendChild(newWindowButton);  // 새 창 버튼 추가
-            videoWrapper.appendChild(fullscreenButton);  // 전체 화면 버튼 추가
-            container.appendChild(videoWrapper);  // 컨테이너에 추가
-        }
+        videoWrapper.appendChild(camLabel);
+        videoWrapper.appendChild(video);
+        addVideoButtons(videoWrapper, video); // 새 버튼 추가 함수 호출
+        container.appendChild(videoWrapper);
     }
+}
 
     // 9. PIN 모달 열기
     function openPinModal(videoSrc) {
@@ -684,24 +751,15 @@ function changeDateSelection(direction) {
     updateWeekday(); // 요일 갱신 함수 호출
 }
 
-    // 16. 태깅 슬라이드 버튼 클릭 이벤트
-    document.getElementById('taggingSlideButton').addEventListener('click', function() {
-        const programSelect = document.getElementById('program');
-        const selectedSiteID = programSelect.options[programSelect.selectedIndex].getAttribute('data-site').trim();
-        const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
-
-        if (classroom && classroom.태깅슬라이드URL) {
-            window.open(classroom.태깅슬라이드URL, '_blank');
-        } else {
-            alert('URL이 없습니다.');
-        }
-    });
-
     // 17. JSON 데이터 로드
-    async function loadClassroomData() {
-        const response = await fetch('classroom.json');
+async function loadClassroomData() {
+    try {
+        const response = await fetch('./classroom.json'); // JSON 파일 경로 확인
         classroomData = await response.json();
+    } catch (error) {
+        console.error('classroom.json 파일 로드 실패:', error);
     }
+}
 
 function verifyPin() {
     const inputPin = document.getElementById('pinInput').value;
@@ -713,6 +771,7 @@ function verifyPin() {
         alert('PIN이 잘못되었습니다.');
     }
 }
+
 </script>
 </body>
 </html>
