@@ -1104,9 +1104,9 @@
     "서비스종료일": null,
     "태깅슬라이드URL": "https://docs.google.com/presentation/d/1rgL-MopVDn4HsLk9Znl8OxZm_dIRBXMI"
   },
-  {
+    {
     "NO": 94,
-    "SITE_ID": "baycent_1x3",
+    "SITE_ID": "baycent_1x2",
     "한글교실명": "베이센트 어린이집-기쁨가득",
     "서비스요일": [
       "월",
@@ -1121,6 +1121,21 @@
   },
   {
     "NO": 95,
+    "SITE_ID": "baycent_1x3",
+    "한글교실명": "베이센트 어린이집-웃음가득",
+    "서비스요일": [
+      "월",
+      "화",
+      "수",
+      "목",
+      "금"
+    ],
+    "서비스시작일": "2024-12-02",
+    "서비스종료일": null,
+    "태깅슬라이드URL": "https://docs.google.com/presentation/d/1vPq9xoHRddESiQLLeOvaLAj9oBN0xhAh"
+  },
+  {
+    "NO": 96,
     "SITE_ID": "poseung_1x4",
     "한글교실명": "시립포승 어린이집-파랑",
     "서비스요일": [
