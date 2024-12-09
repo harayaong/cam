@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>통합 카메라 조회 v1125</title>
+    <title>통합 카메라 조회 v1209</title>
 
 
 <style>
@@ -26,7 +26,60 @@ h1 {
 /* 상단 섹션 스타일: 제목, 버튼 등 */
 .top-section {
     display: flex;
+    justify-content: space-between; /* 좌우 배치 */
+    align-items: center; /* 세로 정렬 */
+    padding: 10px 20px;
+    background-color: #f4f4f4; /* 헤더 배경 색상 */
+    border-bottom: 1px solid #ddd; /* 하단 경계선 */
+}
+
+.header-left {
+    display: flex;
     align-items: center;
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: 20px;
+    color: #007bff;
+}
+
+#taggingSlideButton {
+    margin-left: 10px;
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #ff6347;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#taggingSlideButton:hover {
+    background-color: #e55347;
+}
+
+.header-right {
+    display: flex;
+    gap: 15px; /* 링크 간격 */
+}
+
+.shortcut-link {
+    font-size: 14px;
+    color: #007bff;
+    text-decoration: none;
+    padding: 5px 10px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.shortcut-link:hover {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
 }
 
 /* 설명 텍스트 스타일 */
@@ -231,14 +284,23 @@ h1 {
 
 
 <body>
-    <!-- 상단 섹션 -->
-    <div class="top-section">
-        <!-- 선택된 교실 ID 및 태깅 슬라이드 버튼 -->
+<!-- 상단 섹션 -->
+<div class="top-section">
+    <!-- 왼쪽 정보 표시 -->
+    <div class="header-left">
         <h1><span id="selectedSiteID"></span></h1>
-        <button id="taggingSlideButton" style="margin-left: 10px; padding: 10px; font-size: 15px; background-color: #ff6347; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease;">
+        <button id="taggingSlideButton">
             태깅슬라이드
         </button>
     </div>
+    
+    <!-- 오른쪽 숏컷 -->
+    <div class="header-right">
+        <a href="https://admin.playtagapp.com/company" target="_blank" class="shortcut-link">Admin Tool</a>
+        <a href="https://rerun.playtag.ai/" target="_blank" class="shortcut-link">Perception Admin</a>
+        <a href="https://drive.google.com/drive/u/0/folders/1vT4hkgnCpP781ZjPCRWGUjOtxzDymFGB" target="_blank" class="shortcut-link">태깅슬라이드 공유폴더</a>
+    </div>
+</div>
 
     <!-- PIN 모달 -->
     <div id="pinModal" class="modal">
