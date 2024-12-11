@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>통합 카메라 조회 v1209</title>
+    <title>통합 카메라 조회 v1211</title>
 
 
 <style>
@@ -275,6 +275,30 @@ h1 {
 .video-button:hover {
     background-color: rgba(0, 0, 0, 0.7);
 }
+
+.keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.key {
+    padding: 15px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.key:hover {
+    background-color: #0056b3;
+}
+
 </style>
 </head>
 
@@ -304,17 +328,32 @@ h1 {
     </div>
 </div>
 
-    <!-- PIN 모달 -->
-    <div id="pinModal" class="modal">
-        <div class="modal-content" style="max-width: 300px;">
-            <!-- 모달 헤더 -->
-            <div class="modal-header">비밀번호</div>
-            <!-- PIN 입력 필드 -->
-            <input type="password" id="pinInput" placeholder="PIN 입력" style="width: 100%; padding: 10px; margin-top: 10px; margin-bottom: 10px;">
-            <!-- PIN 확인 버튼 -->
-            <button class="close-btn" onclick="verifyPin()">확인</button>
+<!-- PIN 모달 -->
+<div id="pinModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <!-- 모달 헤더 -->
+        <div class="modal-header">힌트: 안알랴쥼</div>
+        <!-- PIN 입력 필드 -->
+        <input type="password" id="pinInput" placeholder="PIN 입력" style="width: 175px; padding: 10px; margin-top: 10px; text-align: center;" readonly>
+        <!-- 숫자 키패드 -->
+        <div class="keypad">
+            <!-- 숫자 버튼 -->
+            <button class="key" onclick="addPinDigit('1')">1</button>
+            <button class="key" onclick="addPinDigit('2')">2</button>
+            <button class="key" onclick="addPinDigit('3')">3</button>
+            <button class="key" onclick="addPinDigit('4')">4</button>
+            <button class="key" onclick="addPinDigit('5')">5</button>
+            <button class="key" onclick="addPinDigit('6')">6</button>
+            <button class="key" onclick="addPinDigit('7')">7</button>
+            <button class="key" onclick="addPinDigit('8')">8</button>
+            <button class="key" onclick="addPinDigit('9')">9</button>
+            <!-- 추가 버튼 -->
+            <button class="key" onclick="clearPin()">←</button>
+            <button class="key" onclick="addPinDigit('0')">0</button>
+            <button class="key" onclick="verifyPin()">OK</button>
         </div>
     </div>
+</div>
 
     <!-- 폼 섹션 -->
     <div class="form-container">
@@ -837,6 +876,30 @@ function verifyPin() {
         pinModal.style.display = 'none';
     } else {
         alert('PIN이 잘못되었습니다.');
+    }
+}
+
+function addPinDigit(digit) {
+    const pinInput = document.getElementById('pinInput');
+    if (pinInput.value.length < 4) { // 최대 4자리 제한
+        pinInput.value += digit;
+    }
+}
+
+function clearPin() {
+    const pinInput = document.getElementById('pinInput');
+    pinInput.value = '';
+}
+
+function verifyPin() {
+    const pinInput = document.getElementById('pinInput').value;
+    const correctPin = '1240'; // 올바른 PIN 설정
+
+    if (pinInput === correctPin) {
+        document.getElementById('pinModal').style.display = 'none'; // 모달 닫기
+    } else {
+        alert('PIN이 잘못되었습니다.');
+        clearPin();
     }
 }
 
