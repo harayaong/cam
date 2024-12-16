@@ -102,18 +102,23 @@ h1 {
 
 
 
-    /* 폼 컨테이너: 프로그램 선택 및 날짜 선택 영역 */
+/* 폼 섹션의 전체 레이아웃 */
 .form-container {
     display: flex;
-    align-items: center;
     flex-wrap: wrap; /* 줄 바꿈 허용 */
-    justify-content: space-between; /* 아이템 간 간격 균일 */
+    justify-content: space-between; /* 좌우 간격 균일 */
     align-items: center; /* 세로 정렬 중앙 */
-    background-color: white; /* 하얀 배경 */
-    padding: 15px; /* 상하좌우 동일한 여백 */
-    border-radius: 8px; /* 모서리 둥글게 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
-    gap: 10px; /* 내부 아이템 간 간격 */
+    gap: 20px; /* 영역 간 간격 */
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    display: flex;
+    align-items: center; /* 세로 정렬 중앙 */
+    gap: 10px; /* 내부 요소 간 간격 */
 }
 
     /* 폼 레이블 텍스트 스타일 */
@@ -386,15 +391,9 @@ h1 {
     </div>
 </div>
 
-    <!-- 폼 섹션 -->
-    <div class="form-container">
-
-
-
-        <!-- 교실 선택 -->
-<div class="form-container" style="display: flex; align-items: center; gap: 5px;">
-    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
-        <!-- 요일 필터 버튼 -->
+<div class="form-container">
+    <!-- 필터 영역 -->
+    <div class="form-group">
         <div class="weekday-filter">
             <button class="day-button" onclick="filterByWeekday('월')">월</button>
             <button class="day-button" onclick="filterByWeekday('화')">화</button>
@@ -403,17 +402,19 @@ h1 {
             <button class="day-button" onclick="filterByWeekday('금')">금</button>
             <button class="day-button" onclick="filterByWeekday('all')">전체</button>
         </div>
-        <!-- 필터 검색어 입력창 -->
-        <div style="width: 100%; display: flex; justify-content: flex-start; margin-top: 0px;">
+        <div>
             <input type="text" id="searchInput" placeholder="필터검색어"
                 style="padding: 5px; font-size: 10px; width: 200px;" oninput="filterPrograms()">
         </div>
     </div>
 
+    <!-- 교실 선택 영역 -->
+    <div class="form-group">
         <label for="program">교실 선택:</label>
         <select id="program" onchange="changeProgram()">
+            <!-- 교실 리스트 -->
 
-                <!-- 교실 선택 옵션 리스트 -->
+                <!-- 교실 리스트 -->
 					<!-- 유아없음,sanitycheck 재실행필요 <option value="baycent_1x1" data-site="baycent_1x1">예정. 광양베이센트-행복가득: 월, 화, 수, 목, 금</option> 
 					<option value="yekkum_1x4" data-site="yekkum_1x4">예정. 예꿈-고운햇살 월, 화, 수, 목, 금</option>
 					<option value="yekkum_1x5" data-site="yekkum_1x5">예정. 예꿈-맑은샘물 월, 화, 수, 목, 금</option>
@@ -489,21 +490,16 @@ h1 {
 					<option value="baycent_1x3" data-site="baycent_1x3">95. 광양베이센트-기쁨가득: 월, 화, 수, 목, 금</option>
 					<option value="poseung_1x4" data-site="poseung_1x4">96. 시립포승-파랑: 월, 화, 수, 목, 금</option>
 
+        </select>
+    </div>
 
-
-		
-		<!-- 추가 옵션 생략 -->
-            </select>
-
-
-    <!-- 날짜 선택 -->
-    <div style="display: flex; align-items: center; gap: 5px;">
+    <!-- 날짜 선택 영역 -->
+    <div class="form-group">
         <label for="date">선택 날짜:</label>
         <input type="date" id="date" onchange="updateWeekday()">
         <span id="weekday" class="weekday"></span>
     </div>
 </div>
-    </div>
 
         <!-- 단축키 및 사용 팁 -->
         <div>
