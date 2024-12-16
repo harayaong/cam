@@ -105,6 +105,7 @@ h1 {
     /* 폼 컨테이너: 프로그램 선택 및 날짜 선택 영역 */
 .form-container {
     display: flex;
+    align-items: center;
     flex-wrap: wrap; /* 줄 바꿈 허용 */
     justify-content: space-between; /* 아이템 간 간격 균일 */
     align-items: center; /* 세로 정렬 중앙 */
@@ -117,8 +118,8 @@ h1 {
 
     /* 폼 레이블 텍스트 스타일 */
 .form-container div {
-    flex: 1 1 300px; /* 아이템 크기를 균등 분배, 최소 300px */
-    min-width: 150px; /* 최소 너비 지정 */
+    flex: 0 1 auto; /* flex-grow 값을 0으로 설정 */
+    min-width: auto; /* 최소 너비 설정 제거 */
 }
 
     /* 선택 박스 및 날짜 입력 필드 스타일 */
@@ -304,11 +305,12 @@ h1 {
     display: flex;
     gap: 2px;
     margin-bottom: 2px;
+    margin-right: 2px; /* 요일 필터와 교실 선택 간 여백 축소 */
 }
 
 .day-button {
-    padding: 5px 5px;
-    font-size: 14px;
+    padding: 3px 5px;
+    font-size: 12px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -316,6 +318,8 @@ h1 {
     cursor: pointer;
     transition: background-color 0.3s;
 }
+
+
 
 .day-button:hover {
     background-color: #0056b3;
@@ -385,10 +389,28 @@ h1 {
     <!-- 폼 섹션 -->
     <div class="form-container">
 
-        <!-- 프로그램 선택 -->
-<div class="form-container" style="display: flex; align-items: center; gap: 10px;">
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <label for="program">교실:</label>
+
+
+        <!-- 교실 선택 -->
+<div class="form-container" style="display: flex; align-items: center; gap: 5px;">
+    <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <!-- 요일 필터 버튼 -->
+        <div class="weekday-filter">
+            <button class="day-button" onclick="filterByWeekday('월')">월</button>
+            <button class="day-button" onclick="filterByWeekday('화')">화</button>
+            <button class="day-button" onclick="filterByWeekday('수')">수</button>
+            <button class="day-button" onclick="filterByWeekday('목')">목</button>
+            <button class="day-button" onclick="filterByWeekday('금')">금</button>
+            <button class="day-button" onclick="filterByWeekday('all')">전체</button>
+        </div>
+        <!-- 필터 검색어 입력창 -->
+        <div style="width: 100%; display: flex; justify-content: flex-start; margin-top: 0px;">
+            <input type="text" id="searchInput" placeholder="필터검색어"
+                style="padding: 5px; font-size: 10px; width: 200px;" oninput="filterPrograms()">
+        </div>
+    </div>
+
+        <label for="program">교실 선택:</label>
         <select id="program" onchange="changeProgram()">
 
                 <!-- 교실 선택 옵션 리스트 -->
@@ -473,24 +495,10 @@ h1 {
 		<!-- 추가 옵션 생략 -->
             </select>
 
-<!-- 요일 필터 버튼 -->
-<div class="weekday-filter">
-    <button class="day-button" onclick="filterByWeekday('월')">월</button>
-    <button class="day-button" onclick="filterByWeekday('화')">화</button>
-    <button class="day-button" onclick="filterByWeekday('수')">수</button>
-    <button class="day-button" onclick="filterByWeekday('목')">목</button>
-    <button class="day-button" onclick="filterByWeekday('금')">금</button>
-    <button class="day-button" onclick="filterByWeekday('all')">전체</button>
-</div>
-
-        <!-- 검색 입력창 -->
-        <input type="text" id="searchInput" placeholder="검색어"
-            style="padding: 5px; font-size: 15px; width: 100px;" oninput="filterPrograms()">
-    </div>
 
     <!-- 날짜 선택 -->
     <div style="display: flex; align-items: center; gap: 5px;">
-        <label for="date">날짜:</label>
+        <label for="date">선택 날짜:</label>
         <input type="date" id="date" onchange="updateWeekday()">
         <span id="weekday" class="weekday"></span>
     </div>
