@@ -991,6 +991,47 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.day-button:last-child')?.classList.add('active'); // '전체' 버튼
 });
 
+// 요일별 필터링 함수 수정
+function filterByWeekday(day) {
+    const programSelect = document.getElementById('program');
+    const allOptions = programSelect.querySelectorAll('option');
+
+    // 선택된 요일과 일치하는 옵션만 남기고 나머지는 제거
+    programSelect.innerHTML = ''; // 기존 옵션 초기화
+    allOptions.forEach(option => {
+        const optionText = option.textContent;
+        if (day === 'all' || optionText.includes(day)) {
+            programSelect.appendChild(option); // 요일 일치 옵션 추가
+        }
+    });
+
+    // 버튼 스타일 업데이트
+    document.querySelectorAll('.day-button').forEach(button => {
+        if (button.textContent === day || (day === 'all' && button.textContent === '전체')) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
+
+    // 첫 번째 옵션을 선택 상태로 설정
+    programSelect.selectedIndex = 0;
+    changeProgram(); // 선택된 프로그램 갱신
+}
+
+// 단축키 관련 함수 수정
+function changeProgramSelection(direction) {
+    const programSelect = document.getElementById('program');
+    const currentIndex = programSelect.selectedIndex; // 현재 선택된 옵션 인덱스
+    const newIndex = currentIndex + direction; // 이동할 새로운 인덱스 계산
+
+    // 유효한 인덱스 범위 확인
+    if (newIndex >= 0 && newIndex < programSelect.options.length) {
+        programSelect.selectedIndex = newIndex; // 새로운 옵션 선택
+        changeProgram(); // 선택 변경 후 프로그램 갱신
+    }
+}
+
 </script>
 </body>
 </html>
