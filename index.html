@@ -1032,6 +1032,26 @@ function changeProgramSelection(direction) {
     }
 }
 
+// 현재 눌린 키를 추적하기 위한 객체
+const keysPressed = {};
+
+// 키보드 이벤트 리스너 추가
+document.addEventListener('keydown', (event) => {
+    keysPressed[event.key] = true; // 눌린 키 기록
+
+    // 'z'와 'x' 키가 동시에 눌린 경우 또는 'ㅋ'와 'ㅌ' 키가 동시에 눌린 경우
+    if ((keysPressed['z'] && keysPressed['x']) || (keysPressed['ㅋ'] && keysPressed['ㅌ'])) {
+        const pinModal = document.getElementById('pinModal');
+        if (pinModal.style.display === 'flex') { // 모달이 열려 있는 경우
+            pinModal.style.display = 'none'; // 모달 닫기
+        }
+    }
+});
+
+document.addEventListener('keyup', (event) => {
+    delete keysPressed[event.key]; // 키가 떼어지면 기록에서 제거
+});
+
 </script>
 </body>
 </html>
