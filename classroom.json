@@ -573,11 +573,10 @@
     "SITE_ID": "parangsae_gaon",
     "한글교실명": "파랑새 어린이집-가온",
     "서비스요일": [
-      "화",
-      "목"
+      "End of service"
     ],
     "서비스시작일": "2024-05-16",
-    "서비스종료일": null,
+    "서비스종료일": "2024-11-18",
     "태깅슬라이드URL": "https://docs.google.com/presentation/d/1Ns5C8GavZbMKuwKP9RuBDPqfGlhFHUOatMGCSBvQbx8"
   },
   {
@@ -597,11 +596,10 @@
     "SITE_ID": "parangsae_saeron",
     "한글교실명": "파랑새 어린이집-새론",
     "서비스요일": [
-      "화",
-      "목"
+      "End of service"
     ],
     "서비스시작일": "2024-05-16",
-    "서비스종료일": null,
+    "서비스종료일": "2024-11-18",
     "태깅슬라이드URL": "https://docs.google.com/presentation/d/1brMtpskuJGzVHLUUxnqcN8fct6fXVE0kPpMK7HS8m5k"
   },
   {
