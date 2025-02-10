@@ -412,16 +412,7 @@ h1 {
     <div class="form-group">
         <label for="program">교실 선택:</label>
         <select id="program" onchange="changeProgram()">
-            <!-- 교실 리스트 -->
-
-                <!-- 교실 리스트 -->
-					<!-- 유아없음,sanitycheck 재실행필요 <option value="baycent_1x1" data-site="baycent_1x1">예정. 광양베이센트-행복가득: 월, 화, 수, 목, 금</option> 
-					<option value="centralpark_1x2" data-site="centralpark_1x2">97. 공도센트럴파크-미소: 월, 화, 수</option>
-					<option value="centralpark_1x3" data-site="centralpark_1x3">98. 공도센트럴파크-행복: 월, 화, 수</option>
-					<option value="centralpark_1x4" data-site="centralpark_1x4">99. 공도센트럴파크-온유: 월, 화, 수</option>
-							-->
-
-		
+            <!-- 교실 리스트 -->		
 <option value="anrakhyeondae_haengbokhae" data-site="anrakhyeondae_haengbokhae">1. 안락현대 어린이집-행복해: 월, 화, 수</option>
 <option value="baycent_1x2" data-site="baycent_1x2">2. 광양베이센트 어린이집-웃음가득: 월, 화, 수, 목, 금</option>
 <option value="baycent_1x3" data-site="baycent_1x3">3. 광양베이센트 어린이집-기쁨가득: 월, 화, 수, 목, 금</option>
@@ -487,22 +478,40 @@ h1 {
 <script>
 let classroomData = []; // JSON 데이터를 저장할 전역 변수 선언
 
+/**
+ * JSON 데이터를 비동기 로드하는 함수
+ */
 async function loadClassroomData() {
     try {
-        const response = await fetch('./path/to/classroom.json'); // JSON 파일 경로 수정 필요
-        classroomData = await response.json(); // JSON 데이터를 전역 변수에 저장
-        console.log("classroomData 로드 성공:", classroomData); // 로드 성공 시 확인용 로그
+        const response = await fetch('./classroom.json'); // JSON 파일 경로 확인
+        if (!response.ok) {
+            throw new Error('네트워크 오류 또는 JSON 파일이 없습니다.');
+        }
+        classroomData = await response.json();
+        console.log("✅ JSON 데이터 로드 성공:", classroomData); // 로드 성공 확인
     } catch (error) {
-        console.error('JSON 데이터 로드 실패:', error);
+        console.error('❌ JSON 데이터 로드 실패:', error);
     }
 }
 
+/**
+ * 페이지 로드 시 JSON 데이터를 로드
+ */
 document.addEventListener('DOMContentLoaded', async () => {
     await loadClassroomData(); // JSON 데이터 로드
 });
 
-document.getElementById('taggingSlideButton').addEventListener('click', function () {
-    // JSON 데이터 로드 여부 확인
+/**
+ * 태깅슬라이드 버튼 클릭 이벤트
+ */
+document.getElementById('taggingSlideButton').addEventListener('click', async function () {
+    // JSON 데이터가 비어 있으면 다시 로드 시도
+    if (!classroomData || classroomData.length === 0) {
+        console.warn("⚠️ JSON 데이터가 비어 있음. 재시도 중...");
+        await loadClassroomData(); // 다시 로드 시도
+    }
+
+    // 여전히 JSON 데이터가 없으면 경고 메시지 출력
     if (!classroomData || classroomData.length === 0) {
         alert('JSON 데이터가 로드되지 않았습니다. 잠시 후 다시 시도하세요.');
         return;
@@ -516,17 +525,17 @@ document.getElementById('taggingSlideButton').addEventListener('click', function
         return;
     }
 
-    console.log("선택된 SITE_ID:", selectedSiteID);
+    console.log("🎯 선택된 SITE_ID:", selectedSiteID);
 
     const classroom = classroomData.find(item => item.SITE_ID === selectedSiteID);
 
     if (!classroom) {
-        console.error(`매칭되지 않은 SITE_ID: ${selectedSiteID}`);
+        console.error(`❌ 매칭되지 않은 SITE_ID: ${selectedSiteID}`);
         alert('해당 교실 정보가 JSON 데이터에 없습니다.');
         return;
     }
 
-    console.log("매칭된 classroom 객체:", classroom);
+    console.log("✅ 매칭된 classroom 객체:", classroom);
 
     if (classroom.태깅슬라이드URL) {
         window.open(classroom.태깅슬라이드URL, '_blank');
@@ -887,15 +896,7 @@ function changeDateSelection(direction) {
     updateWeekday(); // 요일 갱신 함수 호출
 }
 
-    // 17. JSON 데이터 로드
-async function loadClassroomData() {
-    try {
-        const response = await fetch('./classroom.json'); // JSON 파일 경로 확인
-        classroomData = await response.json();
-    } catch (error) {
-        console.error('classroom.json 파일 로드 실패:', error);
-    }
-}
+
 
 function verifyPin() {
     const inputPin = document.getElementById('pinInput').value;
