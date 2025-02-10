@@ -483,7 +483,7 @@ let classroomData = []; // JSON 데이터를 저장할 전역 변수 선언
  */
 async function loadClassroomData() {
     try {
-        const response = await fetch('./classroom.json'); // JSON 파일 경로 확인
+        const response = await fetch('/classroom.json'); // JSON 파일 경로 확인
         if (!response.ok) {
             throw new Error('네트워크 오류 또는 JSON 파일이 없습니다.');
         }
