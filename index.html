@@ -409,18 +409,43 @@ document.addEventListener("DOMContentLoaded", function() {
         }
         classroomContainer.remove(); // 다 옮긴 후 제거
     }
+
+    pinModal.style.display = 'flex';  // PIN 모달 표시
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').value = today;  // 오늘 날짜 설정
+    updateWeekday();  // 요일 업데이트
+    loadSyncButtons();  // Sync 버튼이 초기 로드되도록 추가
+    updateSiteID();  // SITE_ID 표시 업데이트
 });
-// 프로그램(교실) 변경 시 Sync 버튼을 로드하는 코드 추가 #0316
+
+// 프로그램(교실) 변경 시 Sync 버튼을 로드하는 코드
 function changeProgram() {
-    loadSyncButtons();  // Sync 버튼을 다시 로드 (Sync 버튼이 사라지는 문제 해결)
+    loadSyncButtons();  // Sync 버튼을 다시 로드
     updateSiteID();  // 선택된 SITE_ID 표시 업데이트
 }
 
-// 검색 시 선택 유지 기능 추가 #0316
+// 검색 기능 (검색어 유지 및 포커스 해제 포함)
+document.getElementById('searchProgram').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        const programSelect = document.getElementById('program');
+        
+        for (let i = 0; i < programSelect.options.length; i++) {
+            if (programSelect.options[i].style.display !== "none") {
+                programSelect.selectedIndex = i; // 첫 번째 검색 결과 선택
+                changeProgram(); // 선택 변경 반영
+                break;
+            }
+        }
+        
+        programSelect.focus(); // `select` 박스로 포커스 이동
+    }
+});
+
+// 교실 선택 및 검색 필터링
 function filterPrograms() {
     const searchInput = document.getElementById('searchProgram').value.toLowerCase();
     const programSelect = document.getElementById('program');
-    const selectedValue = programSelect.value;  // 현재 선택된 값 저장
+    const selectedValue = programSelect.value;
 
     for (let i = 0; i < programSelect.options.length; i++) {
         const option = programSelect.options[i];
@@ -431,89 +456,35 @@ function filterPrograms() {
         }
     }
 
-// 페이지 로드 시 Sync 버튼을 보장 #0316
-document.addEventListener('DOMContentLoaded', function() {
-    pinModal.style.display = 'flex';  // PIN 모달 표시
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('date').value = today;  // 오늘 날짜 설정
-    updateWeekday();  // 요일 업데이트
-    loadSyncButtons();  // Sync 버튼이 초기 로드되도록 추가
-    updateSiteID();  // SITE_ID 표시 업데이트
-});
-
-// 🔹 검색어 입력 후 Enter 입력 시, 첫 번째 검색 결과 자동 선택 + 포커스 해제
-document.getElementById('searchProgram').addEventListener('keypress', function(event) {
-    if (event.key === 'Enter') {
-        const programSelect = document.getElementById('program');
-
-        // 🔹 검색된 옵션 중 첫 번째 선택
-        for (let i = 0; i < programSelect.options.length; i++) {
-            if (programSelect.options[i].style.display !== "none") {
-                programSelect.selectedIndex = i; // 첫 번째 검색 결과 선택
-                changeProgram(); // 선택 변경 반영
-                break;
-            }
-        }
-
-        // 🔹 검색어 입력창에서 포커스 해제
-        programSelect.focus(); // `select` 박스로 포커스 이동
-    }
-});
-
     // 기존 선택된 옵션이 숨겨진 경우, 가장 첫 번째 옵션을 선택
     if (!programSelect.querySelector(`option[value="${selectedValue}"]`)?.style.display !== "none") {
         programSelect.selectedIndex = 0;
     }
 }
 
-function selectProgram(value) {
-    console.log("선택된 교실:", value);
-    document.getElementById('searchProgram').value = ""; // 검색어 초기화
-    filterPrograms(); // 검색어 초기화 후 다시 필터 적용
-}
-
-// 체크된 값이 변경될 때 실행
-function selectProgram(value) {
-    console.log("선택된 교실:", value);
-    // 추가 기능 구현 가능 (예: 선택한 교실을 저장하거나 특정 작업 수행)
-}
-
-    // 1. 전역 변수 정의
-    let activeButton = null;
-    let pinModal = document.getElementById('pinModal');
-    let pinVideoElement = document.getElementById('pinVideo');
-
-    // 2. DOMContentLoaded 이벤트 리스너: 페이지 로드 시 초기화
-    document.addEventListener('DOMContentLoaded', function() {
-        pinModal.style.display = 'flex';  // PIN 모달 표시
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date').value = today;  // 오늘 날짜 설정
-        updateWeekday();  // 요일 업데이트
-        loadSyncButtons();  // 싱크 버튼 로드
-        updateSiteID();  // 사이트 ID 업데이트
-    });
-
-    // 4. 사이트 ID 및 요일 업데이트 함수
+// 선택된 SITE_ID 업데이트
 function updateSiteID() {
     const programSelect = document.getElementById('program');
     const selectedOption = programSelect.options[programSelect.selectedIndex];
 
     if (selectedOption) {
-        const fullText = selectedOption.textContent.trim(); // 전체 텍스트 가져오기
+        const fullText = selectedOption.textContent.trim();
         document.getElementById('selectedSiteID').textContent = fullText;
     }
 }
 
-    // 5. 날짜 입력값으로 요일 업데이트
-    function updateWeekday() {
-        const dateInput = document.getElementById('date').value;
-        const date = new Date(dateInput);
-        const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-        const weekday = weekdays[date.getDay()];
-        document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
-    }
+// 선택된 날짜에 따른 요일 업데이트
+function updateWeekday() {
+    const dateInput = document.getElementById('date').value;
+    const date = new Date(dateInput);
+    const weekdays = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const weekday = weekdays[date.getDay()];
+    document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
+}
+// 예외 처리할 교실 리스트 (Sync00~Sync41 표시)
+const EXCEPTIONAL_CLASSES = ["noblecounty_program", "noblecounty_healthcare"];
 
-    // 6. 싱크 버튼 로드 함수
+// Sync 버튼 로드 함수
 function loadSyncButtons() {
     const program = document.getElementById('program').value;
     const syncContainerTop = document.getElementById('syncContainerTop');
@@ -523,58 +494,89 @@ function loadSyncButtons() {
     syncContainerTop.innerHTML = '';  
     syncContainerBottom.innerHTML = '';  
 
-    const totalSyncs = 44;  // Sync 00~43까지 표시
+    // 예외 교실 여부 확인
+    const isExceptional = EXCEPTIONAL_CLASSES.includes(program);
 
-    // 🔹 기본 00~17까지 모든 프로그램에서 추가
-    for (let i = 0; i <= 17; i++) {
+    // 일반 교실: Sync 00~17 / 예외 교실: Sync 00~41
+    let totalSyncs = isExceptional ? 41 : 17;
+
+    for (let i = 0; i <= totalSyncs; i++) {
         const button = document.createElement('button');
         button.classList.add('sync-button');
         button.textContent = `Sync ${i} (${formatTime(i)})`;
         button.onclick = function() {
             loadVideos(`sync${String(i).padStart(3, '0')}`, this);
         };
-        syncContainerTop.appendChild(button);
-    }
 
-    // 🔹 noblecounty 관련 교실은 추가로 18~43까지 표시
-    if (["noblecounty_program", "noblecounty_healthcare"].includes(program)) {
-        console.log("노블카운티 교실 감지됨. Sync 18~43 추가");
-
-        for (let i = 18; i < totalSyncs; i++) {
-            const button = document.createElement('button');
-            button.classList.add('sync-button');
-            button.textContent = `Sync ${i} (${formatTime(i)})`;
-            button.onclick = function() {
-                loadVideos(`sync${String(i).padStart(3, '0')}`, this);
-            };
+        // Sync 00~17은 상단에, 예외 교실의 Sync 18~41은 하단에 추가
+        if (i <= 17) {
+            syncContainerTop.appendChild(button);
+        } else if (isExceptional) {
             syncContainerBottom.appendChild(button);
         }
     }
 
-    // 콘솔에서 syncContainerBottom이 제대로 추가되는지 확인
+    console.log("syncContainerTop 내용:", syncContainerTop.innerHTML);
     console.log("syncContainerBottom 내용:", syncContainerBottom.innerHTML);
 }
 
-    // 7. 싱크 번호를 시간으로 변환하는 함수
-    function formatTime(syncIndex) {
-        const startHour = 9;  // 시작 시간
-        const totalMinutes = syncIndex * 10;  // 10분 단위
-        const hours = Math.floor((startHour * 60 + totalMinutes) / 60);
-        const minutes = totalMinutes % 60;
-        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-    }
+// Sync 번호를 시간으로 변환하는 함수
+function formatTime(syncIndex) {
+    const startHour = 9;  // 시작 시간 (09:00)
+    const totalMinutes = syncIndex * 10;  // 10분 단위 증가
+    const hours = Math.floor((startHour * 60 + totalMinutes) / 60);
+    const minutes = totalMinutes % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
 
-// 동영상마다 [새창] 및 [전체] 버튼 추가
+// 🔹 동영상을 로드하고, UI 버튼(새창/전체) 추가하는 함수
+function loadVideos(sync, button) {
+    if (activeButton) {
+        activeButton.classList.remove('active'); // 이전 활성화 버튼 비활성화
+    }
+    button.classList.add('active'); // 현재 버튼 활성화
+    activeButton = button;
+
+    const date = document.getElementById('date').value;
+    const program = document.getElementById('program').value;
+    const container = document.getElementById('videoContainer');
+    container.innerHTML = ''; // 기존 동영상 삭제
+
+    // 🔹 8개 동영상 생성
+    for (let i = 1; i <= 8; i++) {
+        const videoWrapper = document.createElement('div');
+        videoWrapper.classList.add('video-wrapper');
+
+        const camLabel = document.createElement('div');
+        camLabel.classList.add('cam-label');
+        camLabel.textContent = `CAM0${i}`;
+
+        const video = document.createElement('video');
+        video.controls = true;
+        video.autoplay = true;
+        video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
+
+        // 🔹 동영상 로드 실패 시 메시지 표시
+        video.onerror = function () {
+            videoWrapper.innerHTML = '<p style="color: red; text-align: center;">동영상이 없습니다.</p>';
+        };
+
+        videoWrapper.appendChild(camLabel);
+        videoWrapper.appendChild(video);
+        addVideoButtons(videoWrapper, video); // 새창/전체 버튼 추가
+        container.appendChild(videoWrapper);
+    }
+}
+
+// 🔹 동영상 컨트롤 버튼 (새창 / 전체 화면) 추가
 function addVideoButtons(videoWrapper, video) {
-    // 새 창 보기 버튼
     const newWindowButton = document.createElement('button');
     newWindowButton.textContent = '새창';
     newWindowButton.classList.add('video-button', 'new-window-button');
     newWindowButton.onclick = function() {
-        window.open(video.src, '_blank'); // 새 창으로 열기
+        window.open(video.src, '_blank'); // 새 창에서 열기
     };
 
-    // 전체 화면 보기 버튼
     const fullscreenButton = document.createElement('button');
     fullscreenButton.textContent = '전체';
     fullscreenButton.classList.add('video-button', 'fullscreen-button');
@@ -588,188 +590,122 @@ function addVideoButtons(videoWrapper, video) {
         }
     };
 
-    // 버튼 컨테이너 추가
     const buttonContainer = document.createElement('div');
     buttonContainer.classList.add('button-container');
     buttonContainer.appendChild(newWindowButton);
     buttonContainer.appendChild(fullscreenButton);
 
-    // 버튼 컨테이너를 동영상 래퍼에 추가
     videoWrapper.appendChild(buttonContainer);
 }
-
-// 동영상 생성 및 버튼 추가 호출
-function loadVideos(sync, button) {
-if (activeButton) {
-    activeButton.classList.remove('active'); // 이전 활성화 버튼의 `active` 제거
-}
-button.classList.add('active'); // 현재 버튼에 `active` 추가
-activeButton = button;
-
-    const date = document.getElementById('date').value;
-    const program = document.getElementById('program').value;
-    const container = document.getElementById('videoContainer');
-    container.innerHTML = ''; // 기존 동영상 삭제
-
-    // 동영상 8개 생성
-    for (let i = 1; i <= 8; i++) {
-        const videoWrapper = document.createElement('div');
-        videoWrapper.classList.add('video-wrapper');
-
-        const camLabel = document.createElement('div');
-        camLabel.classList.add('cam-label');
-        camLabel.textContent = `CAM0${i}`;
-
-        const video = document.createElement('video');
-        video.controls = true;
-        video.autoplay = true;
-video.src = `https://d175ce76v5cwjf.cloudfront.net/${program}/${date}/processed/${sync}/${i}.MP4`;
-
-
-        // 동영상 로드 실패 시 메시지 표시
-        video.onerror = function () {
-            videoWrapper.innerHTML = '<p style="color: red; text-align: center;">동영상이 없습니다.</p>';
-        };
-
-        videoWrapper.appendChild(camLabel);
-        videoWrapper.appendChild(video);
-        addVideoButtons(videoWrapper, video); // 새 버튼 추가 함수 호출
-        container.appendChild(videoWrapper);
-    }
-}
-
-    // 9. PIN 모달 열기
-    function openPinModal(videoSrc) {
-        pinVideoElement.src = videoSrc;
-        pinModal.style.display = 'flex';
-    }
-
-    // 10. PIN 모달 닫기
-    function closeModal() {
-        pinModal.style.display = 'none';
-        pinVideoElement.src = '';  // 비디오 정지
-    }
-
-    // 11. 모든 동영상 일시정지
-    function pauseAllVideos() {
-        const videos = document.querySelectorAll('video');
-        videos.forEach(video => video.pause());
-    }
-
-    // 12. 모든 동영상 재생
-    function playAllVideos() {
-        const videos = document.querySelectorAll('video');
-        videos.forEach(video => video.play());
-    }
-
-    // 13. 동영상 재생 시간 되감기
-    function rewindVideos(seconds) {
-        const videos = document.querySelectorAll('video');
-        videos.forEach(video => {
-            video.currentTime = Math.max(video.currentTime - seconds, 0);  // 0초 이하 방지
-        });
-    }
-
-    // 14. 동영상 재생 시간 앞으로 이동
-    function forwardVideos(seconds) {
-        const videos = document.querySelectorAll('video');
-        videos.forEach(video => {
-            video.currentTime = Math.min(video.currentTime + seconds, video.duration);  // 최대 길이 초과 방지
-        });
-    }
-
-// 1. 키보드 이벤트 리스너 추가
-document.addEventListener('keydown', function(event) {
-    // 입력 필드 또는 텍스트 영역에 포커스가 있을 경우 단축키 비활성화
-    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
-        return; // 입력 필드에 포커스가 있을 경우 종료
-    }
-
-    // 2. 입력된 키를 소문자로 변환
-    const key = event.key.toLowerCase();
-
-    // 숫자 단축키 1, 2, 3, 4 처리
-    switch (key) {
-        case '1':
-            rewindVideos(180); // 3분 되감기
-            break;
-        case '2':
-            rewindVideos(30); // 30초 되감기
-            break;
-        case '3':
-            forwardVideos(30); // 30초 앞으로 이동
-            break;
-        case '4':
-            forwardVideos(180); // 3분 앞으로 이동
-            break;
-        case ' ':
-            console.log('Spacebar pressed'); // 디버깅: 스페이스바 입력 감지
-            event.preventDefault();         // 스페이스바 기본 동작 방지
-            togglePlayPause();              // 재생/정지 토글
-            break;
-    }
-/**
- * 모든 비디오의 재생 상태를 토글하는 함수
- * - 재생 중인 비디오가 하나라도 있으면 모두 정지
- * - 정지 상태라면 모두 재생
- */
-function togglePlayPause() {
-    // 현재 문서에서 모든 <video> 요소를 가져옵니다.
+    
+// 🔹 모든 동영상 일시정지
+function pauseAllVideos() {
     const videos = document.querySelectorAll('video');
+    videos.forEach(video => video.pause());
+}
 
-    // 비디오 배열에서 하나라도 재생 중인지 확인
-    // - video.paused가 false인 경우 해당 비디오는 재생 중임
+// 🔹 모든 동영상 재생
+function playAllVideos() {
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => video.play());
+}
+
+// 🔹 재생/정지 토글 함수 (스페이스바 입력 시)
+function togglePlayPause() {
+    const videos = document.querySelectorAll('video');
     const anyPlaying = Array.from(videos).some(video => !video.paused);
 
     if (anyPlaying) {
-        // 하나라도 재생 중인 경우: 모든 비디오를 정지
-        videos.forEach(video => video.pause());
+        pauseAllVideos();
     } else {
-        // 모든 비디오가 정지 상태인 경우: 모든 비디오를 재생
-        videos.forEach(video => video.play());
+        playAllVideos();
     }
 }
 
-    // 4. 싱크 이동 단축키 e(이전)와 r(다음) 처리
-    if (key === 'e' || key === 'ㄷ') {
-        navigateSync(-1);  // 이전 싱크로 이동
-    } else if (key === 'r' || key === 'ㄱ') {
-        navigateSync(1);   // 다음 싱크로 이동
+// 🔹 키보드 단축키 이벤트 리스너 추가
+document.addEventListener('keydown', function(event) {
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+        return; // 입력 필드에서 단축키 비활성화
     }
 
-// 비밀. 싱크 이동 단축키 c, v, ㅊ, ㅍ 처리
-if (key === 'c' || key === 'ㅊ') { // 이전 3개 싱크로 이동
-    navigateSync(-3); // -3개 이동
-    togglePlayPause(); // 이동 후 즉시 재생
-} else if (key === 'v' || key === 'ㅍ') { // 이후 3개 싱크로 이동
-    navigateSync(3); // +3개 이동
-    togglePlayPause(); // 이동 후 즉시 재생
-}
+    const key = event.key.toLowerCase();
 
-    // 5. 교실 선택 단축키 q(위로)와 w(아래로) 처리
-    if (key === 'q' || key === 'ㅂ') {
-        changeProgramSelection(-1);  // 교실 선택 상으로 이동
-    } else if (key === 'w' || key === 'ㅈ') {
-        changeProgramSelection(1);   // 교실 선택 하로 이동
-    }
-
-    // 6. 날짜 선택 단축키 a(하루 전)와 d(하루 후) 처리
-    if (key === 'a' || key === 'ㅁ') {
-        changeDateSelection(-1);  // 하루 전으로 이동
-    } else if (key === 'd' || key === 'ㅇ') {
-        changeDateSelection(1);   // 하루 후로 이동
-    }
-
-    // 7. Sync 0 단축키 s를 눌렀을 때 첫 번째 싱크 버튼 선택
-    if (key === 's' || key === 'ㄴ') {
-        const sync0Button = document.querySelector('.sync-button:first-child'); // 첫 번째 싱크 버튼 가져오기
-        if (sync0Button) {
-            sync0Button.click(); // 버튼 클릭
-        }
+    switch (key) {
+        case '1': rewindVideos(180); break; // 3분 되감기
+        case '2': rewindVideos(30); break; // 30초 되감기
+        case '3': forwardVideos(30); break; // 30초 앞으로 이동
+        case '4': forwardVideos(180); break; // 3분 앞으로 이동
+        case ' ': // 스페이스바: 재생/정지 토글
+            event.preventDefault();
+            togglePlayPause();
+            break;
     }
 });
 
-// 🔹 교실 선택 옵션을 위/아래로 이동 (검색된 목록 내에서만)
+// 🔹 동영상 시간 이동 함수 (되감기/앞으로 이동)
+function rewindVideos(seconds) {
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+        video.currentTime = Math.max(video.currentTime - seconds, 0);  // 0초 이하 방지
+    });
+}
+
+function forwardVideos(seconds) {
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+        video.currentTime = Math.min(video.currentTime + seconds, video.duration);  // 최대 길이 초과 방지
+    });
+}
+
+// 🔹 싱크 이동 함수 (이전/다음 Sync 버튼 클릭)
+function navigateSync(offset) {
+    const syncButtons = document.querySelectorAll('.sync-button');
+    if (activeButton) {
+        let currentIndex = Array.from(syncButtons).indexOf(activeButton);
+        let newIndex = currentIndex + offset;
+
+        if (newIndex < 0) newIndex = 0; // 최소값 제한
+        else if (newIndex >= syncButtons.length) newIndex = syncButtons.length - 1; // 최대값 제한
+
+        syncButtons[newIndex].click();
+        activeButton = syncButtons[newIndex];
+    }
+}
+
+// 🔹 단축키로 싱크 이동
+document.addEventListener('keydown', function(event) {
+    const key = event.key.toLowerCase();
+    
+    if (key === 'e' || key === 'ㄷ') navigateSync(-1); // 이전 싱크
+    else if (key === 'r' || key === 'ㄱ') navigateSync(1); // 다음 싱크
+    else if (key === 'c' || key === 'ㅊ') { // 이전 3개 싱크로 이동
+        navigateSync(-3);
+        togglePlayPause(); // 이동 후 재생
+    } else if (key === 'v' || key === 'ㅍ') { // 이후 3개 싱크로 이동
+        navigateSync(3);
+        togglePlayPause(); // 이동 후 재생
+    }
+});
+    
+// 🔹 날짜 선택 필드를 하루 전/후로 이동시키는 함수
+function changeDateSelection(direction) {
+    const dateInput = document.getElementById('date');
+    const currentDate = new Date(dateInput.value);
+    currentDate.setDate(currentDate.getDate() + direction);
+
+    dateInput.value = currentDate.toISOString().split('T')[0];
+    updateWeekday();
+}
+
+// 🔹 키보드 단축키로 날짜 이동
+document.addEventListener('keydown', function(event) {
+    const key = event.key.toLowerCase();
+    
+    if (key === 'a' || key === 'ㅁ') changeDateSelection(-1); // 하루 전 이동
+    else if (key === 'd' || key === 'ㅇ') changeDateSelection(1); // 하루 후 이동
+});
+
+// 🔹 검색된 목록 내에서만 교실 이동
 function changeProgramSelection(direction) {
     const programSelect = document.getElementById('program');
 
@@ -783,157 +719,84 @@ function changeProgramSelection(direction) {
     // 🔹 범위 확인 후 이동
     if (newIndex >= 0 && newIndex < visibleOptions.length) {
         programSelect.value = visibleOptions[newIndex].value; // 새로운 옵션 선택
-        changeProgram(); // 선택 변경 후 프로그램 갱신
+        changeProgram();
     }
 }
 
-// 9. 싱크 버튼을 이전/다음으로 이동시키는 함수
-function navigateSync(offset) { // offset: 이동량
+// 🔹 키보드 단축키로 교실 이동
+document.addEventListener('keydown', function(event) {
+    const key = event.key.toLowerCase();
+    
+    if (key === 'q' || key === 'ㅂ') changeProgramSelection(-1); // 이전 교실 선택
+    else if (key === 'w' || key === 'ㅈ') changeProgramSelection(1); // 다음 교실 선택
+});
+
+// 🔹 Sync 0 단축키 지원
+document.addEventListener('keydown', function(event) {
+    if (event.key.toLowerCase() === 's' || event.key === 'ㄴ') {
+        const sync0Button = document.querySelector('.sync-button:first-child');
+        if (sync0Button) sync0Button.click();
+    }
+});
+    
+// 🔹 싱크 버튼을 이전/다음으로 이동시키는 함수
+function navigateSync(offset) {
     const syncButtons = document.querySelectorAll('.sync-button');
-    if (activeButton) {
-        let currentIndex = Array.from(syncButtons).indexOf(activeButton);
-        let newIndex = currentIndex + offset;
+    if (!activeButton) return;
 
-        // 이동 범위 제한
-        if (newIndex < 0) {
-            newIndex = 0; // 최소값(0번 싱크)로 제한
-        } else if (newIndex >= syncButtons.length) {
-            newIndex = syncButtons.length - 1; // 최대값(마지막 싱크)로 제한
-        }
+    let currentIndex = Array.from(syncButtons).indexOf(activeButton);
+    let newIndex = currentIndex + offset;
 
-        // 이동 후 싱크 버튼 클릭
-        syncButtons[newIndex].click();
-        activeButton = syncButtons[newIndex]; // 활성 버튼 갱신
-    }
+    // 🔹 범위 제한
+    if (newIndex < 0) newIndex = 0;
+    else if (newIndex >= syncButtons.length) newIndex = syncButtons.length - 1;
+
+    syncButtons[newIndex].click();
+    activeButton = syncButtons[newIndex];
 }
 
-// 10. 날짜 선택 필드를 하루 전/후로 이동시키는 함수
-function changeDateSelection(direction) {
-    const dateInput = document.getElementById('date'); // 날짜 입력 필드 가져오기
-    const currentDate = new Date(dateInput.value); // 현재 날짜 가져오기
-    currentDate.setDate(currentDate.getDate() + direction); // 날짜를 direction만큼 이동
+// 🔹 키보드 단축키로 싱크 이동
+document.addEventListener('keydown', function(event) {
+    const key = event.key.toLowerCase();
 
-    dateInput.value = currentDate.toISOString().split('T')[0]; // 이동된 날짜를 필드에 설정
-    updateWeekday(); // 요일 갱신 함수 호출
-}
-
-
-
-function verifyPin() {
-    const inputPin = document.getElementById('pinInput').value;
-    const correctPin = '1240'; // 올바른 PIN 설정
-
-    if (inputPin === correctPin) {
-        pinModal.style.display = 'none';
-    } else {
-        alert('PIN이 잘못되었습니다.');
-    }
-}
-
-function addPinDigit(digit) {
-    const pinInput = document.getElementById('pinInput');
-    if (pinInput.value.length < 4) { // 최대 4자리 제한
-        pinInput.value += digit;
-    }
-}
-
-function clearPin() {
-    const pinInput = document.getElementById('pinInput');
-    pinInput.value = '';
-}
-
-function verifyPin() {
-    const pinInput = document.getElementById('pinInput').value;
-    const correctPin = '1240'; // 올바른 PIN 설정
-
-    if (pinInput === correctPin) {
-        document.getElementById('pinModal').style.display = 'none'; // 모달 닫기
-    } else {
-        alert('PIN이 잘못되었습니다.');
-        clearPin();
-    }
-}
-
-/**
- * 요일별 필터링 함수
- * - 선택된 요일과 일치하는 교실만 표시
- * - '전체' 버튼 클릭 시 모든 교실 표시
- */
-function filterByWeekday(day) {
-    const programSelect = document.getElementById('program');
-    const options = programSelect.options;
-
-    // 모든 옵션을 반복하며 필터링
-    for (let i = 0; i < options.length; i++) {
-        const optionText = options[i].textContent; // 옵션의 텍스트
-        if (day === 'all' || optionText.includes(day)) {
-            options[i].style.display = ''; // 선택된 요일과 일치하면 표시
-        } else {
-            options[i].style.display = 'none'; // 일치하지 않으면 숨김
-        }
-    }
-
-    // 버튼 스타일 업데이트
-    document.querySelectorAll('.day-button').forEach(button => {
-        if (button.textContent === day || (day === 'all' && button.textContent === '전체')) {
-            button.classList.add('active');
-        } else {
-            button.classList.remove('active');
-        }
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelector('.day-button.active')?.classList.remove('active');
-    document.querySelector('.day-button:last-child')?.classList.add('active'); // '전체' 버튼
+    if (key === 'e' || key === 'ㄷ') navigateSync(-1); // 이전 싱크
+    else if (key === 'r' || key === 'ㄱ') navigateSync(1); // 다음 싱크
+    else if (key === 'c' || key === 'ㅊ') { navigateSync(-3); togglePlayPause(); } // -3 싱크 이동 후 자동재생
+    else if (key === 'v' || key === 'ㅍ') { navigateSync(3); togglePlayPause(); }  // +3 싱크 이동 후 자동재생
 });
 
-// 요일별 필터링 함수 수정
-function filterByWeekday(day) {
-    const programSelect = document.getElementById('program');
-    const allOptions = programSelect.querySelectorAll('option');
+// 🔹 모든 동영상 재생/일시정지 토글
+function togglePlayPause() {
+    const videos = document.querySelectorAll('video');
+    const anyPlaying = Array.from(videos).some(video => !video.paused);
 
-    // 선택된 요일과 일치하는 옵션만 남기고 나머지는 제거
-    programSelect.innerHTML = ''; // 기존 옵션 초기화
-    allOptions.forEach(option => {
-        const optionText = option.textContent;
-        if (day === 'all' || optionText.includes(day)) {
-            programSelect.appendChild(option); // 요일 일치 옵션 추가
-        }
-    });
-
-    // 버튼 스타일 업데이트
-    document.querySelectorAll('.day-button').forEach(button => {
-        if (button.textContent === day || (day === 'all' && button.textContent === '전체')) {
-            button.classList.add('active');
-        } else {
-            button.classList.remove('active');
-        }
-    });
-
-    // 첫 번째 옵션을 선택 상태로 설정
-    programSelect.selectedIndex = 0;
-    changeProgram(); // 선택된 프로그램 갱신
+    if (anyPlaying) videos.forEach(video => video.pause());
+    else videos.forEach(video => video.play());
 }
 
-// 현재 눌린 키를 추적하기 위한 객체
-const keysPressed = {};
-
-// 키보드 이벤트 리스너 추가
-document.addEventListener('keydown', (event) => {
-    keysPressed[event.key] = true; // 눌린 키 기록
-
-    // ','와 '.' 키가 동시에 눌린 경우 또는 ','와 '.' 키가 동시에 눌린 경우
-    if ((keysPressed[','] && keysPressed['.']) || (keysPressed[','] && keysPressed['.'])) {
-        const pinModal = document.getElementById('pinModal');
-        if (pinModal.style.display === 'flex') { // 모달이 열려 있는 경우
-            pinModal.style.display = 'none'; // 모달 닫기
-        }
+// 🔹 키보드 단축키로 전체 재생/일시정지
+document.addEventListener('keydown', function(event) {
+    if (event.key === ' ') { // 스페이스바
+        event.preventDefault();
+        togglePlayPause();
     }
 });
 
-document.addEventListener('keyup', (event) => {
-    delete keysPressed[event.key]; // 키가 떼어지면 기록에서 제거
+// 🔹 모든 동영상 시간 이동 (되감기 & 앞으로 이동)
+function adjustVideoTime(seconds) {
+    document.querySelectorAll('video').forEach(video => {
+        video.currentTime = Math.max(0, Math.min(video.currentTime + seconds, video.duration));
+    });
+}
+
+// 🔹 키보드 단축키로 동영상 시간 조정
+document.addEventListener('keydown', function(event) {
+    const key = event.key.toLowerCase();
+
+    if (key === '1') adjustVideoTime(-180); // -3분
+    else if (key === '2') adjustVideoTime(-30);  // -30초
+    else if (key === '3') adjustVideoTime(30);   // +30초
+    else if (key === '4') adjustVideoTime(180);  // +3분
 });
 
 </script>
