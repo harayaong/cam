@@ -277,6 +277,22 @@ video {
 .key.delete:hover {
     background-color: #c9302c;
 }
+
+/* 교실 선택 및 검색 입력 필드 크기 조정 */
+select, input[type="text"] {
+    font-size: 15px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-left: 10px;
+    width: 200px; /* 교실 선택 박스와 동일한 너비 지정 */
+}
+
+/* 교실 선택 박스 크기만 2배로 늘리기 */
+select#program {
+    width: 400px; /* 기존보다 2배 크기로 설정 (기본값이 200px이라면) */
+}
+
 </style>
 </head>
 
@@ -886,8 +902,8 @@ video {
 
 <!-- 검색 입력창 추가 -->
 <div class="form-group">
-    <label for="searchProgram">교실 검색:</label>
-    <input type="text" id="searchProgram" oninput="filterPrograms()" placeholder="교실명을 입력하세요">
+    <label for="searchProgram">검색어:</label>
+    <input type="text" id="searchProgram" oninput="filterPrograms()" placeholder="검색어를 입력하세요">
 </div>
 
     </div>
