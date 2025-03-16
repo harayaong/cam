@@ -293,6 +293,12 @@ select#program {
     width: 400px; /* 기존보다 2배 크기로 설정 (기본값이 200px이라면) */
 }
 
+/* 선택된 Sync 버튼을 주황색(#ff9800)으로 변경 */
+.sync-button.active {
+    background-color: #ff9800 !important; /* 주황색 */
+    color: white; /* 글자색 */
+}
+
 </style>
 </head>
 
@@ -1127,11 +1133,11 @@ function addVideoButtons(videoWrapper, video) {
 
 // 동영상 생성 및 버튼 추가 호출
 function loadVideos(sync, button) {
-    if (activeButton) {
-        activeButton.classList.remove('active'); // 이전 활성화 버튼 비활성화
-    }
-    button.classList.add('active'); // 현재 버튼 활성화
-    activeButton = button;
+if (activeButton) {
+    activeButton.classList.remove('active'); // 이전 활성화 버튼의 `active` 제거
+}
+button.classList.add('active'); // 현재 버튼에 `active` 추가
+activeButton = button;
 
     const date = document.getElementById('date').value;
     const program = document.getElementById('program').value;
