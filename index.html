@@ -373,11 +373,10 @@ select#program {
     <div class="sync-container bottom" id="syncContainerBottom"></div>
     
 <!-- 공유 버튼 영역 -->
-<div style="text-align: center; margin-top: 10px;">
-<button onclick="copyShareURL()" class="sync-button">날짜와 교실을 다른 직원에게 공유하기</button>
-<span id="copyNotice" style="margin-left: 10px; color: green; display: none;">링크가 복사되었습니다!</span>
+<div style="text-align: center; margin: 10px 0;">
+    <button onclick="copyShareURL()" class="sync-button">이 화면 공유하기</button>
+    <span id="copyNotice" style="display:none; font-size:12px; color:green; margin-left:10px;">복사 완료!</span>
 </div>
-    ,.
     
 </body>
 
@@ -959,23 +958,75 @@ window.addEventListener('DOMContentLoaded', () => {
     applyURLParams();
 });
 
-    function copyShareURL() {
+function copyShareURL() {
     const date = document.getElementById('date').value;
     const program = document.getElementById('program').value;
-    const url = `${location.origin}${location.pathname.split('/').slice(0, -2).join('/')}/${date}/${program}`;
+    const url = `${location.origin}${location.pathname}?date=${date}&program=${program}`;
 
-    // 클립보드에 복사
     navigator.clipboard.writeText(url).then(() => {
         const notice = document.getElementById('copyNotice');
         notice.style.display = 'inline';
         setTimeout(() => {
             notice.style.display = 'none';
-        }, 2000); // 2초 후 메시지 숨김
+        }, 2000);
     }).catch(err => {
         alert('링크 복사에 실패했습니다.');
         console.error(err);
     });
 }
+    
+// URL에서 파라미터 가져오기
+const params = new URLSearchParams(window.location.search);
+const paramDate = params.get("date");
+const paramProgram = params.get("program");
+
+// 날짜와 교실 선택 적용
+if (paramDate) {
+    document.getElementById("date").value = paramDate;
+}
+if (paramProgram) {
+    const programSelect = document.getElementById("program");
+    const optionToSelect = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
+    if (optionToSelect) {
+        programSelect.value = paramProgram;
+    }
+}
+updateWeekday(); // 요일 갱신
+changeProgram(); // 초기화
+    
+function copyShareURL() {
+    const date = document.getElementById('date').value;
+    const program = document.getElementById('program').value;
+    const url = `${location.origin}${location.pathname}?date=${date}&program=${program}`;
+
+    navigator.clipboard.writeText(url).then(() => {
+        const notice = document.getElementById('copyNotice');
+        notice.style.display = 'inline';
+        setTimeout(() => {
+            notice.style.display = 'none';
+        }, 2000);
+    }).catch(err => {
+        alert('링크 복사에 실패했습니다.');
+        console.error(err);
+    });
+}
+   
+const params = new URLSearchParams(window.location.search);
+const paramDate = params.get("date");
+const paramProgram = params.get("program");
+
+if (paramDate) {
+    document.getElementById("date").value = paramDate;
+}
+if (paramProgram) {
+    const programSelect = document.getElementById("program");
+    const option = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
+    if (option) {
+        programSelect.value = paramProgram;
+    }
+}
+updateWeekday();
+changeProgram();
     
 </script>
 
