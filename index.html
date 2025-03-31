@@ -1011,22 +1011,7 @@ function copyShareURL() {
     });
 }
    
-const params = new URLSearchParams(window.location.search);
-const paramDate = params.get("date");
-const paramProgram = params.get("program");
 
-if (paramDate) {
-    document.getElementById("date").value = paramDate;
-}
-if (paramProgram) {
-    const programSelect = document.getElementById("program");
-    const option = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
-    if (option) {
-        programSelect.value = paramProgram;
-    }
-}
-updateWeekday();
-changeProgram();
     
 </script>
 
