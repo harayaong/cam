@@ -382,18 +382,39 @@ select#program {
 
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const programSelect = document.getElementById("program");
     const classroomContainer = document.getElementById("classroomContainer");
 
-    // 하단의 <option>들을 <select>로 이동
+    // 옵션을 먼저 select에 이동
     if (classroomContainer) {
         const options = classroomContainer.children;
         while (options.length > 0) {
             programSelect.appendChild(options[0]);
         }
-        classroomContainer.remove(); // 다 옮긴 후 제거
+        classroomContainer.remove();
     }
+
+    // ✅ URL 파라미터 처리 (trim 꼭 포함!)
+    const params = new URLSearchParams(window.location.search);
+    const paramDate = params.get("date");
+    const paramProgram = params.get("program")?.trim(); // ← 공백 제거
+
+    if (paramDate) {
+        document.getElementById("date").value = paramDate;
+    }
+
+    if (paramProgram) {
+        const option = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
+        if (option) {
+            programSelect.value = paramProgram;
+        }
+    }
+
+    // ✅ 기본 초기화
+    pinModal.style.display = 'flex';
+    updateWeekday();
+    changeProgram();
 });
 // 프로그램(교실) 변경 시 Sync 버튼을 로드하는 코드 추가 #0316
 function changeProgram() {
@@ -975,25 +996,25 @@ function copyShareURL() {
     });
 }
     
-// URL에서 파라미터 가져오기
+// ✅ URL 파라미터 처리 (최신 버전)
 const params = new URLSearchParams(window.location.search);
 const paramDate = params.get("date");
 const paramProgram = params.get("program");
 
-// 날짜와 교실 선택 적용
 if (paramDate) {
     document.getElementById("date").value = paramDate;
 }
 if (paramProgram) {
     const programSelect = document.getElementById("program");
-    const optionToSelect = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
-    if (optionToSelect) {
+    const option = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
+    if (option) {
         programSelect.value = paramProgram;
     }
 }
-updateWeekday(); // 요일 갱신
-changeProgram(); // 초기화
-    
+updateWeekday();
+changeProgram();
+
+// ✅ 이건 꼭 유지해야 함! (공유 버튼 기능)
 function copyShareURL() {
     const date = document.getElementById('date').value;
     const program = document.getElementById('program').value;
