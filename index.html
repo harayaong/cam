@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>통합 카메라 조회 v0404</title>
+    <title>통합 카메라 조회 v0407</title>
 
 
 <style>
@@ -348,7 +348,7 @@ select#program {
     <select id="program" onchange="changeProgram()"></select>
 <!-- 검색 입력창 -->
 <div class="form-group">
-    <label for="searchProgram">검색어(Site-ID로 조회 권장):</label>
+    <label for="searchProgram">검색어:</label>
     <input type="text" id="searchProgram" oninput="filterPrograms()" placeholder="검색어를 입력하세요">
 </div>
     </div>
@@ -519,46 +519,36 @@ function updateSiteID() {
         document.getElementById('weekday').innerHTML = `<span style="font-weight: bold;">${weekday}</span>`;
     }
 
-    // 6. 싱크 버튼 로드 함수
+// 6. 싱크 버튼 로드 함수
 function loadSyncButtons() {
     const program = document.getElementById('program').value;
     const syncContainerTop = document.getElementById('syncContainerTop');
     const syncContainerBottom = document.getElementById('syncContainerBottom');
 
     // 기존 버튼 초기화
-    syncContainerTop.innerHTML = '';  
-    syncContainerBottom.innerHTML = '';  
+    syncContainerTop.innerHTML = '';
+    syncContainerBottom.innerHTML = '';
 
-    const totalSyncs = 44;  // Sync 00~43까지 표시
+    const totalSyncs = 42; // Sync 0~41까지 생성
 
-    // 🔹 기본 00~17까지 모든 프로그램에서 추가
-    for (let i = 0; i <= 17; i++) {
+    for (let i = 0; i < totalSyncs; i++) {
         const button = document.createElement('button');
         button.classList.add('sync-button');
         button.textContent = `Sync ${i} (${formatTime(i)})`;
-        button.onclick = function() {
+        button.onclick = function () {
             loadVideos(`sync${String(i).padStart(3, '0')}`, this);
         };
-        syncContainerTop.appendChild(button);
-    }
 
-    // 🔹 noblecounty 관련 교실은 추가로 18~43까지 표시
-    if (["noblecounty_program", "noblecounty_healthcare"].includes(program)) {
-        console.log("노블카운티 교실 감지됨. Sync 18~43 추가");
-
-        for (let i = 18; i < totalSyncs; i++) {
-            const button = document.createElement('button');
-            button.classList.add('sync-button');
-            button.textContent = `Sync ${i} (${formatTime(i)})`;
-            button.onclick = function() {
-                loadVideos(`sync${String(i).padStart(3, '0')}`, this);
-            };
+        // 상단: 0~17번, 하단: 18~41번
+        if (i <= 17) {
+            syncContainerTop.appendChild(button);
+        } else {
             syncContainerBottom.appendChild(button);
         }
     }
 
-    // 콘솔에서 syncContainerBottom이 제대로 추가되는지 확인
-    console.log("syncContainerBottom 내용:", syncContainerBottom.innerHTML);
+    console.log("syncContainerTop:", syncContainerTop.innerHTML);
+    console.log("syncContainerBottom:", syncContainerBottom.innerHTML);
 }
 
     // 7. 싱크 번호를 시간으로 변환하는 함수
