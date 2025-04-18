@@ -78,10 +78,11 @@ h1 {
 
 /* 버튼 컨테이너 및 버튼 스타일 */
 .sync-container {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr); /* 10개 버튼 정렬 */
-    grid-gap: 10px; /* 버튼 간격 */
-    margin-top: 10px;
+  display: flex;
+  flex-wrap: nowrap;       /* ✅ 줄바꿈 안함 */
+  gap: 10px;
+  overflow-x: auto;        /* ✅ 스크롤 허용 */
+  padding: 10px 0;
 }
 
 .sync-container.top {
@@ -324,12 +325,16 @@ select#program {
 
 /* 싱크 버튼 스타일 */
 .sync-button {
-  flex: 1 1 18%;        /* 반응형 너비 비율 */
-  max-width: 200px;     /* 너무 커지지 않도록 제한 */
-  min-width: 100px;     /* 너무 작아지지 않도록 제한 */
-  padding: 0.4rem 0.8rem;
-  text-align: center;
-  box-sizing: border-box;
+  flex: 0 0 auto;          /* 고정 크기 유지 */
+  width: 100px;            /* 원하는 버튼 너비 (100~110px 추천) */
+  height: 50px;
+  font-size: 13px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
   white-space: nowrap;
 }
 
