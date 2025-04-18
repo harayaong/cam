@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>통합 카메라 조회 v0415</title>
+    <title>통합 카메라 조회 v0418</title>
 
 
 <style>
@@ -345,7 +345,22 @@ select#program {
     flex: 1 1 100%;     /* 한 줄에 1개씩 */
   }
 }
-    
+   
+    .shortcut-link {
+    font-size: 14px;
+    color: white;
+    background-color: #ff9800; /* 주황색 */
+    text-decoration: none;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.shortcut-link:hover {
+    background-color: #e07b00; /* 주황색 hover */
+}
     
 </style>
 </head>
@@ -354,14 +369,28 @@ select#program {
 <body>
 <!-- 상단 섹션 -->
 <div class="top-section">
-    <!-- 왼쪽 정보 표시 -->
-    <div class="header-left">
-        <h1><span id="selectedSiteID"></span></h1>
-    </div>
+<!-- 왼쪽 정보 표시 + 버튼들 -->
+<div class="header-left">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <h1><span id="selectedSiteID"></span></h1>
+    
+    <!-- 이미지 템플릿 버튼 -->
+    <button onclick="openImageTemplate()" class="shortcut-link">이미지템플릿</button>
+    
+    <!-- 디버그 버튼 -->
+    <button onclick="openDebugPage()" class="shortcut-link">디버그</button>
+
+    <!-- 공유 버튼 -->
+    <button onclick="copyShareURL()" class="shortcut-link">지금 보는 비디오 공유하기</button>
+    
+    <!-- 복사 알림 -->
+    <span id="copyNotice" style="display:none; font-size:12px; color:green;">복사 완료!</span>
+  </div>
+</div>
+
     <!-- 오른쪽 숏컷 -->
     <div class="header-right">
         <a href="https://admin.playtagapp.com/company" target="_blank" class="shortcut-link">Admin Tool</a>
-        <a href="https://rerun.playtag.ai/" target="_blank" class="shortcut-link">Perception Admin</a>
         <a href="https://annotation.playtag.ai/" target="_blank" class="shortcut-link">구_Video annotation</a>
     </div>
 </div>
@@ -420,11 +449,6 @@ select#program {
     <!-- 동기화 버튼 컨테이너 (하단) -->
     <div class="sync-container bottom" id="syncContainerBottom"></div>
     
-<!-- 공유 버튼 영역 -->
-<div style="text-align: center; margin: 10px 0;">
-    <button onclick="copyShareURL()" class="sync-button">이 화면 공유하기</button>
-    <span id="copyNotice" style="display:none; font-size:12px; color:green; margin-left:10px;">복사 완료!</span>
-</div>
     
     
     
@@ -1087,7 +1111,21 @@ function copyShareURL() {
     });
 }
    
+function openDebugPage() {
+    const site = document.getElementById('program').value;
+    const date = document.getElementById('date').value;
 
+    const debugURL = `http://3.38.28.246:5000/debug_site?site=${site}&date=${date}`;
+    window.open(debugURL, '_blank');
+}
+    
+function openImageTemplate() {
+    const site = document.getElementById('program').value;
+    const date = document.getElementById('date').value;
+
+    const url = `https://storyline-image-template.s3.ap-northeast-2.amazonaws.com/${date}/${site}.jpg`;
+    window.open(url, '_blank');
+}
     
 </script>
 
