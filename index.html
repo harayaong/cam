@@ -526,12 +526,17 @@ function filterPrograms() {
 
 // 페이지 로드 시 Sync 버튼을 보장 #0316
 document.addEventListener('DOMContentLoaded', function() {
-    pinModal.style.display = 'flex';  // PIN 모달 표시
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('date').value = today;  // 오늘 날짜 설정
-    updateWeekday();  // 요일 업데이트
-    loadSyncButtons();  // Sync 버튼이 초기 로드되도록 추가
-    updateSiteID();  // SITE_ID 표시 업데이트
+    pinModal.style.display = 'flex';
+
+    const dateInput = document.getElementById('date');
+    if (!dateInput.value) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+
+    updateWeekday();
+    loadSyncButtons();
+    updateSiteID();
 });
 
 // 🔹 검색어 입력 후 Enter 입력 시, 첫 번째 검색 결과 자동 선택 + 포커스 해제
