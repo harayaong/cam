@@ -463,8 +463,10 @@ select#program {
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    const programSelect = document.getElementById("program");
     const dateInput = document.getElementById("date");
+    const programSelect = document.getElementById("program");
+    const classroomContainer = document.getElementById("classroomContainer");
+
     const params = new URLSearchParams(window.location.search);
     const paramDate = params.get("date");
     const paramProgram = params.get("program")?.trim();
@@ -477,9 +479,8 @@ document.addEventListener("DOMContentLoaded", function () {
         dateInput.value = today;
     }
 
-    // ✅ 옵션 로딩이 느릴 수 있으므로 100ms 딜레이로 적용
+    // 옵션 로드 및 프로그램 선택 처리
     setTimeout(() => {
-        const classroomContainer = document.getElementById("classroomContainer");
         if (classroomContainer) {
             const options = classroomContainer.children;
             while (options.length > 0) {
@@ -489,20 +490,19 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         if (paramProgram) {
-            const option = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
-            if (option) {
+            const matchOption = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
+            if (matchOption) {
                 programSelect.value = paramProgram;
             }
         }
 
-        // 초기화 실행
         pinModal.style.display = 'flex';
         updateWeekday();
         changeProgram();
-    }, 100); // ✅ 옵션 로딩 기다림
+    }, 100);
 });
 
-    
+
 // 프로그램(교실) 변경 시 Sync 버튼을 로드하는 코드 추가 #0316
 function changeProgram() {
     loadSyncButtons();  // Sync 버튼을 다시 로드 (Sync 버튼이 사라지는 문제 해결)
@@ -580,16 +580,6 @@ function selectProgram(value) {
     let activeButton = null;
     let pinModal = document.getElementById('pinModal');
     let pinVideoElement = document.getElementById('pinVideo');
-
-    // 2. DOMContentLoaded 이벤트 리스너: 페이지 로드 시 초기화
-    document.addEventListener('DOMContentLoaded', function() {
-        pinModal.style.display = 'flex';  // PIN 모달 표시
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('date').value = today;  // 오늘 날짜 설정
-        updateWeekday();  // 요일 업데이트
-        loadSyncButtons();  // 싱크 버튼 로드
-        updateSiteID();  // 사이트 ID 업데이트
-    });
 
     // 4. 사이트 ID 및 요일 업데이트 함수
 function updateSiteID() {
