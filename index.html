@@ -507,6 +507,8 @@ document.addEventListener("DOMContentLoaded", function () {
 // 프로그램(교실) 변경 시 Sync 버튼을 로드하는 코드 추가 #0316
 function changeProgram() {
     loadSyncButtons();  // Sync 버튼을 다시 로드 (Sync 버튼이 사라지는 문제 해결)
+    updateSiteID();  // 선택된 SITE_ID 표시 업데이트
+
 }
 
 // 검색 시 선택 유지 기능 추가 #0316
@@ -1031,33 +1033,33 @@ document.addEventListener('keyup', (event) => {
 
     // URL에서 날짜와 교실 파라미터를 추출해 반영
 function applyURLParams() {
-    const pathSegments = window.location.pathname.split('/').filter(Boolean);
-    
-    // ex: /cam/2025-03-31/paragonedupore_1x3
-    if (pathSegments.length >= 3) {
-        const dateFromURL = pathSegments[pathSegments.length - 2];     // "2025-03-31"
-        const programFromURL = pathSegments[pathSegments.length - 1];  // "paragonedupore_1x3"
+    const params = new URLSearchParams(window.location.search);
+    const paramDate = params.get("date");
+    const paramProgram = params.get("program")?.trim();
 
-        // 날짜 적용
+    if (paramDate) {
         const dateInput = document.getElementById('date');
         if (dateInput) {
-            dateInput.value = dateFromURL;
+            dateInput.value = paramDate;
             updateWeekday();
         }
+    }
 
-        // 교실 적용 (select 요소가 로드된 후 반영)
+    if (paramProgram) {
         const programSelect = document.getElementById('program');
-        if (programSelect) {
-            // 0.1초 후 적용 (옵션들이 동적으로 로드되기 때문)
-            setTimeout(() => {
-                const options = Array.from(programSelect.options);
-                const matchOption = options.find(opt => opt.value.includes(programFromURL));
-                if (matchOption) {
-                    programSelect.value = matchOption.value;
-                    changeProgram();
-                }
-            }, 100);
-        }
+
+        // 옵션 DOM이 완전히 로드되었는지 기다리기
+        setTimeout(() => {
+            const options = Array.from(programSelect.options);
+            const matchOption = options.find(opt => opt.value === paramProgram);
+            if (matchOption) {
+                programSelect.value = paramProgram;
+                changeProgram();
+
+                // ✅ 여기에 한번 더 강제 호출!
+                updateSiteID();
+            }
+        }, 150); // 옵션이 로딩되는 시간 여유를 위해 약간 늘려줌
     }
 }
 
