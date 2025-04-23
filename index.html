@@ -465,8 +465,12 @@ select#program {
 document.addEventListener("DOMContentLoaded", function () {
     const programSelect = document.getElementById("program");
     const classroomContainer = document.getElementById("classroomContainer");
+    const dateInput = document.getElementById("date");
+    const params = new URLSearchParams(window.location.search);
+    const paramDate = params.get("date");
+    const paramProgram = params.get("program")?.trim();
 
-    // 옵션을 먼저 select에 이동
+    // ✅ select 옵션 먼저 이동
     if (classroomContainer) {
         const options = classroomContainer.children;
         while (options.length > 0) {
@@ -475,15 +479,15 @@ document.addEventListener("DOMContentLoaded", function () {
         classroomContainer.remove();
     }
 
-    // ✅ URL 파라미터 처리 (trim 꼭 포함!)
-    const params = new URLSearchParams(window.location.search);
-    const paramDate = params.get("date");
-    const paramProgram = params.get("program")?.trim(); // ← 공백 제거
-
+    // ✅ 날짜 설정: 파라미터가 있으면 그걸로, 없으면 오늘 날짜
     if (paramDate) {
-        document.getElementById("date").value = paramDate;
+        dateInput.value = paramDate;
+    } else {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
     }
 
+    // ✅ 프로그램 선택
     if (paramProgram) {
         const option = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
         if (option) {
@@ -491,11 +495,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // ✅ 기본 초기화
+    // ✅ 공통 초기화
     pinModal.style.display = 'flex';
-    updateWeekday();
+    updateWeekday(); // ← 반드시 날짜 설정 이후 호출
     changeProgram();
-});
+});,.
 // 프로그램(교실) 변경 시 Sync 버튼을 로드하는 코드 추가 #0316
 function changeProgram() {
     loadSyncButtons();  // Sync 버튼을 다시 로드 (Sync 버튼이 사라지는 문제 해결)
