@@ -395,13 +395,13 @@ select#program {
 
     <!-- 오른쪽 숏컷 -->
     <div class="header-right">
-        <a href="http://54.180.144.33:5000/" target="_blank" class="shortcut-link">trainset download</a>
+        <a href="http://3.35.217.125:5000/" target="_blank" class="shortcut-link">trainset download</a>
         <a href="https://admin.playtagapp.com/company" target="_blank" class="shortcut-link">Admin Tool</a>
         <a href="https://annotation.playtag.ai/" target="_blank" class="shortcut-link">구_Video annotation</a>
     </div>
 </div>
 
-<!-- PIN 모달 0423 주석처리함 
+<!-- PIN 모달 -->
 <div id="pinModal" class="modal">
     <div class="modal-content" style="max-width: 400px;">
         <div class="modal-header">힌트: 우리집현관비밀번호</div>
@@ -422,7 +422,6 @@ select#program {
         </div>
     </div>
 </div>
--->
     
 <!-- 폼 컨테이너 -->
 <div class="form-container">
@@ -508,7 +507,6 @@ document.addEventListener("DOMContentLoaded", function () {
 function changeProgram() {
     loadSyncButtons();  // Sync 버튼을 다시 로드 (Sync 버튼이 사라지는 문제 해결)
     updateSiteID();  // 선택된 SITE_ID 표시 업데이트
-
 }
 
 // 검색 시 선택 유지 기능 추가 #0316
@@ -1033,33 +1031,33 @@ document.addEventListener('keyup', (event) => {
 
     // URL에서 날짜와 교실 파라미터를 추출해 반영
 function applyURLParams() {
-    const params = new URLSearchParams(window.location.search);
-    const paramDate = params.get("date");
-    const paramProgram = params.get("program")?.trim();
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    
+    // ex: /cam/2025-03-31/paragonedupore_1x3
+    if (pathSegments.length >= 3) {
+        const dateFromURL = pathSegments[pathSegments.length - 2];     // "2025-03-31"
+        const programFromURL = pathSegments[pathSegments.length - 1];  // "paragonedupore_1x3"
 
-    if (paramDate) {
+        // 날짜 적용
         const dateInput = document.getElementById('date');
         if (dateInput) {
-            dateInput.value = paramDate;
+            dateInput.value = dateFromURL;
             updateWeekday();
         }
-    }
 
-    if (paramProgram) {
+        // 교실 적용 (select 요소가 로드된 후 반영)
         const programSelect = document.getElementById('program');
-
-        // 옵션 DOM이 완전히 로드되었는지 기다리기
-        setTimeout(() => {
-            const options = Array.from(programSelect.options);
-            const matchOption = options.find(opt => opt.value === paramProgram);
-            if (matchOption) {
-                programSelect.value = paramProgram;
-                changeProgram();
-
-                // ✅ 여기에 한번 더 강제 호출!
-                updateSiteID();
-            }
-        }, 150); // 옵션이 로딩되는 시간 여유를 위해 약간 늘려줌
+        if (programSelect) {
+            // 0.1초 후 적용 (옵션들이 동적으로 로드되기 때문)
+            setTimeout(() => {
+                const options = Array.from(programSelect.options);
+                const matchOption = options.find(opt => opt.value.includes(programFromURL));
+                if (matchOption) {
+                    programSelect.value = matchOption.value;
+                    changeProgram();
+                }
+            }, 100);
+        }
     }
 }
 
