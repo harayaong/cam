@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>통합 카메라 조회 v0418</title>
+    <title>통합 카메라 조회 v0429</title>
 
 
 <style>
@@ -482,26 +482,28 @@ document.addEventListener("DOMContentLoaded", function () {
         dateInput.value = today;
     }
 
-    // 옵션 로드 및 프로그램 선택 처리
+    // 옵션 로드 후 프로그램 설정
     setTimeout(() => {
         if (classroomContainer) {
-            const options = classroomContainer.children;
-            while (options.length > 0) {
-                programSelect.appendChild(options[0]);
+            const optionEls = classroomContainer.children;
+            while (optionEls.length > 0) {
+                programSelect.appendChild(optionEls[0]);
             }
             classroomContainer.remove();
         }
 
         if (paramProgram) {
-            const matchOption = Array.from(programSelect.options).find(opt => opt.value === paramProgram);
+            const options = Array.from(programSelect.options);
+            const matchOption = options.find(opt => opt.value === paramProgram);
             if (matchOption) {
                 programSelect.value = paramProgram;
+                programSelect.selectedIndex = options.indexOf(matchOption);
             }
         }
 
-        pinModal.style.display = 'flex';
+        // 초기화
         updateWeekday();
-        changeProgram();
+        changeProgram(); // 내부에서 updateSiteID()도 실행됨
     }, 100);
 });
 
