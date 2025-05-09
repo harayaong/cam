@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>통합 카메라 조회 v0429</title>
+    <title>통합 카메라 조회 v0509</title>
 
 
 <style>
@@ -381,12 +381,15 @@ select#program {
     
     <!-- 이미지 템플릿 버튼 -->
     <button onclick="openImageTemplate()" class="shortcut-link">이미지템플릿</button>
-    
-    <!-- 디버그 버튼 -->
-    <button onclick="openDebugPage()" class="shortcut-link">디버그</button>
 
+    <!-- 동영상디버그 버튼 -->
+    <a href="http://43.203.121.132:5000/" target="_blank" class="shortcut-link">비디오디버그</a>
+
+    <!-- 디버그 버튼 -->
+    <button onclick="openDebugPage()" class="shortcut-link">디버그</button>    
+    
     <!-- 공유 버튼 -->
-    <button onclick="copyShareURL()" class="shortcut-link">지금 보는 비디오 공유하기</button>
+    <button onclick="copyShareURL()" class="shortcut-link">공유하기</button>
     
     <!-- 복사 알림 -->
     <span id="copyNotice" style="display:none; font-size:12px; color:green;">복사 완료!</span>
