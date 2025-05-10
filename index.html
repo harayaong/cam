@@ -350,7 +350,7 @@ select#program {
     flex: 1 1 100%;     /* 한 줄에 1개씩 */
   }
 }
-   
+    
     .shortcut-link {
     font-size: 14px;
     color: white;
@@ -368,6 +368,25 @@ select#program {
 }
     
 </style>
+
+<!-- Add OIDC library for authentication - using our minimal client -->
+<script src="js/lib/oidc-client.js"></script>
+
+<!-- Add auth.js script before the closing head tag -->
+<script src="js/cognito-auth.js"></script>
+<script src="js/auth.js"></script>
+
+<!-- Force hide login modal if authenticated -->
+<script>
+    // Check if authenticated via session storage
+    if (sessionStorage.getItem('isAuthenticated') === 'true') {
+        // Add a style to hide login modal
+        document.write('<style>#loginModal { display: none !important; }</style>');
+        console.log("User is authenticated, hiding login modal");
+    } else {
+        console.log("User is not authenticated, login modal will be shown");
+    }
+</script>
 </head>
 
 
@@ -375,9 +394,9 @@ select#program {
 <!-- 상단 섹션 -->
 <div class="top-section">
 <!-- 왼쪽 정보 표시 + 버튼들 -->
-<div class="header-left">
+    <div class="header-left">
   <div style="display: flex; align-items: center; gap: 10px;">
-    <h1><span id="selectedSiteID"></span></h1>
+        <h1><span id="selectedSiteID"></span></h1>
     
     <!-- 이미지 템플릿 버튼 -->
     <button onclick="openImageTemplate()" class="shortcut-link">이미지템플릿</button>
@@ -393,7 +412,7 @@ select#program {
     
     <!-- 복사 알림 -->
     <span id="copyNotice" style="display:none; font-size:12px; color:green;">복사 완료!</span>
-  </div>
+    </div>
 </div>
 
     <!-- 오른쪽 숏컷 -->
@@ -406,8 +425,23 @@ select#program {
     </div>
 </div>
 
-<!-- PIN 모달 
-<div id="pinModal" class="modal">
+<!-- Login modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <form id="loginForm">
+            <div style="margin: 20px 0; text-align: center;">
+                <p style="margin-bottom: 20px;">Press login button to enter the site</p>
+                <div style="margin-top: 20px;">
+                    <button type="button" class="key" style="width: 100%;" onclick="window.Auth.login()">LOGIN</button>
+                </div>
+                <div id="loginErrorMessage" style="color: red; margin-top: 10px; display: none; text-align: center;"></div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- PIN modal (hidden but kept for reference)
+<div id="pinModal" class="modal" style="display: none;">
     <div class="modal-content" style="max-width: 400px;">
         <div class="modal-header">힌트: 우리집현관비밀번호</div>
         <input type="password" id="pinInput" placeholder="PIN 입력" style="width: 175px; padding: 10px; margin-top: 10px; text-align: center;" readonly>
@@ -427,8 +461,7 @@ select#program {
         </div>
     </div>
 </div>
--->
-    
+ -->    
 <!-- 폼 컨테이너 -->
 <div class="form-container">
 <!-- 교실 선택 영역 -->
@@ -493,13 +526,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 programSelect.appendChild(optionEls[0]);
             }
             classroomContainer.remove();
-        }
+    }
 
-        if (paramProgram) {
+    if (paramProgram) {
             const options = Array.from(programSelect.options);
             const matchOption = options.find(opt => opt.value === paramProgram);
             if (matchOption) {
-                programSelect.value = paramProgram;
+            programSelect.value = paramProgram;
                 programSelect.selectedIndex = options.indexOf(matchOption);
             }
         }
@@ -508,9 +541,10 @@ document.addEventListener("DOMContentLoaded", function () {
         updateWeekday();
         changeProgram(); // 내부에서 updateSiteID()도 실행됨
     }, 100);
+    
+    // Check authentication with Auth wrapper
+    window.Auth && window.Auth.init();
 });
-
-
 // 프로그램(교실) 변경 시 Sync 버튼을 로드하는 코드 추가 #0316
 function changeProgram() {
     loadSyncButtons();  // Sync 버튼을 다시 로드 (Sync 버튼이 사라지는 문제 해결)
@@ -534,8 +568,8 @@ function filterPrograms() {
 
 // 페이지 로드 시 Sync 버튼을 보장 #0316
 document.addEventListener('DOMContentLoaded', function() {
-    pinModal.style.display = 'flex';
-
+    // Use login modal instead of PIN
+    // Login is handled by auth.js
     const dateInput = document.getElementById('date');
     if (!dateInput.value) {
         const today = new Date().toISOString().split('T')[0];
@@ -921,38 +955,26 @@ function changeDateSelection(direction) {
 
 
 function verifyPin() {
-    const inputPin = document.getElementById('pinInput').value;
-    const correctPin = '1240'; // 올바른 PIN 설정
-
-    if (inputPin === correctPin) {
-        pinModal.style.display = 'none';
-    } else {
-        alert('PIN이 잘못되었습니다.');
-    }
+    // This function is deprecated and replaced by the login functionality in auth.js
+    console.log('PIN verification has been replaced by the ID/password login system');
+    // Original functionality:
+    // const inputPin = document.getElementById('pinInput').value;
+    // const correctPin = '1240'; // 올바른 PIN 설정
+    // if (inputPin === correctPin) {
+    //     pinModal.style.display = 'none';
+    // } else {
+    //     alert('PIN이 잘못되었습니다.');
+    // }
 }
 
 function addPinDigit(digit) {
-    const pinInput = document.getElementById('pinInput');
-    if (pinInput.value.length < 4) { // 최대 4자리 제한
-        pinInput.value += digit;
-    }
+    // This function is deprecated and replaced by the login functionality in auth.js
+    console.log('PIN keypad has been replaced by the ID/password login system');
 }
 
 function clearPin() {
-    const pinInput = document.getElementById('pinInput');
-    pinInput.value = '';
-}
-
-function verifyPin() {
-    const pinInput = document.getElementById('pinInput').value;
-    const correctPin = '1240'; // 올바른 PIN 설정
-
-    if (pinInput === correctPin) {
-        document.getElementById('pinModal').style.display = 'none'; // 모달 닫기
-    } else {
-        alert('PIN이 잘못되었습니다.');
-        clearPin();
-    }
+    // This function is deprecated and replaced by the login functionality in auth.js
+    console.log('PIN clearing has been replaced by the ID/password login system');
 }
 
 /**
