@@ -1,0 +1,41 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"cognito-idp:UpdateUserPoolDomain",
+				"cognito-idp:DeleteUserPool",
+				"cognito-idp:DeleteUserPoolClient",
+				"cognito-idp:UpdateUserPoolClient",
+				"cognito-idp:GetUserPoolMfaConfig",
+				"cognito-idp:DeleteUserPoolDomain",
+				"cognito-idp:ListUserPoolClients",
+				"cognito-idp:DescribeUserPool",
+				"cognito-idp:CreateUserPoolDomain",
+				"cognito-idp:CreateUserPoolClient",
+				"cognito-idp:SetUserPoolMfaConfig",
+				"cognito-idp:UpdateUserPool",
+				"cognito-idp:DescribeUserPoolClient",
+				"cognito-idp:ListIdentityProviders",
+				"cognito-idp:ListGroups",
+				"cognito-idp:ListResourceServers"
+			],
+			"Resource": "arn:aws:cognito-idp:*:426607217159:userpool/*"
+		},
+		{
+			"Sid": "VisualEditor1",
+			"Effect": "Allow",
+			"Action": [
+				"cognito-idp:DescribeUserPoolDomain",
+				"cognito-idp:CreateUserPool",
+				"cognito-idp:ListUserPools",
+				"cognito-identity:ListIdentityPools",
+				"cognito-identity:DescribeIdentityPool",
+				"cognito-identity:*"
+			],
+			"Resource": "*"
+		}
+	]
+}
