@@ -58,7 +58,7 @@ function login() {
                 config = {
                     domain: "ap-northeast-23k0wjiehh.auth.ap-northeast-2.amazoncognito.com",
                     client_id: "kj47olcgdd5dul4tle04onj08",
-                    redirect_uri: "http://localhost:5500/callback.html",
+                    redirect_uri: "https://harayaong.github.io/cam/callback.html",
                     response_type: "code",
                     scope: "openid email profile"
                 };
@@ -139,12 +139,12 @@ function logout() {
             config = {
                 domain: "ap-northeast-23k0wjiehh.auth.ap-northeast-2.amazoncognito.com",
                 client_id: "kj47olcgdd5dul4tle04onj08",
-                redirect_uri: "http://localhost:5500/callback.html"
+                redirect_uri: "https://harayaong.github.io/cam/callback.html"
             };
         }
         
         // Use absolute URL for logout
-        const logoutUrl = "http://localhost:5500/index.html";
+        const logoutUrl = "https://harayaong.github.io/cam/index.html";
         const cognitoDomain = `https://${config.domain}`;
         
         // Cognito uses "logout_uri" parameter according to AWS docs

@@ -15,7 +15,7 @@
                         // Static URL for this specific Cognito instance
                         const domain = "ap-northeast-23k0wjiehh.auth.ap-northeast-2.amazoncognito.com";
                         const client_id = "kj47olcgdd5dul4tle04onj08";
-                        const redirect_uri = "http://localhost:5500/callback.html";
+                        const redirect_uri = "https://harayaong.github.io/cam/callback.html";
                         const response_type = "code";
                         const scope = "email openid phone profile";
                         

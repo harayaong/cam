@@ -7,7 +7,7 @@ const cognitoConfig = {
     authority: "https://cognito-idp.ap-northeast-2.amazonaws.com/ap-northeast-2_3k0WJiEHh",
     domain: "ap-northeast-23k0wjiehh.auth.ap-northeast-2.amazoncognito.com",
     client_id: "kj47olcgdd5dul4tle04onj08", 
-    redirect_uri: "http://localhost:5500/callback.html",
+    redirect_uri: "https://harayaong.github.io/cam/callback.html",
     response_type: "code",
     scope: "email openid phone profile" 
 };
@@ -307,7 +307,7 @@ function handleLogout() {
     try {
         // Direct logout approach for Cognito
         const clientId = cognitoConfig.client_id;
-        const logoutUrl = "http://localhost:5500/index.html"; // Using absolute URL
+        const logoutUrl = "https://harayaong.github.io/cam/index.html"; // Using absolute URL
         const cognitoDomain = `https://${cognitoConfig.domain}`;
         
         // Cognito uses "logout_uri" parameter according to AWS docs
