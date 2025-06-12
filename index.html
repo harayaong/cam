@@ -873,11 +873,11 @@ function togglePlayPause() {
         navigateSync(1);   // 다음 싱크로 이동
     }
 
-// 비밀. 싱크 이동 단축키 c, v, ㅊ, ㅍ 처리
-if (key === 'c' || key === 'ㅊ') { // 이전 3개 싱크로 이동
+// 비밀. 싱크 이동 단축키 b,n,b,ㅜ 처리
+if (key === 'b' || key === 'b') { // 이전 3개 싱크로 이동
     navigateSync(-3); // -3개 이동
     togglePlayPause(); // 이동 후 즉시 재생
-} else if (key === 'v' || key === 'ㅍ') { // 이후 3개 싱크로 이동
+} else if (key === 'n' || key === 'n') { // 이후 3개 싱크로 이동
     navigateSync(3); // +3개 이동
     togglePlayPause(); // 이동 후 즉시 재생
 }
