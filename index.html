@@ -104,6 +104,17 @@
     .action-button:hover {
       background-color: #90ee90; /* 더 진한 연두 */
     }
+    .weekday-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      margin-left: 6px;
+      border-radius: 20px;
+      background-color: #e0f7fa;
+      color: #00796b;
+      font-weight: bold;
+      font-size: 13px;
+      border: 1px solid #b2ebf2;
+    }
   </style>
 </head>
 <body>
@@ -122,7 +133,7 @@
     <div class="control-left">
       <label for="dateInput">날짜 선택</label>
       <input type="date" id="dateInput" onchange="updateWeekday()">
-      <span id="weekday" style="font-weight: bold;"></span>
+      <span id="weekday" class="weekday-badge"></span>
 
       <label for="siteSearch">SITE-ID 검색</label>
       <input type="text" id="siteSearch" placeholder="검색어 입력" oninput="filterSiteOptions()">
