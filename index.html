@@ -903,7 +903,8 @@
       const select = document.getElementById("siteInput");
       for (let option of select.options) {
         const text = option.textContent.toLowerCase();
-        option.style.display = text.includes(input) ? "" : "none";
+        const value = option.value.toLowerCase();
+        option.style.display = text.includes(input) || value.includes(input) ? "" : "none";
       }
     }
 
