@@ -119,7 +119,7 @@
 </head>
 <body>
   <div class="header-bar">
-    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250618-2</h1>
+    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250618</h1>
     <div id="actionButtons">
       <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
       <button class="action-button" onclick="openDebugTool()">통합디버그</button>
@@ -763,15 +763,26 @@
   <div class="sync-buttons" id="syncContainerBottom"></div>
 
   <script>
-    function handleSearchEnter(event) {
-    if (event.key === "Enter") {
+    function handleSearchEnter(e) {
+    if (e.key === "Enter") {
+      const input = document.getElementById("siteSearch").value.toLowerCase();
       const select = document.getElementById("siteInput");
-      const visibleOptions = Array.from(select.options).filter(opt => opt.style.display !== "none");
 
-      if (visibleOptions.length > 1) { // index 0은 "교실 선택"이니까 생략
-        select.value = visibleOptions[1].value;
-        loadVideos(currentSyncIndex.toString().padStart(2, '0'));
-      } else {
+      let matched = false;
+      for (let i = 0; i < select.options.length; i++) {
+        const option = select.options[i];
+        const value = option.value.toLowerCase();
+        const text = option.textContent.toLowerCase();
+
+        if (value === input || text.includes(input)) {
+          option.selected = true;
+          matched = true;
+          loadVideos(currentSyncIndex.toString().padStart(2, '0'));
+          break;
+        }
+      }
+
+      if (!matched) {
         alert("일치하는 교실이 없습니다.");
       }
     }
