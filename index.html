@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>통합카메라조회 페이지 v.250616</title>
+  <title>통합카메라조회</title>
   <style>
     body {
       font-family: sans-serif;
@@ -119,7 +119,7 @@
 </head>
 <body>
   <div class="header-bar">
-    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250616</h1>
+    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250618</h1>
     <div id="actionButtons">
       <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
       <button class="action-button" onclick="openDebugTool()">통합디버그</button>
@@ -131,12 +131,13 @@
 
   <div class="control-bar">
     <div class="control-left">
-      <label for="dateInput">날짜 선택</label>
+      <label for="dateInput">📆</label>
       <input type="date" id="dateInput" onchange="updateWeekday()">
       <span id="weekday" class="weekday-badge"></span>
 
-      <label for="siteSearch">SITE-ID 검색</label>
-      <input type="text" id="siteSearch" placeholder="검색어 입력" oninput="filterSiteOptions()">
+      <label for="siteSearch">🔎</label>
+      <input type="text" id="siteSearch" placeholder="검색어 입력"
+          oninput="filterSiteOptions()" onkeydown="handleSearchEnter(event)">
 
       <label for="siteInput">SITE-ID 선택</label>
       <select id="siteInput" size="1">
@@ -762,6 +763,19 @@
   <div class="sync-buttons" id="syncContainerBottom"></div>
 
   <script>
+    function handleSearchEnter(event) {
+    if (event.key === "Enter") {
+      const select = document.getElementById("siteInput");
+      const visibleOptions = Array.from(select.options).filter(opt => opt.style.display !== "none");
+
+      if (visibleOptions.length > 1) { // index 0은 "교실 선택"이니까 생략
+        select.value = visibleOptions[1].value;
+        loadVideos(currentSyncIndex.toString().padStart(2, '0'));
+      } else {
+        alert("일치하는 교실이 없습니다.");
+      }
+    }
+  }
     let currentSyncIndex = 0;
 
     document.addEventListener("DOMContentLoaded", () => {
