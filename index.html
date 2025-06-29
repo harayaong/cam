@@ -119,7 +119,7 @@
 </head>
 <body>
   <div class="header-bar">
-    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250618-3</h1>
+    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250630</h1>
     <div id="actionButtons">
       <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
       <button class="action-button" onclick="openDebugTool()">통합디버그</button>
@@ -139,7 +139,7 @@
       <input type="text" id="siteSearch" placeholder="검색어 입력"
           oninput="filterSiteOptions()" onkeydown="handleSearchEnter(event)">
 
-      <label for="siteInput">SITE-ID 선택</label>
+      <label for="siteInput">SITE 선택</label>
       <select id="siteInput" size="1">
         <option value="aeyuk_1x3">aeyuk_1x3 / 경산애육-민들레12 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="aeyuk_2x1">aeyuk_2x1 / 경산애육-장미 / 0900-1200 / 금,목,수,월,화,</option>
@@ -149,10 +149,10 @@
         <option value="aisol_1x1">aisol_1x1 / 달서아이솔-다솔 / 0900-1200 / 목,수,월,</option>
         <option value="aisol_1x4">aisol_1x4 / 달서아이솔-해솔 / 0900-1200 / 목,수,월,</option>
         <option value="aisup_1x4">aisup_1x4 / 북구우방아이숲-기린 / 0900-1200 / 금,목,수,월,화,</option>
-        <option value="andiok_1x1">andiok_1x1 / 전주안디옥-믿음 / 0900-1200 / 금,목,수,월,화,</option>
-        <option value="andiok_1x2">andiok_1x2 / 전주안디옥-소망 / 0900-1200 / 금,목,수,월,화,</option>
-        <option value="andiok_2x2">andiok_2x2 / 전주안디옥-사랑 / 0900-1200 / 금,목,수,월,화,</option>
-        <option value="angellc_1x1">angellc_1x1 / -#0605미정 / 0900-1200 / ,</option>
+        <option value="andiok_1x1">andiok_1x1 / 전주안디옥-믿음 / 0900-1200 / ,</option>
+        <option value="andiok_1x2">andiok_1x2 / 전주안디옥-소망 / 0900-1200 / ,</option>
+        <option value="andiok_2x2">andiok_2x2 / 전주안디옥-사랑 / 0900-1200 / ,</option>
+        <option value="angellc_1x1">angellc_1x1 / WMG-Room105 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="anrakhyeondae_1x1">anrakhyeondae_1x1 / 동래안락현대-행복해 / 0900-1200 / 금,수,월,</option>
         <option value="araparagon_1x2">araparagon_1x2 / 서구아라파라곤한별-누리 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="arasinan_1x1">arasinan_1x1 / 서구아라신안꿈꾸는-하늘나리 / 0900-1200 / 금,목,수,월,화,</option>
@@ -165,7 +165,7 @@
         <option value="baekkotmaeul_1x3">baekkotmaeul_1x3 / 평택배꽃마을-하얀꽃잎 / 0900-1200 / 목,수,월,</option>
         <option value="baekseok_2x2">baekseok_2x2 / 양주백석-새들 / 0900-1200 / 목,수,월,</option>
         <option value="baycent_1x1">baycent_1x1 / 광양베이센트-웃음가득2 / 0900-1200 / 금,목,수,월,화,</option>
-        <option value="baycent_1x2">baycent_1x2 / 광양베이센트-웃음가득1 / 0900-1200 / ,</option>
+        <option value="baycent_1x2">baycent_1x2 / 광양베이센트-웃음가득1 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="baycent_1x3">baycent_1x3 / 광양베이센트-기쁨가득 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="beomeow_1x1">beomeow_1x1 / 수성범어W-좋아해 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="beomeow_1x2">beomeow_1x2 / 수성범어W-행복해 / 0900-1200 / 금,목,수,월,화,</option>
@@ -175,8 +175,8 @@
         <option value="bobae_2x1">bobae_2x1 / 춘천보배-열매 / 0900-1200 / 금,목,화,</option>
         <option value="bom_1x5">bom_1x5 / 동구봄-풀잎 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="bomsori_424">bomsori_424 / 달서봄소리-샘물 / 0900-1200 / 목,수,월,</option>
-        <option value="bora_2x1">bora_2x1 / 용인보라-연두2 / 0900-1200 / 목,월,화,</option>
-        <option value="bora_2x3">bora_2x3 / 용인보라-연두1 / 0900-1200 / 목,월,화,</option>
+        <option value="bora_2x1">bora_2x1 / 용인보라-연두2 / 0900-1200 / 금,수,월,</option>
+        <option value="bora_2x3">bora_2x3 / 용인보라-연두1 / 0900-1200 / 금,수,월,</option>
         <option value="byeolbitjikjang_1x1">byeolbitjikjang_1x1 / 영천별빛직장-별님 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="byeolbitjikjang_1x2">byeolbitjikjang_1x2 / 영천별빛직장-해님 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="byeolbitjikjang_1x3">byeolbitjikjang_1x3 / 영천별빛직장-달님 / 0900-1200 / 금,목,수,월,화,</option>
@@ -252,12 +252,12 @@
         <option value="dongnaekkume_1x4">dongnaekkume_1x4 / 동래꿈에그린-사랑해 / 0900-1200 / 금,목,월,</option>
         <option value="dongnaekkume_1x5">dongnaekkume_1x5 / 동래꿈에그린-좋아해 / 0900-1200 / 금,목,월,</option>
         <option value="dongnaekkume_1x6">dongnaekkume_1x6 / 동래꿈에그린-감사해 / 0900-1200 / 금,목,월,</option>
-        <option value="dongnaesk_1x1">dongnaesk_1x1 / 동래3차SK뷰-보담보담 / 0900-1200 / 금,수,월,</option>
-        <option value="dongnaesk_1x2">dongnaesk_1x2 / 동래3차SK뷰-초롱초롱 / 0900-1200 / 금,수,월,</option>
-        <option value="dongnaesk_1x3">dongnaesk_1x3 / 동래3차SK뷰-포롱포롱 / 0900-1200 / 금,수,월,</option>
-        <option value="dongnaesk_1x4">dongnaesk_1x4 / 동래3차SK뷰-도담도담 / 0900-1200 / 금,수,월,</option>
-        <option value="dongnaesk_1x5">dongnaesk_1x5 / 동래3차SK뷰-다복다복 / 0900-1200 / 금,수,월,</option>
-        <option value="dongnaesk_1x6">dongnaesk_1x6 / 동래3차SK뷰-도란도란 / 0900-1200 / 금,수,월,</option>
+        <option value="dongnaesk_1x1">dongnaesk_1x1 / 동래3차SK뷰-보담보담 / 0900-1200 / ,</option>
+        <option value="dongnaesk_1x2">dongnaesk_1x2 / 동래3차SK뷰-초롱초롱 / 0900-1200 / ,</option>
+        <option value="dongnaesk_1x3">dongnaesk_1x3 / 동래3차SK뷰-포롱포롱 / 0900-1200 / ,</option>
+        <option value="dongnaesk_1x4">dongnaesk_1x4 / 동래3차SK뷰-도담도담 / 0900-1200 / ,</option>
+        <option value="dongnaesk_1x5">dongnaesk_1x5 / 동래3차SK뷰-다복다복 / 0900-1200 / ,</option>
+        <option value="dongnaesk_1x6">dongnaesk_1x6 / 동래3차SK뷰-도란도란 / 0900-1200 / ,</option>
         <option value="dongsan_1x2">dongsan_1x2 / 북구연암동산-호수 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="dongsan_1x3">dongsan_1x3 / 북구연암동산-하늘 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="dongsan_1x4">dongsan_1x4 / 북구연암동산-바다 / 0900-1200 / 금,목,수,월,화,</option>
@@ -293,8 +293,8 @@
         <option value="edubyeol_1x4">edubyeol_1x4 / 화성에듀별-행복한 / 0900-1200 / 목,월,화,</option>
         <option value="eoullim_1x2">eoullim_1x2 / 화성어울림2차-솔잎향기 / 0900-1200 / 금,수,월,</option>
         <option value="eoullim_1x4">eoullim_1x4 / 화성어울림2차-푸른나무 / 0900-1200 / 금,수,월,</option>
-        <option value="eungamhana_1x1">eungamhana_1x1 / 은평응암하나-새들 / 0900-1200 / 목,수,월,</option>
-        <option value="eungamhana_2x1">eungamhana_2x1 / 은평응암하나-꽃들 / 0900-1200 / 목,수,월,</option>
+        <option value="eungamhana_1x1">eungamhana_1x1 / 은평응암하나-새들 / 0900-1200 / ,</option>
+        <option value="eungamhana_2x1">eungamhana_2x1 / 은평응암하나-꽃들 / 0900-1200 / ,</option>
         <option value="ewha_1x1">ewha_1x1 / 포항이화-창의로운 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="ewha_1x2">ewha_1x2 / 포항이화-슬기로운 / 0900-1200 / ,</option>
         <option value="ewha_2x1">ewha_2x1 / 포항이화-지혜로운 / 0900-1200 / 금,목,수,월,화,</option>
@@ -387,7 +387,7 @@
         <option value="harrington_1x3">harrington_1x3 / 동래효성해링턴-구름송이 / 0900-1200 / 금,목,화,</option>
         <option value="harrington_1x4">harrington_1x4 / 동래효성해링턴-산새소리 / 0900-1200 / 금,목,화,</option>
         <option value="harrington_1x5">harrington_1x5 / 동래효성해링턴-넓은바다 / 0900-1200 / 금,목,화,</option>
-        <option value="hayangdongseo_1x1">hayangdongseo_1x1 / 경산하양동서-초록잎새 / 0900-1200 / 금,목,수,월,화,</option>
+        <option value="hayangdongseo_1x1">hayangdongseo_1x1 / 경산하양동서-초록잎새 / 0900-1200 / ,</option>
         <option value="hayangdongseo_1x2">hayangdongseo_1x2 / 서비스종료-서비스종료 / 0900-1200 / ,</option>
         <option value="hayangdongseo_1x3">hayangdongseo_1x3 / 경산하양동서-예쁜미소 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="hayangeco_1x1">hayangeco_1x1 / 경산하양에코-우주 / 0900-1200 / 금,목,수,월,화,</option>
@@ -452,7 +452,7 @@
         <option value="jinhaejoy_1x3">jinhaejoy_1x3 / 창원진해조이-아이리더2 / 0900-1200 / 금,수,화,</option>
         <option value="jinhaejoy_1x7">jinhaejoy_1x7 / 창원진해조이-아이리더1 / 0900-1200 / 금,수,화,</option>
         <option value="jinhaejoy_1x9">jinhaejoy_1x9 / 창원진해조이-영리더1 / 0900-1200 / 목,수,화,</option>
-        <option value="joeunnamu_1x1">joeunnamu_1x1 / 전주좋은나무-지혜 / 0900-1200 / 금,목,수,월,화,</option>
+        <option value="joeunnamu_1x1">joeunnamu_1x1 / 전주좋은나무-지혜 / 0900-1200 / ,</option>
         <option value="jukjeon_1x3">jukjeon_1x3 / 용인죽전-초록잎새 / 0900-1200 / 금,수,월,</option>
         <option value="jukjeon_1x4">jukjeon_1x4 / 용인죽전-산새소리 / 0900-1200 / 금,수,월,</option>
         <option value="jukjeon_2x5">jukjeon_2x5 / 용인죽전-고운햇살 / 0900-1200 / 금,수,월,</option>
@@ -482,12 +482,12 @@
         <option value="keunsarang_3x2">keunsarang_3x2 / 서구큰사랑-소망 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="keunsarang_3x3">keunsarang_3x3 / 서구큰사랑-창의 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="keurositihaengbok_1x1">keurositihaengbok_1x1 / 마포크로시티-똑똑2세 / 0900-1200 / 금,수,월,</option>
-        <option value="kidsrkids_1x1">kidsrkids_1x1 / -#0605미정 / 0900-1200 / ,</option>
+        <option value="kidsrkids_1x1">kidsrkids_1x1 / WMG-Stringrays / 0900-1200 / 금,목,수,월,화,</option>
         <option value="kinderheim_1x4">kinderheim_1x4 / 창원킨더하임-산새소리 / 0900-1200 / 목,수,화,</option>
         <option value="kkume_1x1">kkume_1x1 / 수원꿈에-지혜 / 0900-1200 / 금,목,수,월,화,</option>
-        <option value="kkumkkot_1x1">kkumkkot_1x1 / 동구꿈꽃-고운햇살 / 0900-1200 / 금,수,월,</option>
+        <option value="kkumkkot_1x1">kkumkkot_1x1 / 동구꿈꽃-고운햇살 / 0900-1200 / 목,수,화,</option>
         <option value="kkumkkot_2x1">kkumkkot_2x1 / 동구꿈꽃-밝은햇살 / 0900-1200 / 금,수,월,</option>
-        <option value="kkumkkot_3x1">kkumkkot_3x1 / 동구꿈꽃-행복누리 / 0900-1200 / 금,수,월,</option>
+        <option value="kkumkkot_3x1">kkumkkot_3x1 / 동구꿈꽃-행복누리 / 0900-1200 / 목,수,화,</option>
         <option value="koaroo_1x3">koaroo_1x3 / 춘천코아루-슬기 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="koaroo_1x4">koaroo_1x4 / 춘천코아루-지혜 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="kokkiri_1x1">kokkiri_1x1 / 의정부호원코끼리-햇님 / 0900-1200 / 금,수,월,</option>
@@ -512,7 +512,7 @@
         <option value="maribona_3x1">maribona_3x1 / 계양마리보나-힘찬 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="maribona_3x2">maribona_3x2 / 계양마리보나-신나는 / 0900-1200 / 금,목,수,월,화,</option>
         <option value="maribona_3x3">maribona_3x3 / 계양마리보나-빛나는 / 0900-1200 / 금,목,수,월,화,</option>
-        <option value="masanjoy_1x2">masanjoy_1x2 / 창원마산조이-지혜쑥쑥 / 0900-1200 / 금,목,수,</option>
+        <option value="masanjoy_1x2">masanjoy_1x2 / 창원마산조이-지혜쑥쑥 / 0900-1200 / 목,수,화,</option>
         <option value="masanjoy_2x2">masanjoy_2x2 / 창원마산조이-글로벌리더 / 0900-1200 / 목,수,월,</option>
         <option value="masanjoy_2x3">masanjoy_2x3 / 창원마산조이-생각쑥쑥 / 0900-1200 / 목,수,화,</option>
         <option value="masanjoy_2x4">masanjoy_2x4 / 창원마산조이-영리더 / 0900-1200 / 목,수,화,</option>
