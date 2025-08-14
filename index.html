@@ -819,9 +819,18 @@
     }
 
     function openDebugTool() {
-      const siteId = document.getElementById("classroomSelect").value;
-      const date = document.getElementById("datePicker").value;
-      const url = `https://playtag-debugging-tool.vercel.app/?site=${siteId}&date=${date}`;
+      const siteEl = document.getElementById("siteInput");
+      const dateEl = document.getElementById("dateInput");
+      const site = siteEl ? siteEl.value : "";
+      let date = dateEl ? dateEl.value : "";
+    
+      if (!date) {
+        const d = new Date();
+        const pad = n => String(n).padStart(2, "0");
+        date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      }
+    
+      const url = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
       window.open(url, "_blank");
     }
 
