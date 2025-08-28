@@ -118,8 +118,26 @@
     }
     .sync-buttons button .time{display:block;font-size:12px;opacity:.8;margin-top:2px}
     .sync-buttons button { white-space: nowrap; }
+    /* 녹화 구간별 버튼 배경색 (색각친화 팔레트) */
+    .sync-buttons button.win0 { background:#e6f3ff; border-color:#9ec9ff; }  /* 1구간 */
+    .sync-buttons button.win1 { background:#eaf7e6; border-color:#a8d8a8; }  /* 2구간 */
+    .sync-buttons button.win2 { background:#fff2cc; border-color:#f1c84b; }  /* 3구간 */
+
+    .sync-buttons button.win0:hover { background:#d9ecff; }
+    .sync-buttons button.win1:hover { background:#def1d9; }
+    .sync-buttons button.win2:hover { background:#ffeaa6; }
+
+    /* active가 덮어씌우도록 테두리/글자 강조 */
+    .sync-buttons button.active {
+      background: lightgreen !important;
+      border-color:#5fbf5f !important;
+      font-weight: 700;
+    }
   </style>
 </head>
+  
+  
+  
 <body>
   <div class="header-bar">
     <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250828</h1>
@@ -127,7 +145,6 @@
       <button class="action-button" onclick="openDebugTool()">선택교실디버그</button>
       <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
       <button class="action-button" onclick="window.open('http://54.166.249.184:5001/', '_blank')">Train-set</button>
-      <button class="action-button" >기능버튼2(예정)</button>
       <button class="action-button" onclick="openImageTemplate()">이미지템플릿</button>
     </div>
   </div>
@@ -677,6 +694,15 @@
   <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">3</span> 30초 앞으로 |
   <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">4</span> 3분 앞으로
 </p>
+  <div style="margin:12px 0; font-size:13px; color:#333; background:#f9f9f9; border:1px solid #ddd; padding:8px 12px; border-radius:6px;">
+  <strong>0828 버전 변경사항</strong>
+  <ul style="margin:6px 0 0 16px; padding:0;">
+    <li>디버그툴에 표시되는 sync정보와 일치되도록 개선 - 녹화 첫 구간은 sync00부터, 두세번째 구간은 실제 시간대 sync로 표시 (예:춘천사우_산까치2)</li>
+    <li>싱크 버튼에 녹화시간이 표시되도록 개선</li>
+    <li>모든 싱크 버튼을 상단에 배치, 오전/오후 구간별 색상으로 구분</li>
+    <li>단축키 안내를 비디오 영역 하단으로 이동</li>
+  </ul>
+  </div>
   <div class="sync-buttons" id="syncContainerBottom"></div>
 
 <script>
@@ -887,6 +913,15 @@
     const toMin = hhmm => parseInt(hhmm.slice(0,2),10)*60 + parseInt(hhmm.slice(2),10);
     return ms.map(m => [toMin(m[1]), toMin(m[2])]).sort((a,b)=>a[0]-b[0]);
   }
+  // t: 분(예: 09:00 = 540). 이 시각이 몇 번째 녹화구간(0,1,2,...)인지
+  function windowIndexForTime(t){
+    const wins = getSiteWindows(); // [[startMin, endMin], ...]
+    for (let i=0; i<wins.length; i++){
+      const [s, e] = wins[i];
+      if (t >= s && t < e) return i;
+    }
+    return -1; // 어떤 구간에도 속하지 않으면
+  }
   // 각 버튼이 대표하는 "시각(분)"들을 10분 간격으로 최대 18개 반환
   function computeSlotsMinutes(){
     const base = 9*60;             // 09:00 (표시용 index 계산 기준)
@@ -927,6 +962,18 @@
     }
     return result;
   }
+  // [NEW] 싱크 k가 어느 녹화구간(0,1,2,...)에 속하는지 반환
+  function windowIndexForK(k){
+    const base = 9*60;              // 09:00 기준(분)
+    const startMin = base + k*10;   // 이 싱크의 시작 시간(분)
+    const wins = getSiteWindows();  // [[start,end], ...] 분 단위
+    for (let i = 0; i < wins.length; i++){
+      const [s, e] = wins[i];
+      if (startMin >= s && startMin < e) return i;
+    }
+    return -1; // 어떤 구간에도 속하지 않으면
+  }
+  
   function renderSyncButtons(){
     const top = document.getElementById("syncContainerTop");
     const bot = document.getElementById("syncContainerBottom");
@@ -966,6 +1013,8 @@
 
       // 한 줄 표기: "sync 06 10:00"
       btn.textContent = `sync ${pad2(dispSync)} ${hh}:${mm}`;
+      const w = windowIndexForTime(t);      // ← 추가
+      if (w >= 0) btn.classList.add(`win${w}`);  // ← 추가
 
       btn.addEventListener("click", () => setActiveSyncByPos(pos));
       top.appendChild(btn);
