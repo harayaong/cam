@@ -707,23 +707,36 @@
 
 <script>
   function handleSearchEnter(e) {
-    if (e.key === "Enter") {
-      const input = document.getElementById("siteSearch").value.toLowerCase();
-      const select = document.getElementById("siteInput");
-      let matched = false;
-      for (let i = 0; i < select.options.length; i++) {
-        const option = select.options[i];
-        const value = option.value.toLowerCase();
-        const text = option.textContent.toLowerCase();
-        if (value === input || text.includes(input)) {
-          option.selected = true;
-          matched = true;
-          loadVideos(currentSyncIndex.toString().padStart(2, '0'));
-          break;
-        }
-      }
-      if (!matched) alert("일치하는 교실이 없습니다.");
+    if (e.key !== "Enter") return;
+
+    const q = document.getElementById("siteSearch").value.trim().toLowerCase();
+    const select = document.getElementById("siteInput");
+    const options = Array.from(select.options);
+
+    // 1) 콤보박스 필터링 (일치하는 항목만 보이게)
+    const matches = [];
+    options.forEach((opt, idx) => {
+      const value = opt.value.toLowerCase();
+      const text = opt.textContent.toLowerCase();
+      const hit = q === "" || value === q || text.includes(q);
+      opt.style.display = hit ? "" : "none";
+      if (hit) matches.push(idx);
+    });
+
+    // 2) 매치 없으면 안내
+    if (matches.length === 0) {
+      alert("일치하는 교실이 없습니다.");
+      return;
     }
+
+    // 3) 첫 번째 매치를 선택
+    select.selectedIndex = matches[0];
+
+    // 4) 싱크 버튼 재생성 + 첫 슬롯 자동 재생
+    //   (renderSyncButtons 안에서 visibleMap/버튼들이 갱신되고,
+    //    setActiveSyncByPos(0)이 실제 비디오 로딩까지 수행)
+    renderSyncButtons();
+    setActiveSyncByPos(0);
   }
 
   let currentPos = 0;          // 버튼 배열에서의 위치(0..17) — URL에 쓰는 인덱스
