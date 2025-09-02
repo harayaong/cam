@@ -130,7 +130,7 @@
     .date-badge:hover {
       background-color: #90ee90;
     }
-      
+    
   </style>
 </head>
 <body>
@@ -695,7 +695,9 @@
 
     <!-- 오른쪽: 규칙 URL 페이지(iframe) -->
     <div class="panel">
-      <h2>디버그툴</h2>
+      <h2>디버그툴 <label for="debugDateInput">📆</label>
+          <input type="date" id="debugDateInput"></h2>
+        
       <iframe id="rightPage" title="Debug/Index Page"></iframe>
     </div>
   </div>
@@ -1116,6 +1118,77 @@ function updateLeftSubtitleBySync(syncNum){
     document.getElementById('siteInput')?.addEventListener('change', () => {
       // site 바뀌면 renderSyncButtons()가 다시 그린 뒤 setActiveSyncByPos(0)에서 갱신됨
     });
+    function getDebugFrame(){ return document.getElementById('rightPage'); }
+    function getDebugDateFromURL(){
+      const f = getDebugFrame();
+      if (!f) return null;
+      try {
+        const src = f.getAttribute('src') || '';               // 속성 기준
+        if (!src) return null;
+        return new URL(src, window.location.href).searchParams.get('date');
+      } catch { return null; }
+    }
+
+    function buildDebugURL(site, date, baseSrc){
+      // baseSrc가 없으면 기본 도메인으로 시작
+      const base = baseSrc
+        ? new URL(baseSrc, window.location.href)
+        : new URL('https://playtag-debugging-tool.vercel.app/');
+      const sp = base.searchParams;
+
+      if (site) sp.set('site', site);
+      if (date) sp.set('date', date);
+
+      // 새로고침 보장용 캐시버스터
+      sp.set('_cb', Date.now().toString());
+      base.search = sp.toString();
+      return base.toString();
+    }
+
+    /** 오른쪽 프레임의 date만 바꾸어 재호출 (강제 리로드 보장) */
+    function updateDebugFrameDate(dateStr){
+      const f = getDebugFrame();
+      if (!f || !dateStr) return;
+
+      const currentSrc = f.getAttribute('src') || '';
+      const siteSel = document.getElementById('siteInput');
+      const site = siteSel?.value?.trim() || new URL(currentSrc, window.location.href).searchParams.get('site') || '';
+
+      const newURL = buildDebugURL(site, dateStr, currentSrc || null);
+
+      // 같은 문자열이라도 강제 리로드 되도록 about:blank → 새 URL 순서로 설정
+      if (currentSrc) {
+        f.setAttribute('src', 'about:blank');
+        // 아주 짧은 지연 후 새 URL 주입
+        setTimeout(() => { f.setAttribute('src', newURL); }, 0);
+      } else {
+        f.setAttribute('src', newURL);
+      }
+    }
+
+    // 우측 달력 초기화 + 이벤트
+    (function initRightCalendar(){
+      const input = document.getElementById('debugDateInput');
+      const f = getDebugFrame();
+      if (!input || !f) return;
+
+      // 초기값: 프레임 src의 date → 없으면 좌측 date → 오늘
+      input.value = getDebugDateFromURL()
+                 || document.getElementById('dateInput')?.value
+                 || new Date().toISOString().split('T')[0];
+
+      // 변경 시 프레임만 갱신
+      input.addEventListener('change', (e) => {
+        const d = e.target.value;
+        if (d) updateDebugFrameDate(d);
+      });
+
+      // 프레임이 외부 요인으로 바뀌었을 때 달력 동기화
+      f.addEventListener('load', () => {
+        const d = getDebugDateFromURL();
+        if (d) input.value = d;
+      });
+    })();
 </script>
 </body>
 </html>
