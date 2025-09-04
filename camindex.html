@@ -137,10 +137,11 @@
   <div class="header-bar">
     <h1>카메라인덱스조회</h1>
     <div id="actionButtons">
+        <button class="action-button" onclick="openDebugImages()">디버그 이미지</button>
         <button class="action-button" onclick="openDebugTool()">선택교실디버그</button>
         <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
         <button class="action-button" onclick="openImageTemplate()">이미지템플릿</button>
-        <button class="action-button" onclick="window.open('https://harayaong.github.io/cam/camindex.html','_blank','noopener')">통합비디오조회</button>
+        <button class="action-button" onclick="window.open('https://harayaong.github.io/cam/','_blank','noopener')">통합비디오조회</button>
       </div>
   </div>
 
@@ -746,6 +747,30 @@ function openDebugTool() {
   const date = document.getElementById("dateInput").value || new Date().toISOString().split('T')[0];
   const url = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
   window.open(url, "_blank");
+}
+function openDebugImages() {
+  const siteEl = document.getElementById("siteInput");
+  const dateEl = document.getElementById("dateInput");
+
+  const site = siteEl ? siteEl.value.trim() : "";
+  let date = dateEl ? dateEl.value : "";
+
+  if (!site) {
+    alert("SITE-ID를 선택해주세요.");
+    return;
+  }
+  // 날짜가 비어 있으면 오늘 날짜로
+  if (!date) {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+
+  const url =
+    `http://52.20.164.148:7777/api/get_combined_debug_images` +
+    `?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+
+  window.open(url, "_blank", "noopener");
 }
 function filterSiteOptions() {
   const input = document.getElementById("siteSearch").value.toLowerCase();
