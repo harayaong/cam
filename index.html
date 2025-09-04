@@ -699,7 +699,7 @@
   <div style="margin:12px 0; font-size:13px; color:#333; background:#f9f9f9; border:1px solid #ddd; padding:8px 12px; border-radius:6px;">
   <strong>버전 변경사항</strong>
   <ul style="margin:6px 0 0 16px; padding:0;">
-    <li>0904-디버그이미지 기능버튼 추가</li>
+    <li>0904-디버그이미지 기능버튼 추가, 자동재생기능 제거</li>
     <li>0902-캠인덱스비교 기능버튼 추가</li>
     <li>0828-디버그툴에 표시되는 sync정보와 일치되도록 개선 - 녹화 첫 구간은 sync00부터, 두세번째 구간은 실제 시간대 sync로 표시 (예:춘천사우_산까치2)</li>
     <li>0828-싱크 버튼에 녹화시간이 표시되도록 개선</li>
@@ -807,8 +807,8 @@
       const video = document.createElement("video");
       video.src = url;
       video.controls = true;
-      video.autoplay = true;
-      video.muted = true;
+      video.preload = "metadata";  // 영상 전체 대신 길이/썸네일만 로드
+      video.muted = true;          // 사용자 조작 시 재생
 
       const overlay = document.createElement("div");
       overlay.className = "overlay-label";
