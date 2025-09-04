@@ -140,10 +140,11 @@
   
 <body>
   <div class="header-bar">
-    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250902</h1>
+    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지 v.250904</h1>
     <div id="actionButtons">
-      <button class="action-button" onclick="openDebugTool()">선택교실디버그</button>
-      <button class="action-button" onclick="window.open('https://harayaong.github.io/cam/camindex.html','_blank','noopener')">캠인덱스비교조회</button>
+      <button class="action-button" onclick="openDebugImages()">디버그 이미지</button>
+      <button class="action-button" onclick="openDebugTool()">통합디버그툴</button>
+      <button class="action-button" onclick="window.open('https://harayaong.github.io/cam/camindex.html','_blank','noopener')">캠인덱스비교</button>
       <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
       <button class="action-button" onclick="window.open('http://54.166.249.184:5001/', '_blank')">Train-set</button>
       <button class="action-button" onclick="openImageTemplate()">이미지템플릿</button>
@@ -698,7 +699,8 @@
   <div style="margin:12px 0; font-size:13px; color:#333; background:#f9f9f9; border:1px solid #ddd; padding:8px 12px; border-radius:6px;">
   <strong>버전 변경사항</strong>
   <ul style="margin:6px 0 0 16px; padding:0;">
-    <li>0902-캠인덱스비교 버튼 추가</li>
+    <li>0904-디버그이미지 기능버튼 추가</li>
+    <li>0902-캠인덱스비교 기능버튼 추가</li>
     <li>0828-디버그툴에 표시되는 sync정보와 일치되도록 개선 - 녹화 첫 구간은 sync00부터, 두세번째 구간은 실제 시간대 sync로 표시 (예:춘천사우_산까치2)</li>
     <li>0828-싱크 버튼에 녹화시간이 표시되도록 개선</li>
     <li>0828-모든 싱크 버튼을 상단에 배치, 오전/오후 구간별 색상으로 구분</li>
@@ -858,6 +860,31 @@
     window.open(url, "_blank");
   }
 
+  function openDebugImages() {
+    const siteEl = document.getElementById("siteInput");
+    const dateEl = document.getElementById("dateInput");
+
+    const site = siteEl ? siteEl.value.trim() : "";
+    let date = dateEl ? dateEl.value : "";
+
+    if (!site) {
+      alert("SITE-ID를 선택해주세요.");
+      return;
+    }
+    // 날짜가 비어 있으면 오늘 날짜로
+    if (!date) {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    }
+
+    const url =
+      `http://52.20.164.148:7777/api/get_combined_debug_images` +
+      `?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+
+    window.open(url, "_blank", "noopener");
+  }
+  
   function filterSiteOptions() {
     const input = document.getElementById("siteSearch").value.toLowerCase();
     const select = document.getElementById("siteInput");
