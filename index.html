@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>통합카메라조회 v251022</title>
+  <title>통합카메라조회 v251028</title>
   <style>
     body {
       font-family: sans-serif;
@@ -146,8 +146,6 @@
 }
   </style>
 </head>
-  
-  
   
 <body>
   <div class="header-bar">
@@ -682,10 +680,7 @@
     </div>
   </div>
 
-  <div class="sync-buttons" id="syncContainerTop"></div>
-
-  <div id="videoContainer" class="video-grid"></div>
-  <p style="font-size: 13px; margin: 4px 0; color: #555;">
+    <p style="font-size: 13px; margin: 4px 0; color: #555;">
   ⌨️ <strong>단축키 안내:</strong>
   <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">Space</span> 재생/일시정지 |
   <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">←</span>/<span style="background: #eee; padding: 2px 6px; border-radius: 4px;">→</span> 싱크 이동 |
@@ -697,9 +692,54 @@
   <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">3</span> 30초 앞으로 |
   <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">4</span> 3분 앞으로
 </p>
+  
+<!-- 디버그 이미지 영역 -->
+<div id="debugPanel" style="margin-top:16px;">
+
+  
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+    <!-- 새 버튼: 사용이력취합문서 -->
+
+    <!-- 기존 버튼: 디버그 이미지 불러오기 -->
+<button class="action-button" onclick="loadDebugImagesSequential()">디버그 이미지 불러오기</button>
+    
+    <button
+      class="action-button"
+      onclick="window.open('https://docs.google.com/spreadsheets/d/1llRO5e9ODg9jzwif-i2noxAc29qwIcGhjXtZyHAJFGs/edit?gid=0#gid=0', '_blank')">
+      📊 디버그이미지 사용시 사용이력을 취합해주세요. - 사용이력취합문서 - 
+    </button>
+
+    <span id="debugStatus" style="color:#666;font-size:13px;">(대기중)</span>
+  </div>
+
+  <div id="debugImgBox" class="debug-grid"></div>
+</div>
+  
+  <details id="syncSection" style="margin-top:10px;" close>
+  <summary
+    style="cursor:pointer; font-weight:600; background:#f0f0f0; padding:6px 10px; border-radius:6px;">
+    ⏱️ 싱크 선택 보기/숨기기 - 사용을 지양하고 디버그이미지를 사용해주세요
+  </summary>
+
+  <div class="sync-buttons" id="syncContainerTop" style="margin-top:8px;"></div>
+</details>
+
+<details id="videoSection" style="margin-top:12px;" close>
+  <summary
+    style="cursor:pointer; font-weight:600; background:#f5f5f5; padding:6px 10px; border-radius:6px;">
+    🎬 비디오 영역 보기/숨기기 - 사용을 지양하고 디버그이미지를 사용해주세요
+  </summary>
+  
+  <div id="videoContainer" class="video-grid" style="margin-top:10px;"></div>
+</details>
+  
+
+  <div class="sync-buttons" id="syncContainerBottom"></div>
+  
   <div style="margin:12px 0; font-size:13px; color:#333; background:#f9f9f9; border:1px solid #ddd; padding:8px 12px; border-radius:6px;">
   <strong>버전 변경사항</strong>
   <ul style="margin:6px 0 0 16px; padding:0;">
+    <li>1028-동영상과 디버그이미지 영역 위치를 변경, 비디오는 기본 숨김처리 </li>
     <li>1022-신규교실_서구수림 4교실 추가 + 디버그이미지를 페이지 하단에 호출기능 추가</li>
     <li>0919-신규교실 추가</li>
     <li>0904-디버그이미지 기능버튼 추가, 자동재생기능 제거</li>
@@ -709,18 +749,7 @@
     <li>0828-모든 싱크 버튼을 상단에 배치, 오전/오후 구간별 색상으로 구분</li>
     <li>0828-단축키 안내를 비디오 영역 하단으로 이동</li>
   </ul>
-  </div>
-  <div class="sync-buttons" id="syncContainerBottom"></div>
-
-  <!-- 디버그 이미지 영역 -->
-<div id="debugPanel" style="margin-top:16px;">
-  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-    <button class="action-button" onclick="loadDebugImagesSequential()">디버그 이미지 새로고침</button>
-    <span id="debugStatus" style="color:#666;font-size:13px;">(대기중)</span>
-  </div>
-  <div id="debugImgBox" class="debug-grid"></div>
-</div>
-  
+  </div>  
   
 <script>
   function handleSearchEnter(e) {
@@ -776,20 +805,20 @@
   if (typeof setActiveSyncByPos === "function") setActiveSyncByPos(0);
 
   // ④ 디버그 이미지 최초 로딩
-  if (typeof loadDebugImagesSequential === "function") loadDebugImagesSequential();
+  // if (typeof loadDebugImagesSequential === "function") loadDebugImagesSequential();
 
   // ⑤ SITE 변경/날짜 변경 시 디버그 이미지 자동 갱신
-  const siteSel = document.getElementById("siteInput");
-  if (siteSel) siteSel.addEventListener("change", () => {
-    renderSyncButtons();
-    setActiveSyncByPos(0);
-    loadDebugImagesSequential();
-  });
+  // const siteSel = document.getElementById("siteInput");
+  // if (siteSel) siteSel.addEventListener("change", () => {
+  //  renderSyncButtons();
+  //  setActiveSyncByPos(0);
+  //  loadDebugImagesSequential();
+  // });
     
-  if (dateEl) dateEl.addEventListener("change", () => {
-    updateWeekday();
-    loadDebugImagesSequential();
-  });
+  // if (dateEl) dateEl.addEventListener("change", () => {
+  //  updateWeekday();
+  //  loadDebugImagesSequential();
+  // });
 });
 
   function updateWeekday() {
@@ -1172,8 +1201,33 @@ const cell = document.createElement("div");
 cell.className = "debug-cell";
 
 const header = document.createElement("header");
-header.textContent = sync;
 header.className = "debug-cap";
+
+const syncId = sync;
+
+const linkBtn = document.createElement("button");
+linkBtn.textContent = `${syncId} 새창으로`;
+linkBtn.style.cssText = `
+  background:#f5f5f5;
+  border:1px solid #ccc;
+  border-radius:4px;
+  padding:2px 8px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background 0.2s;
+`;
+linkBtn.onmouseenter = () => (linkBtn.style.background = "#e0e0e0");
+linkBtn.onmouseleave = () => (linkBtn.style.background = "#f5f5f5");
+
+linkBtn.onclick = () => {
+  const site = document.getElementById("siteInput")?.value || "";
+  const date = document.getElementById("dateInput")?.value || "";
+  const url = `https://playtag-debugging-tool.vercel.app/sync-images.html?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}&sync=${syncId}`;
+  window.open(url, "_blank");
+};
+
+header.appendChild(linkBtn);
 
 const frame = document.createElement("iframe");
 frame.className = "debug-frame";
@@ -1280,6 +1334,8 @@ box.appendChild(cell);
   document.documentElement.style.margin = '0';
   document.body.style.margin = '0';
 })();
+  
+  
   
   </script>
   
