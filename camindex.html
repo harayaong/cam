@@ -1,162 +1,177 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>캠인덱스비교v251020</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>통합카메라조회 v251106</title>
   <style>
-    :root {
-      --gap: 12px;
-      --border: #ddd;
-      --muted: #666;
+    body {
+      font-family: sans-serif;
+      padding: 3px;
+      line-height: 1;
     }
-    body { font-family: sans-serif; padding: 8px; line-height: 1.2; }
-    input[type="date"], input[type="text"], select {
-      height: 32px; padding: 4px 8px; font-size: 14px; box-sizing: border-box;
+    input[type="date"],
+    input[type="text"],
+    select {
+      height: 32px;
+      padding: 4px 8px;
+      font-size: 14px;
+      box-sizing: border-box;
     }
-    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    h1 { margin: 0; font-size: 26px; }
-    .action-button {
-      background-color: lightgreen; border: 1px solid #ccc; padding: 6px 12px; margin-left: 4px;
-      cursor: pointer; font-weight: bold; border-radius: 4px;
-    }
-    .action-button:hover { background-color: #90ee90; }
-
-    .control-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-    .control-left { display: flex; align-items: center; gap: 12px; }
-    #siteSearch { padding: 4px 8px; }
-    .weekday-badge {
-      display: inline-block; padding: 4px 10px; border-radius: 20px; background-color: #e0f7fa;
-      color: #00796b; font-weight: bold; font-size: 13px; border: 1px solid #b2ebf2;
-    }
-
-   /* 한 줄(가로 스크롤 가능), 버튼 폭은 내용만큼 */
-    .sync-buttons {
+    .header-bar {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .video-wrapper {
+      position: relative;
+    }
+    video {
+      width: 100%;
+      height: auto;
+      background: #000;
+    }
+    .overlay-label {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 4px 4px;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+    .video-placeholder {
+      width: 100%;
+      height: 200px;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+    }
+    .sync-buttons {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
       gap: 6px;
       margin: 10px 0;
-      overflow-x: auto;
-      flex-wrap: nowrap;     /* ← 줄바꿈 금지 */
     }
-    .sync-buttons button { flex: 0 0 auto; }
-    .sync-buttons button .time { display:block; font-size:12px; opacity:.85; margin-top:2px }
-    .sync-buttons button.active { background: lightgreen !important; border-color:#5fbf5f !important; font-weight: 700; }
+    .sync-buttons button {
+      padding: 8px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      white-space: nowrap;   /* ← 이 줄만 추가 */
+    }
+    .sync-buttons button:hover {
+      background-color: #ddd;
+    }
+    .sync-buttons button.active {
+      background-color: lightgreen;
+      font-weight: bold;
+    }
+    .control-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .control-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    #siteSearch {
+      padding: 4px 8px;
+    }
+    .action-button {
+      background-color: lightgreen;
+      border: 1px solid #ccc;
+      padding: 6px 12px;
+      margin-left: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 4px;
+    }
+    .action-button:hover {
+      background-color: #90ee90; /* 더 진한 연두 */
+    }
+    .weekday-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      margin-left: 6px;
+      border-radius: 20px;
+      background-color: #e0f7fa;
+      color: #00796b;
+      font-weight: bold;
+      font-size: 13px;
+      border: 1px solid #b2ebf2;
+    }
+    .sync-buttons button .time{display:block;font-size:12px;opacity:.8;margin-top:2px}
+    .sync-buttons button { white-space: nowrap; }
+    /* 녹화 구간별 버튼 배경색 (색각친화 팔레트) */
+    .sync-buttons button.win0 { background:#e6f3ff; border-color:#9ec9ff; }  /* 1구간 */
+    .sync-buttons button.win1 { background:#eaf7e6; border-color:#a8d8a8; }  /* 2구간 */
+    .sync-buttons button.win2 { background:#fff2cc; border-color:#f1c84b; }  /* 3구간 */
 
-    /* 구간별 색상 (색각친화) */
-    .sync-buttons button.win0 { background:#e6f3ff; border-color:#9ec9ff; }
-    .sync-buttons button.win1 { background:#eaf7e6; border-color:#a8d8a8; }
-    .sync-buttons button.win2 { background:#fff2cc; border-color:#f1c84b; }
     .sync-buttons button.win0:hover { background:#d9ecff; }
     .sync-buttons button.win1:hover { background:#def1d9; }
     .sync-buttons button.win2:hover { background:#ffeaa6; }
 
-    /* 아래는 좌/우 프레임 구성 */
-    .split {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr; /* 왼쪽이 살짝 넓게 */
-      gap: var(--gap);
-      align-items: start;
-    }
-    @media (max-width: 1100px) {
-      .split { grid-template-columns: 1fr; }
-    }
-    .panel {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: var(--gap);
-      background: #fff;
-    }
-    .panel h2 {
-      margin: 0 0 8px 0; font-size: 16px; color: #111;
-      display:flex; align-items:center; gap:8px;
-    }
-    .panel .sub { color: var(--muted); font-size: 12px; }
-
-    .video-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      grid-auto-flow: row;
-    }
-    @media (max-width: 1300px) {
-      .video-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-    @media (max-width: 900px) {
-      .video-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    .video-wrapper { position: relative; }
-    video { width: 100%; height: auto; background: #000; }
-    .overlay-label {
-      position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.6); color: #fff;
-      padding: 3px 6px; font-size: 12px; font-weight: bold; border-radius: 4px;
-    }
-    .video-placeholder {
-      width: 100%; aspect-ratio: 16/9; background: #000; display: grid; place-items: center;
-      color: #fff; font-weight: bold;
-    }
-    iframe#rightPage {
-      width: 100%; height: 75vh; border: none; background: #f9fafb;
-    }
-
-    .shortcuts {
-      font-size: 13px; margin: 8px 0; color: #555;
-      background:#f9f9f9; border:1px solid #ddd; padding:8px 12px; border-radius:6px;
-    }
-    .kbd { background:#eee; padding:2px 6px; border-radius:4px; }
-    /* 왼쪽 비디오 상단 서브타이틀 */
-    #leftSubtitle{font-size:13px;color:#333;margin:4px 0;}
-    #leftSubtitle .date-badge{
-      display:inline-block;
-      padding:2px 8px;
-      border-radius:12px;
-      background:#222;      /* 강조 배경 */
-      color:#fff;           /* 텍스트 반전 */
-      font-weight:700;
-      margin-right:6px;
-    }
-    #leftSubtitle .site{opacity:.85;margin-right:6px;}
-    #leftSubtitle .sync{opacity:.7;}
-  
-  /* 날짜 강조용 작은 버튼 */
-    .date-badge {
-      background-color: lightgreen;   /* .action-button 기본과 동일 */
-      border: 1px solid #ccc;
-      padding: 2px 8px;
-      font-size: 13px;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: default; /* 클릭 안 되도록 */
-    }
-    .date-badge:hover {
-      background-color: #90ee90;
+    /* active가 덮어씌우도록 테두리/글자 강조 */
+    .sync-buttons button.active {
+      background: lightgreen !important;
+      border-color:#5fbf5f !important;
+      font-weight: 700;
     }
     
+.debug-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.debug-cell { background:#fafafa; border:1px solid #e5e5e5; border-radius:6px; overflow:hidden; }
+.debug-cap  { font:12px/1.6 sans-serif; color:#555; padding:6px 8px; background:#f3f6f9; border-bottom:1px solid #e5e5e5; }
+/* 디버그 카드용 iframe: 고정 높이 + 내부 스크롤 */
+.debug-frame{
+  width: 100%;
+  height: 575px;  /* ← 필요에 맞게 900~1800px 등으로 조정 가능 */
+  border: 0;
+  display: block;
+}
   </style>
 </head>
+  
 <body>
   <div class="header-bar">
-    <h1>카메라인덱스조회</h1>
+    <h1 style="margin: 0; font-size: 30px;">통합카메라조회 페이지</h1>
     <div id="actionButtons">
-        <button class="action-button" onclick="openDebugImages()">디버그 이미지</button>
-        <button class="action-button" onclick="openDebugTool()">선택교실디버그</button>
-        <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
-        <button class="action-button" onclick="openImageTemplate()">이미지템플릿</button>
-        <button class="action-button" onclick="window.open('https://harayaong.github.io/cam/','_blank','noopener')">통합비디오조회</button>
-      </div>
+      <button class="action-button" onclick="openDebugImages()">디버그 이미지</button>
+      <button class="action-button" onclick="openDebugTool()">통합디버그툴</button>
+      <button class="action-button" onclick="window.open('https://harayaong.github.io/cam/camindex.html','_blank','noopener')">캠인덱스비교</button>
+      <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
+      <button class="action-button" onclick="window.open('http://44.211.213.122:5001/', '_blank')">Train-set</button>
+      <button class="action-button" onclick="openImageTemplate()">이미지템플릿</button>
+    </div>
   </div>
 
   <div class="control-bar">
     <div class="control-left">
       <label for="dateInput">📆</label>
-      <input type="date" id="dateInput" onchange="updateWeekday(); onSiteOrDateChange();" />
+      <input type="date" id="dateInput" onchange="updateWeekday()">
       <span id="weekday" class="weekday-badge"></span>
 
       <label for="siteSearch">🔎</label>
-      <input type="text" id="siteSearch" placeholder="검색어 입력" oninput="filterSiteOptions()" onkeydown="handleSearchEnter(event)" />
+      <input type="text" id="siteSearch" placeholder="검색어 입력"
+          oninput="filterSiteOptions()" onkeydown="handleSearchEnter(event)">
 
       <label for="siteInput">SITE 선택</label>
-      <select id="siteInput" size="1" onchange="onSiteOrDateChange()">
-        <!-- 교실 옵션: 예시로 일부만 넣고, 나머지는 기존 페이지와 동일 구조로 확장 가능 -->
+      <select id="siteInput" size="1">
 <option value="cptp_1x1">cptp_1x1 / CathedralParkway / ??? / usa_poc_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="aeyuk_1x3">aeyuk_1x3 / 경산애육 / 민들레12 / nextday_1000-1200+1500-1600 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="aeyuk_2x1">aeyuk_2x1 / 경산애육 / 장미 / nextday_1300-1600 / Mon, Tue, Wed, Thu, Fri</option>
@@ -295,8 +310,8 @@
 <option value="gapoyubora_1x4">gapoyubora_1x4 / 창원가포유보라 / 하늘누리 / today_0900-1200 / Mon, Wed, Fri</option>
 <option value="gasan_1x4">gasan_1x4 / 포천가산 / 바다 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="gasan_1x6">gasan_1x6 / 포천가산 / 햇살 / today_0900-1200 / Mon, Wed, Thu</option>
-<option value="geullogomdallae_429">geullogomdallae_429 / 근로복지공단곰달래 / 가득찬 / today_0900-1200 / Mon, Wed, Fri</option>
-<option value="geullogomdallae_430">geullogomdallae_430 / 근로복지공단곰달래 / 당찬 / today_0900-1200 / Mon, Wed, Fri</option>
+<option value="geullogomdallae_429">geullogomdallae_429 / 근로복지공단곰달래 / 가득찬 / nextday_0930-1130+1500-1600 / Mon, Wed, Fri</option>
+<option value="geullogomdallae_430">geullogomdallae_430 / 근로복지공단곰달래 / 당찬 / nextday_0900-1100+1500-1600 / Mon, Tue, Thu</option>
 <option value="geullogomdallae_431">geullogomdallae_431 / 근로복지공단곰달래 / 힘찬 / today_0900-1200 / Mon, Wed, Fri</option>
 <option value="geullogomdallae_432">geullogomdallae_432 / 근로복지공단곰달래 / 슬찬 / today_0900-1200 / Mon, Wed, Fri</option>
 <option value="geullogomdallae_436">geullogomdallae_436 / 근로복지공단곰달래 / 알찬 / today_0900-1200 / Mon, Wed, Fri</option>
@@ -605,6 +620,10 @@
 <option value="suji_1x6">suji_1x6 / 용인수지 / 지혜로운 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="supsokgabe_1x2">supsokgabe_1x2 / 군산숲속가베 / 믿음 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="supsokjai_1x3">supsokjai_1x3 / 춘천숲속자이 / 슬기 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="surim_448">surim_448 / 서구수림 / 씨앗 / today_0900-1200 / Tue, Wed, Thu</option>
+<option value="surim_449">surim_449 / 서구수림 / 연못 / today_0900-1200 / Tue, Wed, Thu</option>
+<option value="surim_450">surim_450 / 서구수림 / 풀잎 / today_0900-1200 / Tue, Wed, Thu</option>
+<option value="surim_451">surim_451 / 서구수림 / 열매 / today_0900-1200 / Tue, Wed, Thu</option>
 <option value="tapgoeul_2x3">tapgoeul_2x3 / 수원탑고을 / 아람 / nextday_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="thepalace_1x1">thepalace_1x1 / 수성더팰리스2차 / 포비 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="thepalace_1x2">thepalace_1x2 / 수성더팰리스2차 / 에디 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
@@ -613,8 +632,8 @@
 <option value="uriaideul_2x2">uriaideul_2x2 / 청주우리아이들 / 퍼플 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="uriaideul_2x3">uriaideul_2x3 / 청주우리아이들 / 초콜릿 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="uriaideul_2x4">uriaideul_2x4 / 청주우리아이들 / 오렌지 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="verahills_1x1">verahills_1x1 / 은평베라힐즈 / 민들레 / today_0900-1200 / Mon, Wed, Fri</option>
-<option value="verahills_1x6">verahills_1x6 / 은평베라힐즈 / 장미 / today_0900-1200 / Mon, Wed, Fri</option>
+<option value="verahills_1x1">verahills_1x1 / 은평베라힐즈 / 민들레 / today_0900-1200 / Mon, Wed, Thu</option>
+<option value="verahills_1x6">verahills_1x6 / 은평베라힐즈 / 장미 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="vision_1x5">vision_1x5 / 평택비전 / 지혜 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="wolbae_2x2">wolbae_2x2 / 달서월배 / 주홍 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="wolbae_2x3">wolbae_2x3 / 달서월배 / 빨강 / today_0900-1200 / Tue, Thu, Fri</option>
@@ -647,7 +666,7 @@
 <option value="yogebet_1x2">yogebet_1x2 / 구미요게벳 / 초롱초롱 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yogebet_1x4">yogebet_1x4 / 구미요게벳 / 성큼성큼 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yogebet_1x6">yogebet_1x6 / 구미요게벳 / 아장아장 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="yuaenai_433">yuaenai_433 / 동래유앤아이 / 풀잎 / today_0900-1200 / Mon, Tue, Thu</option>
+<option value="yuaenai_433">yuaenai_433 / 동래유앤아이 / 풀잎 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="yukyeongsup_1x3">yukyeongsup_1x3 / 경산육영숲 / 수선화 / nextday_1000-1300 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yukyeongsup_2x1">yukyeongsup_2x1 / 경산육영숲 / 요술꽃 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yukyeongsup_2x2">yukyeongsup_2x2 / 경산육영숲 / 자운영 / nextday_0900-1100+1200-1300 / Mon, Tue, Wed, Thu, Fri</option>
@@ -658,555 +677,669 @@
 <option value="yurim_403">yurim_403 / 용인유림 / 누리 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="yurwon_2x4">yurwon_2x4 / 동구율원 / 싹틔움2 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yurwon_2x5">yurwon_2x5 / 동구율원 / 싹틔움1 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="surim_448">surim_448 / 서구수림 / 씨앗 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="surim_449">surim_449 / 서구수림 / 연못 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="surim_450">surim_450 / 서구수림 / 풀잎 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="surim_451">surim_451 / 서구수림 / 열매 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
-
       </select>
     </div>
   </div>
 
-  <!-- 싱크 버튼 (상단만) -->
-  <div class="sync-buttons" id="syncContainer"></div>
+    <p style="font-size: 13px; margin: 4px 0; color: #555;">
+  ⌨️ <strong>단축키 안내:</strong>
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">Space</span> 재생/일시정지 |
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">←</span>/<span style="background: #eee; padding: 2px 6px; border-radius: 4px;">→</span> 싱크 이동 |
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">↑</span>/<span style="background: #eee; padding: 2px 6px; border-radius: 4px;">↓</span> SITE-ID 이동 |
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">Q</span> 전날 |
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">W</span> 다음날 |
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">1</span> 3분 되감기 |
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">2</span> 30초 되감기 |
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">3</span> 30초 앞으로 |
+  <span style="background: #eee; padding: 2px 6px; border-radius: 4px;">4</span> 3분 앞으로
+</p>
+  
+<!-- 디버그 이미지 영역 -->
+<div id="debugPanel" style="margin-top:16px;">
 
-  <!-- 좌/우 프레임 -->
-  <div class="split">
-    <!-- 왼쪽: 현재 페이지 비디오 -->
-    <div class="panel">
-      <h2>비디오조회 <span class="sub" id="leftSubtitle"></span></h2>
-      <div id="videoContainer" class="video-grid"></div>
-      <div class="shortcuts">
-        ⌨️ <strong>단축키</strong>:
-        <span class="kbd">Space</span> 재생/일시정지 |
-        <span class="kbd">←</span>/<span class="kbd">→</span> 싱크 이동 |
-        <span class="kbd">↑</span>/<span class="kbd">↓</span> SITE 이동 |
-        <span class="kbd">Q</span> 전날 | <span class="kbd">W</span> 다음날 |
-        <span class="kbd">1</span> 3분 되감기 | <span class="kbd">2</span> 30초 되감기 |
-        <span class="kbd">3</span> 30초 앞으로 | <span class="kbd">4</span> 3분 앞으로
-      </div>
-    </div>
+  
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+    <!-- 새 버튼: 사용이력취합문서 -->
 
-    <!-- 오른쪽: 규칙 URL 페이지(iframe) -->
-    <div class="panel">
-      <h2>디버그툴 <label for="debugDateInput">📆</label>
-          <input type="date" id="debugDateInput"></h2>
-        
-      <iframe id="rightPage" title="Debug/Index Page"></iframe>
-    </div>
+    <!-- 기존 버튼: 디버그 이미지 불러오기 -->
+<button class="action-button" onclick="loadDebugImagesSequential()">디버그 이미지 불러오기</button>
+    
+    <button
+      class="action-button"
+      onclick="window.open('https://docs.google.com/spreadsheets/d/1llRO5e9ODg9jzwif-i2noxAc29qwIcGhjXtZyHAJFGs/edit?gid=0#gid=0', '_blank')">
+      📊 디버그이미지 사용시 사용이력을 취합해주세요. - 사용이력취합문서 - 
+    </button>
+
+    <span id="debugStatus" style="color:#666;font-size:13px;">(대기중)</span>
   </div>
 
-<script>
-/* ---------- 공통 상태 ---------- */
-let currentPos = 0;              // 표시되는 버튼 배열에서의 위치(0..n-1)
-let visibleMap = [];             // [{url:0, tMin:540, label:'09:00'} ...]
-const fmt2 = v => String(v).padStart(2, "0");
+  <div id="debugImgBox" class="debug-grid"></div>
+</div>
+  
+  <details id="syncSection" style="margin-top:10px;" close>
+  <summary
+    style="cursor:pointer; font-weight:600; background:#f0f0f0; padding:6px 10px; border-radius:6px;">
+    ⏱️ 싱크 선택 보기/숨기기 - 사용을 지양하고 디버그이미지를 사용해주세요
+  </summary>
 
-/* ---------- 초기화 ---------- */
-document.addEventListener("DOMContentLoaded", () => {
-  const today = new Date().toISOString().split('T')[0];
+  <div class="sync-buttons" id="syncContainerTop" style="margin-top:8px;"></div>
+</details>
+
+<details id="videoSection" style="margin-top:12px;" close>
+  <summary
+    style="cursor:pointer; font-weight:600; background:#f5f5f5; padding:6px 10px; border-radius:6px;">
+    🎬 비디오 영역 보기/숨기기 - 사용을 지양하고 디버그이미지를 사용해주세요
+  </summary>
+  
+  <div id="videoContainer" class="video-grid" style="margin-top:10px;"></div>
+</details>
+  
+
+  <div class="sync-buttons" id="syncContainerBottom"></div>
+  
+  <div style="margin:12px 0; font-size:13px; color:#333; background:#f9f9f9; border:1px solid #ddd; padding:8px 12px; border-radius:6px;">
+  <strong>버전 변경사항</strong>
+  <ul style="margin:6px 0 0 16px; padding:0;">
+    <li>1106-cptp_1x1 usa_poc 교실 임시 추가 </li>
+    <li>1028-동영상과 디버그이미지 영역 위치를 변경, 비디오는 기본 숨김처리 </li>
+    <li>1022-신규교실_서구수림 4교실 추가 + 디버그이미지를 페이지 하단에 호출기능 추가</li>
+    <li>0919-신규교실 추가</li>
+    <li>0904-디버그이미지 기능버튼 추가, 자동재생기능 제거</li>
+    <li>0902-캠인덱스비교 기능버튼 추가</li>
+    <li>0828-디버그툴에 표시되는 sync정보와 일치되도록 개선 - 녹화 첫 구간은 sync00부터, 두세번째 구간은 실제 시간대 sync로 표시 (예:춘천사우_산까치2)</li>
+    <li>0828-싱크 버튼에 녹화시간이 표시되도록 개선</li>
+    <li>0828-모든 싱크 버튼을 상단에 배치, 오전/오후 구간별 색상으로 구분</li>
+    <li>0828-단축키 안내를 비디오 영역 하단으로 이동</li>
+  </ul>
+  </div>  
+  
+<script>
+  function handleSearchEnter(e) {
+    if (e.key !== "Enter") return;
+
+    const q = document.getElementById("siteSearch").value.trim().toLowerCase();
+    const select = document.getElementById("siteInput");
+    const options = Array.from(select.options);
+
+    // 1) 콤보박스 필터링 (일치하는 항목만 보이게)
+    const matches = [];
+    options.forEach((opt, idx) => {
+      const value = opt.value.toLowerCase();
+      const text = opt.textContent.toLowerCase();
+      const hit = q === "" || value === q || text.includes(q);
+      opt.style.display = hit ? "" : "none";
+      if (hit) matches.push(idx);
+    });
+
+    // 2) 매치 없으면 안내
+    if (matches.length === 0) {
+      alert("일치하는 교실이 없습니다.");
+      return;
+    }
+
+    // 3) 첫 번째 매치를 선택
+    select.selectedIndex = matches[0];
+
+    // 4) 싱크 버튼 재생성 + 첫 슬롯 자동 재생
+    //   (renderSyncButtons 안에서 visibleMap/버튼들이 갱신되고,
+    //    setActiveSyncByPos(0)이 실제 비디오 로딩까지 수행)
+    renderSyncButtons();
+    setActiveSyncByPos(0);
+  }
+
+  let currentPos = 0;          // 버튼 배열에서의 위치(0..17) — URL에 쓰는 인덱스
+  let visibleMap = [];         // [{url:0, global:36}, ...] 형태로 표시/이동용 맵
+
+  document.addEventListener("DOMContentLoaded", () => {
+  // ① 오늘 날짜 자동 세팅
   const dateEl = document.getElementById("dateInput");
-  dateEl.value = today;
-  updateWeekday();
-  renderSyncButtons();
-  setActiveSyncByPos(0);
-  updateRightPane();
+  if (dateEl && !dateEl.value) {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    dateEl.value = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+
+  // ② 요일 표시 갱신
+  if (typeof updateWeekday === "function") updateWeekday();
+
+  // ③ 초기화 (버튼 및 비디오)
+  if (typeof renderSyncButtons === "function") renderSyncButtons();
+  if (typeof setActiveSyncByPos === "function") setActiveSyncByPos(0);
+
+  // ④ 디버그 이미지 최초 로딩
+  // if (typeof loadDebugImagesSequential === "function") loadDebugImagesSequential();
+
+  // ⑤ SITE 변경/날짜 변경 시 디버그 이미지 자동 갱신
+  // const siteSel = document.getElementById("siteInput");
+  // if (siteSel) siteSel.addEventListener("change", () => {
+  //  renderSyncButtons();
+  //  setActiveSyncByPos(0);
+  //  loadDebugImagesSequential();
+  // });
+    
+  // if (dateEl) dateEl.addEventListener("change", () => {
+  //  updateWeekday();
+  //  loadDebugImagesSequential();
+  // });
 });
 
-/* ---------- 유틸 ---------- */
-function updateWeekday() {
-  const dateStr = document.getElementById("dateInput").value;
-  const weekdaySpan = document.getElementById("weekday");
-  if (!dateStr) { weekdaySpan.textContent = ""; return; }
-  const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
-  const day = new Date(dateStr).getDay();
-  weekdaySpan.textContent = `${days[day]}`;
-}
-function copySiteId() {
-  const siteId = document.getElementById("siteInput").value || "";
-  if (!siteId) return alert("SITE-ID가 선택되지 않았습니다.");
-  navigator.clipboard.writeText(siteId).then(()=>alert("SITE-ID가 복사되었습니다."));
-}
-function openImageTemplate() {
-  const date = document.getElementById("dateInput").value;
-  const site = document.getElementById("siteInput").value.trim();
-  if (!date || !site) return alert("날짜와 SITE-ID를 선택해주세요.");
-  const url = `https://storyline-image-template.s3.ap-northeast-2.amazonaws.com/${date}/${site}.jpg`;
-  window.open(url, "_blank");
-}
-function openDebugTool() {
-  const site = document.getElementById("siteInput").value || "";
-  const date = document.getElementById("dateInput").value || new Date().toISOString().split('T')[0];
-  const url = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
-  window.open(url, "_blank");
-}
-function openDebugImages() {
-  const siteEl = document.getElementById("siteInput");
-  const dateEl = document.getElementById("dateInput");
-
-  const site = siteEl ? siteEl.value.trim() : "";
-  let date = dateEl ? dateEl.value : "";
-
-  if (!site) {
-    alert("SITE-ID를 선택해주세요.");
-    return;
+  function updateWeekday() {
+    const dateStr = document.getElementById("dateInput").value;
+    const weekdaySpan = document.getElementById("weekday");
+    if (!dateStr) {
+      weekdaySpan.textContent = "";
+      return;
+    }
+    const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    const day = new Date(dateStr).getDay();
+    weekdaySpan.textContent = `${days[day]}`;
   }
-  // 날짜가 비어 있으면 오늘 날짜로
+
+  function setActiveSyncByPos(pos) {
+    if (!visibleMap.length) return;
+    pos = Math.max(0, Math.min(pos, visibleMap.length - 1));
+
+    currentPos = pos;
+
+    // URL에 들어갈 sync 번호는 버튼의 순번(0..17)
+    const urlSync = String(visibleMap[pos].url).padStart(2, '0');
+    loadVideos(urlSync);
+
+    // active 버튼 표시
+    document.querySelectorAll(".sync-buttons button").forEach(b => b.classList.remove("active"));
+    const activeBtn = document.getElementById(`sync-btn-pos-${pos}`);
+    if (activeBtn) activeBtn.classList.add("active");
+  }
+
+  function loadVideos(syncNumber) {
+    const date = document.getElementById("dateInput").value;
+    const site = document.getElementById("siteInput").value.trim();
+    const container = document.getElementById("videoContainer");
+    if (!date || !site) {
+      alert("날짜와 교실을 선택해주세요.");
+      return;
+    }
+    const syncLabel = `sync${syncNumber.padStart(3, '0')}`;
+    const useNewURL = new Date(date) >= new Date("2025-06-16");
+    const baseURL = useNewURL
+      ? "https://d22x5o96gu3cuo.cloudfront.net"
+      : "https://d175ce76v5cwjf.cloudfront.net";
+
+    container.innerHTML = "";
+
+    for (let cam = 1; cam <= 8; cam++) {
+      const url = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
+      const wrapper = document.createElement("div");
+      wrapper.className = "video-wrapper";
+
+      const video = document.createElement("video");
+      video.src = url;
+      video.controls = true;
+      video.preload = "metadata";  // 영상 전체 대신 길이/썸네일만 로드
+      video.muted = true;          // 사용자 조작 시 재생
+
+      const overlay = document.createElement("div");
+      overlay.className = "overlay-label";
+      overlay.textContent = `CAM${cam.toString().padStart(2, '0')}`;
+
+      video.onerror = () => { wrapper.innerHTML = `<div class="video-placeholder">비디오가 없습니다</div>`; };
+
+      wrapper.appendChild(video);
+      wrapper.appendChild(overlay);
+      container.appendChild(wrapper);
+    }
+  }
+
+  function copySiteId() {
+    const siteId = document.getElementById("siteInput").value;
+    if (!siteId) {
+      alert("SITE-ID가 선택되지 않았습니다.");
+      return;
+    }
+    navigator.clipboard.writeText(siteId).then(() => {
+      alert("SITE-ID가 클립보드에 복사되었습니다.");
+    }).catch(() => {
+      alert("복사에 실패했습니다.");
+    });
+  }
+
+  function openImageTemplate() {
+    const date = document.getElementById("dateInput").value;
+    const site = document.getElementById("siteInput").value.trim();
+    if (!date || !site) {
+      alert("날짜와 SITE-ID를 선택해주세요.");
+      return;
+    }
+    const url = `https://storyline-image-template.s3.ap-northeast-2.amazonaws.com/${date}/${site}.jpg`;
+    window.open(url, '_blank');
+  }
+
+  function openDebugTool() {
+    const siteEl = document.getElementById("siteInput");
+    const dateEl = document.getElementById("dateInput");
+    const site = siteEl ? siteEl.value : "";
+    let date = dateEl ? dateEl.value : "";
+    if (!date) {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    }
+    const url = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+    window.open(url, "_blank");
+  }
+
+  function openDebugImages() {
+    const siteEl = document.getElementById("siteInput");
+    const dateEl = document.getElementById("dateInput");
+
+    const site = siteEl ? siteEl.value.trim() : "";
+    let date = dateEl ? dateEl.value : "";
+
+    if (!site) {
+      alert("SITE-ID를 선택해주세요.");
+      return;
+    }
+    // 날짜가 비어 있으면 오늘 날짜로
+    if (!date) {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, "0");
+      date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    }
+
+    const url =
+      `http://52.20.164.148:7777/api/get_combined_debug_images` +
+      `?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+
+    window.open(url, "_blank", "noopener");
+  }
+  
+  function filterSiteOptions() {
+    const input = document.getElementById("siteSearch").value.toLowerCase();
+    const select = document.getElementById("siteInput");
+    for (let option of select.options) {
+      const text = option.textContent.toLowerCase();
+      const value = option.value.toLowerCase();
+      option.style.display = text.includes(input) || value.includes(input) ? "" : "none";
+    }
+  }
+
+  document.addEventListener("keydown", (e) => {
+  const tag = document.activeElement.tagName.toLowerCase();
+  if ((tag === "input" || tag === "select") && e.key === " ") return;
+
+  const videos = document.querySelectorAll("#videoContainer video");
+
+  if (e.key === " ") {
+    e.preventDefault();
+    let anyPaused = Array.from(videos).some(v => v.paused);
+    videos.forEach(video => { if (anyPaused) video.play(); else video.pause(); });
+  } else if (e.key === "ArrowRight") {
+    if (visibleMap.length) {
+      const next = Math.min(currentPos + 1, visibleMap.length - 1);
+      if (next !== currentPos) setActiveSyncByPos(next);
+    }
+  } else if (e.key === "ArrowLeft") {
+    if (visibleMap.length) {
+      const prev = Math.max(currentPos - 1, 0);
+      if (prev !== currentPos) setActiveSyncByPos(prev);
+    }
+  } else if (["ArrowUp","ArrowDown"].includes(e.key)) {
+    const siteSelect = document.getElementById("siteInput");
+    const currentIndex = siteSelect.selectedIndex;
+
+    if (e.key === "ArrowUp" && currentIndex > 1) {
+      siteSelect.selectedIndex = currentIndex - 1;
+      renderSyncButtons();
+      setActiveSyncByPos(0);
+    } else if (e.key === "ArrowDown" && currentIndex < siteSelect.options.length - 1) {
+      siteSelect.selectedIndex = currentIndex + 1;
+      renderSyncButtons();
+      setActiveSyncByPos(0);
+    }
+  } else if (["1","2","3","4"].includes(e.key)) {   // ← 여기부터가 바로 이어지도록!
+    const seekAmount = {"1": -180, "2": -30, "3": 30, "4": 180}[e.key];
+    videos.forEach(video => { video.currentTime = Math.max(0, video.currentTime + seekAmount); });
+  } else if (["q","Q","ㅂ"].includes(e.key)) {
+    const dateInput = document.getElementById("dateInput");
+    const currentDate = new Date(dateInput.value);
+    currentDate.setDate(currentDate.getDate() - 1);
+    dateInput.value = currentDate.toISOString().split('T')[0];
+    updateWeekday();
+    setActiveSyncByPos(currentPos);
+  } else if (["w","W","ㅈ"].includes(e.key)) {
+    const dateInput = document.getElementById("dateInput");
+    const currentDate = new Date(dateInput.value);
+    currentDate.setDate(currentDate.getDate() + 1);
+    dateInput.value = currentDate.toISOString().split('T')[0];
+    updateWeekday();
+    setActiveSyncByPos(currentPos);
+  }
+});
+
+  function m(hhmm){return parseInt(hhmm.slice(0,2),10)*60+parseInt(hhmm.slice(2),10)}
+  function getSiteWindows(){
+    const sel = document.getElementById("siteInput");
+    if (!sel) return [];
+    const txt = sel.options[sel.selectedIndex]?.textContent || "";
+    // '1000-1200', '1500-1600' 형태를 모두 잡기 (언더스코어/플러스 등 앞뒤 문자와 무관)
+    const ms = [...txt.matchAll(/(\d{4})-(\d{4})/g)];
+    const toMin = hhmm => parseInt(hhmm.slice(0,2),10)*60 + parseInt(hhmm.slice(2),10);
+    return ms.map(m => [toMin(m[1]), toMin(m[2])]).sort((a,b)=>a[0]-b[0]);
+  }
+  // t: 분(예: 09:00 = 540). 이 시각이 몇 번째 녹화구간(0,1,2,...)인지
+  function windowIndexForTime(t){
+    const wins = getSiteWindows(); // [[startMin, endMin], ...]
+    for (let i=0; i<wins.length; i++){
+      const [s, e] = wins[i];
+      if (t >= s && t < e) return i;
+    }
+    return -1; // 어떤 구간에도 속하지 않으면
+  }
+  // 각 버튼이 대표하는 "시각(분)"들을 10분 간격으로 최대 18개 반환
+  function computeSlotsMinutes(){
+    const base = 9*60;             // 09:00 (표시용 index 계산 기준)
+    const wins = getSiteWindows();  // [[startMin, endMin], ...]
+    const times = [];
+    // 각 구간을 10분 경계로 올림해서 수집 (08:30도 그대로 들어옴)
+    for (const [s, e] of wins){
+      let t = Math.ceil(s/10)*10;   // 시작을 10분 단위로 올림
+      for (; t < e; t += 10) times.push(t);
+    }
+    // 중복 제거 + 정렬
+    const uniq = [...new Set(times)].sort((a,b)=>a-b);
+    if (uniq.length === 0) {
+      // 아무 구간이 없으면 09:00부터 18개 기본 제공
+      return Array.from({length:18}, (_,i)=> base + i*10);
+    }
+    if (uniq.length <= 18) return uniq;
+    // 연속(10분 간격) 구간으로 그룹화 (예: 오전/오후)
+    const groups = [];
+    let cur = [];
+    for (let i=0;i<uniq.length;i++){
+      if (i===0 || uniq[i] === uniq[i-1] + 10) cur.push(uniq[i]);
+      else { groups.push(cur); cur=[uniq[i]]; }
+    }
+    if (cur.length) groups.push(cur);
+    if (groups.length === 1) return groups[0].slice(0,18);
+    // 두 구간 이상이면 9+9 분배 후 부족분은 시간순으로 채움
+    const g0 = groups[0].slice(0,9);
+    const g1 = groups[1].slice(0,9);
+    let result = g0.concat(g1);
+    let needed = 18 - result.length;
+    if (needed > 0){
+      const rest=[];
+      rest.push(...groups[0].slice(g0.length));
+      rest.push(...groups[1].slice(g1.length));
+      for (let gi=2; gi<groups.length; gi++) rest.push(...groups[gi]);
+      result.push(...rest.slice(0,needed));
+    }
+    return result;
+  }
+  // [NEW] 싱크 k가 어느 녹화구간(0,1,2,...)에 속하는지 반환
+  function windowIndexForK(k){
+    const base = 9*60;              // 09:00 기준(분)
+    const startMin = base + k*10;   // 이 싱크의 시작 시간(분)
+    const wins = getSiteWindows();  // [[start,end], ...] 분 단위
+    for (let i = 0; i < wins.length; i++){
+      const [s, e] = wins[i];
+      if (startMin >= s && startMin < e) return i;
+    }
+    return -1; // 어떤 구간에도 속하지 않으면
+  }
+  
+  function renderSyncButtons(){
+    const top = document.getElementById("syncContainerTop");
+    const bot = document.getElementById("syncContainerBottom");
+    top.innerHTML = "";
+    if (bot) bot.innerHTML = ""; // 상단만 사용
+
+    const base = 9*60;                 // 09:00
+    const slots = computeSlotsMinutes(); // 버튼들이 대표하는 "시각(분)" 배열
+    if (!slots.length) return;
+
+    // 연속(10분 간격) 구간으로 그룹화하여 "첫 구간 길이" 구함
+    const groups = [];
+    let cur = [];
+    for (let i=0;i<slots.length;i++){
+      if (i===0 || slots[i] === slots[i-1] + 10) cur.push(slots[i]);
+      else { groups.push(cur); cur=[slots[i]]; }
+    }
+    if (cur.length) groups.push(cur);
+    const firstGroupLen = groups[0]?.length || slots.length;
+
+    // 화면 이동/URL 매핑용 전역 맵 갱신
+    // url: 버튼 순서(0..17) => sync00..17, t: 실제 시각(분), global: (09:00=0) 기준 인덱스(음수도 가능)
+    visibleMap = slots.map((t, pos) => ({ url: pos, t, global: Math.round((t - base)/10) }));
+
+    // 버튼 만들기
+    const pad2 = v => String(v).padStart(2,"0");
+    slots.forEach((t, pos) => {
+      const btn = document.createElement("button");
+      btn.id = `sync-btn-pos-${pos}`;
+      btn.dataset.pos = String(pos);
+
+      const hh = pad2(Math.floor(t/60));
+      const mm = pad2(t % 60);
+
+      // 라벨 번호: 첫 구간은 00부터 pos 기준, 이후 구간은 실제 시간 인덱스(global)
+      const dispSync = (pos < firstGroupLen) ? pos : visibleMap[pos].global;
+
+      // 한 줄 표기: "sync 06 10:00"
+      btn.textContent = `sync ${pad2(dispSync)} ${hh}:${mm}`;
+      const w = windowIndexForTime(t);      // ← 추가
+      if (w >= 0) btn.classList.add(`win${w}`);  // ← 추가
+
+      btn.addEventListener("click", () => setActiveSyncByPos(pos));
+      top.appendChild(btn);
+    });
+
+    // 현재 위치 보정/활성
+    if (currentPos < 0 || currentPos >= visibleMap.length) {
+      setActiveSyncByPos(0);
+    } else {
+      const active = document.getElementById(`sync-btn-pos-${currentPos}`);
+      if (active) active.classList.add("active");
+    }
+  }
+
+    // https 엔드포인트 (sync-images.html)
+  function buildDebugBaseURL() {
+  const site = document.getElementById("siteInput")?.value.trim() || "";
+
+  // 날짜가 비어 있으면 오늘 날짜로 채워 넣기
+  const dateEl = document.getElementById("dateInput");
+  let date = dateEl?.value || "";
   if (!date) {
     const d = new Date();
     const pad = n => String(n).padStart(2, "0");
     date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    if (dateEl) {
+      dateEl.value = date;
+      // 요일 배지 갱신 함수가 있다면 호출
+      if (typeof updateWeekday === "function") updateWeekday();
+    }
   }
 
-  const url =
-    `http://52.20.164.148:7777/api/get_combined_debug_images` +
-    `?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
-
-  window.open(url, "_blank", "noopener");
-}
-function filterSiteOptions() {
-  const input = document.getElementById("siteSearch").value.toLowerCase();
-  const select = document.getElementById("siteInput");
-  for (let option of select.options) {
-    const text = option.textContent.toLowerCase();
-    const value = option.value.toLowerCase();
-    option.style.display = (text.includes(input) || value.includes(input)) ? "" : "none";
+  return `https://playtag-debugging-tool.vercel.app/sync-images.html?site=${
+    encodeURIComponent(site)
+  }&date=${encodeURIComponent(date)}`;
   }
+
+  // sync000 ~ sync017 배열
+  function buildSyncList(){
+    const arr = [];
+    for (let i=0;i<18;i++){
+      arr.push(`sync${String(i).padStart(3,"0")}`);
+    }
+    return arr;
+  }
+
+function loadDebugImagesSequential(){
+  const box = document.getElementById("debugImgBox");
+  const status = document.getElementById("debugStatus");
+  if (!box || !status) return;
+
+  const base = buildDebugBaseURL();           // https://playtag-debugging-tool.vercel.app/sync-images.html?... 까지
+  const syncs = Array.from({length:18},(_,i)=>`sync${String(i).padStart(3,"0")}`);
+
+  // 초기화
+  box.innerHTML = "";
+  status.textContent = "디버그 이미지를 불러오는 중… (0/18)";
+
+  let idx = 0;
+
+  const loadNext = () => {
+    if (idx >= syncs.length) {
+      status.textContent = "디버그 이미지 로딩 완료";
+      return;
+    }
+
+// ---- 디버그 이미지 아이프레임 한 셀 추가 ----
+const sync = syncs[idx];
+const urlBase = buildDebugBaseURL();
+const url = `${urlBase}&sync=${sync}&embed=1&origin=${encodeURIComponent(location.origin)}&_=${Date.now()}`;
+
+const cell = document.createElement("div");
+cell.className = "debug-cell";
+
+const header = document.createElement("header");
+header.className = "debug-cap";
+
+const syncId = sync;
+
+const linkBtn = document.createElement("button");
+linkBtn.textContent = `${syncId} 새창으로`;
+linkBtn.style.cssText = `
+  background:#f5f5f5;
+  border:1px solid #ccc;
+  border-radius:4px;
+  padding:2px 8px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background 0.2s;
+`;
+linkBtn.onmouseenter = () => (linkBtn.style.background = "#e0e0e0");
+linkBtn.onmouseleave = () => (linkBtn.style.background = "#f5f5f5");
+
+linkBtn.onclick = () => {
+  const site = document.getElementById("siteInput")?.value || "";
+  const date = document.getElementById("dateInput")?.value || "";
+  const url = `https://playtag-debugging-tool.vercel.app/sync-images.html?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}&sync=${syncId}`;
+  window.open(url, "_blank");
+};
+
+header.appendChild(linkBtn);
+
+const frame = document.createElement("iframe");
+frame.className = "debug-frame";
+frame.loading = "lazy";
+frame.referrerPolicy = "no-referrer";
+/* 내부 스크롤 허용 (고정 높이 안에서 세로로 스크롤) */
+frame.scrolling = "yes";
+frame.setAttribute("data-sync", sync);
+
+let done = false;
+const finish = () => {
+  if (done) return;
+  done = true;
+  idx++;
+  status.textContent = `디버그 이미지를 불러오는 중… (${idx}/18)`;
+  setTimeout(loadNext, 60);
+};
+
+frame.onload = finish;
+frame.onerror = finish;
+frame.src = url;
+
+cell.appendChild(header);
+cell.appendChild(frame);
+box.appendChild(cell);
+  };
+
+  loadNext();
 }
-function handleSearchEnter(e) {
-  if (e.key !== "Enter") return;
-  const q = document.getElementById("siteSearch").value.trim().toLowerCase();
-  const select = document.getElementById("siteInput");
-  const options = Array.from(select.options);
-  const matches = [];
-  options.forEach((opt, idx) => {
-    const value = opt.value.toLowerCase();
-    const text = opt.textContent.toLowerCase();
-    const hit = q === "" || value === q || text.includes(q);
-    opt.style.display = hit ? "" : "none";
-    if (hit) matches.push(idx);
+  (function () {
+  const sp = new URLSearchParams(location.search);
+  if (sp.get("embed") !== "1") return;
+  const sync = sp.get("sync") || "";
+  const targetOrigin = sp.get("origin") || "*";
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
+
+  const post = () => {
+    const h = Math.max(
+      document.body.scrollHeight, document.documentElement.scrollHeight,
+      document.body.offsetHeight,  document.documentElement.offsetHeight,
+      document.body.clientHeight,   document.documentElement.clientHeight
+    );
+    parent.postMessage({ type:"SYNC_IMAGES_SIZE", sync, height:h }, targetOrigin);
+  };
+
+  window.addEventListener("load", () => { post(); setTimeout(post, 200); });
+  const ro = new ResizeObserver(() => post());
+  ro.observe(document.body);
+  let n=0, t=setInterval(()=>{ post(); if(++n>30) clearInterval(t); }, 500);
+})();
+  (function(){
+  // embed=1 아니면 안 보냄 (일반 화면은 영향 X)
+  const params = new URLSearchParams(location.search);
+  if (params.get('embed') !== '1') return;
+
+  // 이 프레임이 나타내는 sync id를 query에서 가져오되, 기본값도 마련
+  const sync = params.get('sync') || 'sync000';
+
+  // 현재 문서(자식)의 전체 높이를 계산
+  function docHeight(){
+    const b = document.body, e = document.documentElement;
+    return Math.max(
+      b.scrollHeight, b.offsetHeight, b.clientHeight,
+      e.scrollHeight, e.offsetHeight, e.clientHeight
+    );
+  }
+
+  // 부모에게 높이 전달
+  function postSize(){
+    try {
+      parent.postMessage({ type:'SYNC_IMAGES_SIZE', sync, height: docHeight() }, '*');
+    } catch(e) { /* ignore */ }
+  }
+
+  // 처음/이미지 로드 후/창 크기 변경/버튼 클릭 등 다양한 타이밍에 재계산
+  window.addEventListener('load', () => {
+    postSize();
+    // 이미지가 늦게 로드될 수 있으니 몇 번 더 보냄
+    setTimeout(postSize, 200);
+    setTimeout(postSize, 600);
+    setTimeout(postSize, 1200);
   });
-  if (matches.length === 0) return alert("일치하는 교실이 없습니다.");
-  select.selectedIndex = matches[0];
-  onSiteOrDateChange(true); // 재계산 + 첫 슬롯 활성화
-}
+  window.addEventListener('resize', postSize);
 
-/* ---------- 우측 프레임 업데이트 ---------- */
-function updateRightPane() {
-  const site = document.getElementById("siteInput").value || "";
-  const date = document.getElementById("dateInput").value || "";
-  const iframe = document.getElementById("rightPage");
-  if (!site || !date) return;
-  iframe.src = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
-}
-
-/* ---------- 싱크 & 비디오 ---------- */
-function onSiteOrDateChange(resetPos=false) {
-  renderSyncButtons();
-  setActiveSyncByPos(resetPos ? 0 : Math.min(currentPos, visibleMap.length-1));
-  updateRightPane();
-}
-
-/* 사이트 옵션의 텍스트에서 '0900-1200', '1500-1600' 등 시간 구간 추출 */
-function getSiteWindows(){
-  const sel = document.getElementById("siteInput");
-  if (!sel) return [];
-  const txt = sel.options[sel.selectedIndex]?.textContent || "";
-  const ms = [...txt.matchAll(/(\d{4})-(\d{4})/g)];
-  const toMin = hhmm => parseInt(hhmm.slice(0,2),10)*60 + parseInt(hhmm.slice(2),10);
-  // 정렬
-  return ms.map(m => [toMin(m[1]), toMin(m[2])]).sort((a,b)=>a[0]-b[0]);
-}
-/* 특정 분이 어느 구간(winIdx)에 속하는지 */
-function windowIndexForTime(tMin){
-  const wins = getSiteWindows();
-  for (let i=0;i<wins.length;i++){
-    const [s,e] = wins[i];
-    if (tMin>=s && tMin<e) return i;
-  }
-  return -1;
-}
-/* 10분 간격 슬롯(최대 18개) 계산 */
-function computeSlotsMinutes(){
-  const wins = getSiteWindows();
-  const times = [];
-  for (const [s, e] of wins){
-    let t = Math.ceil(s/10)*10;
-    for (; t<e; t+=10) times.push(t);
-  }
-  const uniq = [...new Set(times)].sort((a,b)=>a-b);
-  if (uniq.length === 0) return Array.from({length:18}, (_,i)=> (9*60) + i*10); // 기본 09:00~(18개)
-  if (uniq.length <= 18) return uniq;
-
-  // 연속 그룹화 후 9+9 분배
-  const groups = [];
-  let cur = [];
-  for (let i=0;i<uniq.length;i++){
-    if (i===0 || uniq[i] === uniq[i-1] + 10) cur.push(uniq[i]);
-    else { groups.push(cur); cur = [uniq[i]]; }
-  }
-  if (cur.length) groups.push(cur);
-  if (groups.length === 1) return groups[0].slice(0,18);
-  const g0 = groups[0].slice(0,9);
-  const g1 = groups[1].slice(0,9);
-  let result = g0.concat(g1);
-  let needed = 18 - result.length;
-  if (needed>0){
-    const rest = [];
-    rest.push(...groups[0].slice(g0.length));
-    rest.push(...groups[1].slice(g1.length));
-    for (let gi=2; gi<groups.length; gi++) rest.push(...groups[gi]);
-    result.push(...rest.slice(0,needed));
-  }
-  return result;
-}
-function minutesToLabel(tMin){
-  const h = Math.floor(tMin/60), m = tMin%60;
-  return `${fmt2(h)}:${fmt2(m)}`;
-}
-/* 싱크 버튼 렌더링: 시간창 기반 슬롯 → (표시)sync NN, (URL)버튼순번(0..17) */
-function renderSyncButtons(){
-  // 어떤 페이지 구조든 안전하게 컨테이너를 찾음
-  const cont =
-    document.getElementById("syncContainerTop") ||
-    document.getElementById("syncContainer") ||
-    document.querySelector(".sync-buttons");
-
-  if (!cont) {
-    console.warn("[renderSyncButtons] 컨테이너(.sync-buttons or #syncContainerTop/#syncContainer) 없음");
-    return;
-  }
-
-  const bot = document.getElementById("syncContainerBottom");
-  if (bot) bot.innerHTML = ""; // 상단만 사용
-  cont.innerHTML = "";
-
-  const base = 9 * 60;   // 09:00 기준(분)
-  let slots = [];
-  try { slots = computeSlotsMinutes(); } catch (e) { slots = []; }
-
-  // 슬롯 계산이 비어도 버튼은 반드시 보이도록 fallback (0..17)
-  if (!Array.isArray(slots) || slots.length === 0) {
-    slots = Array.from({length: 18}, (_, i) => base + i * 10);
-  }
-
-  // 연속(10분 간격) 구간으로 분리 → 첫 구간 길이
-  const groups = [];
-  let cur = [];
-  for (let i=0;i<slots.length;i++){
-    if (i===0 || slots[i] === slots[i-1] + 10) cur.push(slots[i]);
-    else { groups.push(cur); cur=[slots[i]]; }
-  }
-  if (cur.length) groups.push(cur);
-  const firstGroupLen = groups[0]?.length || slots.length;
-
-  // 화면/URL 매핑 (URL sync 번호 = 버튼 순번 0..17)
-  visibleMap = slots.slice(0,18).map((t, pos) => ({
-    url: pos,                                  // ← URL에 들어갈 sync 번호
-    t,
-    global: Math.round((t - base)/10)          // 09:00 기준 실제 시간 인덱스
-  }));
-
-  const pad2 = v => String(v).padStart(2,"0");
-
-  visibleMap.forEach((item, pos) => {
-    const btn = document.createElement("button");
-    btn.id = `sync-btn-pos-${pos}`;
-    btn.dataset.pos = String(pos);
-
-    // 표시 번호: 첫 구간은 00부터 pos, 이후 구간은 실제 시간 인덱스(global)
-    const dispSync = (pos < firstGroupLen) ? pos : item.global;
-    btn.textContent = `sync ${pad2(dispSync)}`;     // 시간 텍스트 제거(원하면 hh:mm 다시 넣을 수 있음)
-
-    // 오전/오후 색상 유지 (가능할 때만)
-    const w = (typeof windowIndexForTime === "function") ? windowIndexForTime(item.t) : -1;
-    if (w >= 0) btn.classList.add(`win${w}`);
-
-    btn.addEventListener("click", () => setActiveSyncByPos(pos));
-    cont.appendChild(btn);
+  // 페이지 내 이미지들이 로드될 때마다 다시 계산
+  document.querySelectorAll('img').forEach(img=>{
+    if (!img.complete) img.addEventListener('load', postSize, {once:false});
   });
 
-  // 활성화
-  if (currentPos < 0 || currentPos >= visibleMap.length) {
-    setActiveSyncByPos(0);
-  } else {
-    const active = document.getElementById(`sync-btn-pos-${currentPos}`);
-    if (active) active.classList.add("active");
-  }
-}
-
-/* 선택/URL 로딩은 기존 로직 그대로: visibleMap[pos].url을 사용 */
-function setActiveSyncByPos(pos) {
-  if (!visibleMap.length) return;
-  pos = Math.max(0, Math.min(pos, visibleMap.length - 1));
-  currentPos = pos;
-
-  // URL에 쓰는 sync 번호는 '버튼 순번(0..17)'
-  const syncNum = visibleMap[pos].url;                // 숫자 그대로
-  loadVideos(syncNum);                                // loadVideos 안에서 padStart(3)
-
-  // active 표시
-  document.querySelectorAll(".sync-buttons button").forEach(b => b.classList.remove("active"));
-  const activeBtn = document.getElementById(`sync-btn-pos-${pos}`);
-  if (activeBtn) activeBtn.classList.add("active");
-}
-/* 싱크 선택 → 좌측 비디오 로딩 & active 스타일 */
-function setActiveSyncByPos(pos){
-  if (!visibleMap.length) return;
-  pos = Math.max(0, Math.min(pos, visibleMap.length - 1));
-  currentPos = pos;
-
-  const syncNum = visibleMap[pos].url;
-  loadVideos(syncNum);
-  updateLeftSubtitleBySync(syncNum);   // ← 날짜 강조 포함 서브타이틀 갱신
-
-  document.querySelectorAll(".sync-buttons button").forEach(b => b.classList.remove("active"));
-  const activeBtn = document.getElementById(`sync-btn-pos-${pos}`);
-  if (activeBtn) activeBtn.classList.add("active");
-}
-/** 비디오 존재 여부를 메타데이터 로드로 판별: 성공 시 실제 재생 가능한 <video> 엘리먼트를 반환, 실패 시 null */
-function probeVideo(url) {
-  return new Promise((resolve) => {
-    const v = document.createElement("video");
-    v.src = url;
-    v.preload = "metadata";
-    v.controls = true;
-    v.autoplay = false;
-    v.muted = true;
-    v.playsInline = true;
-
-    const timer = setTimeout(() => {
-      cleanup(false);
-      resolve(v);
-    }, 8000); // 최대 8초 대기 (환경에 맞게 조정 가능)
-
-    function cleanup(isError = false) {
-      clearTimeout(timer);
-      v.onloadedmetadata = null;
-      v.onerror = null;
-      if (isError) {
-        // 에러 경우 소스 해제하여 네트워크 사용 최소화
-        v.removeAttribute("src");
-        v.load();
-      }
+  // 페이지 내 “이미지 개수(1/4/10)” 같은 버튼들이 있다면 모두 감시
+  document.addEventListener('click', (e)=>{
+    const t = e.target;
+    if (!t) return;
+    // 버튼 class나 data-attr에 맞춰서 조건을 필요시 조정
+    if (t.matches('button, .btn, [data-variant]')) {
+      // UI가 바뀐 뒤 레이아웃이 안정될 시간을 조금 주고 다시 계산
+      setTimeout(postSize, 200);
+      setTimeout(postSize, 600);
     }
-
-    v.onloadedmetadata = () => {
-      cleanup(false);
-      resolve(v); // 성공: 이 비디오 엘리먼트를 그대로 사용
-    };
-    v.onerror = () => {
-      cleanup(true);
-      resolve(null);
-    };
-  });
-}
-
-/** (교체) 선택된 sync에 대해 cam01..cam08을 검사하여 '존재하는 것만' 2열로 렌더 */
-async function loadVideos(syncNumber) {
-  const date = document.getElementById("dateInput").value;
-  const site = document.getElementById("siteInput").value.trim();
-  const container = document.getElementById("videoContainer");
-  if (!date || !site) {
-    alert("날짜와 교실을 선택해주세요.");
-    return;
-  }
-
-  const syncLabel = `sync${String(syncNumber).padStart(3,'0')}`;
-  const useNewURL = new Date(date) >= new Date("2025-06-16");
-  const baseURL = useNewURL
-    ? "https://d22x5o96gu3cuo.cloudfront.net"
-    : "https://d175ce76v5cwjf.cloudfront.net";
-
-  container.innerHTML = "";
-
-  // 1) 병렬로 모두 probe (cam01..08)
-  const cams = Array.from({length: 8}, (_, i) => i + 1);
-  const probes = cams.map(cam => {
-    const url = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
-    return probeVideo(url).then(v => ({ cam, videoEl: v }));
   });
 
-  const results = await Promise.all(probes);
-
-  // 2) 존재하는 캠만 cam 번호 오름차순으로 정렬
-  const available = results
-    .filter(r => r.videoEl)
-    .sort((a, b) => a.cam - b.cam);
-
-  // 3) 일괄 렌더 (DOM 삽입 순서 = 표시 순서)
-  for (const { cam, videoEl } of available) {
-      showFirstFrame(videoEl);                 // ← 첫 프레임만 표시
-
-      const wrapper = document.createElement("div");
-      wrapper.className = "video-wrapper";
-
-      const overlay = document.createElement("div");
-      overlay.className = "overlay-label";
-      overlay.textContent = `CAM${String(cam).padStart(2, "0")}`;
-
-      wrapper.appendChild(videoEl);
-      wrapper.appendChild(overlay);
-      container.appendChild(wrapper);
-    }
-
-  // 4) 아무 비디오도 없으면 안내만 표시
-  if (available.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "video-placeholder";
-    empty.textContent = "사용 가능한 비디오가 없습니다";
-    container.appendChild(empty);
-  }
-}
-
-/* ---------- 키보드 단축키 ---------- */
-document.addEventListener("keydown", (e) => {
-  const tag = document.activeElement.tagName.toLowerCase();
-  if ((tag === "input" || tag === "select") && e.key === " ") return;
-
-  const vids = document.querySelectorAll("#videoContainer video");
-  if (e.key === " ") {
-    e.preventDefault();
-    const anyPaused = Array.from(vids).some(v => v.paused);
-    vids.forEach(v => anyPaused ? v.play() : v.pause());
-  } else if (e.key === "ArrowRight") {
-    if (visibleMap.length) setActiveSyncByPos(Math.min(currentPos+1, visibleMap.length-1));
-  } else if (e.key === "ArrowLeft") {
-    if (visibleMap.length) setActiveSyncByPos(Math.max(currentPos-1, 0));
-  } else if (["ArrowUp","ArrowDown"].includes(e.key)) {
-    const siteSelect = document.getElementById("siteInput");
-    let i = siteSelect.selectedIndex;
-    if (e.key === "ArrowUp" && i > 0) siteSelect.selectedIndex = i - 1;
-    if (e.key === "ArrowDown" && i < siteSelect.options.length - 1) siteSelect.selectedIndex = i + 1;
-    onSiteOrDateChange(false);
-  } else if (["1","2","3","4"].includes(e.key)) {
-    const seek = {"1": -180, "2": -30, "3": 30, "4": 180}[e.key];
-    vids.forEach(v => v.currentTime = Math.max(0, v.currentTime + seek));
-  } else if (["q","Q","ㅂ"].includes(e.key)) {
-    const dateInput = document.getElementById("dateInput");
-    const d = new Date(dateInput.value || new Date());
-    d.setDate(d.getDate() - 1);
-    dateInput.value = d.toISOString().split('T')[0];
-    updateWeekday(); onSiteOrDateChange(false);
-  } else if (["w","W","ㅈ"].includes(e.key)) {
-    const dateInput = document.getElementById("dateInput");
-    const d = new Date(dateInput.value || new Date());
-    d.setDate(d.getDate() + 1);
-    dateInput.value = d.toISOString().split('T')[0];
-    updateWeekday(); onSiteOrDateChange(false);
-  }
-});
-// 메타데이터 로드 후 0초로 멈춰 '첫 프레임'만 보이게
-function showFirstFrame(videoEl) {
-  try { videoEl.autoplay = false; } catch {}
-  videoEl.preload = "metadata";
-  videoEl.playsInline = true;
-
-  // 이미 로드된 경우도 고려
-  const pauseAtZero = () => { videoEl.currentTime = 0; videoEl.pause(); };
-  if (videoEl.readyState >= 1) pauseAtZero();
-  else {
-    videoEl.addEventListener("loadedmetadata", pauseAtZero, { once: true });
-  }
-}
-    function fmtDateWithWeekday(dateStr){
-  const d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  const days = ['일','월','화','수','목','금','토'];
-  const y = d.getFullYear();
-  const m = String(d.getMonth()+1).padStart(2,'0');
-  const dd = String(d.getDate()).padStart(2,'0');
-  return `${y}-${m}-${dd}(${days[d.getDay()]})`;
-}
-
-function updateLeftSubtitleBySync(syncNum){
-  const date = document.getElementById('dateInput').value;
-  const site = document.getElementById('siteInput').value;
-  const el = document.getElementById('leftSubtitle');
-  if (!el) return;
-  const syncLabel = `sync${String(syncNum).padStart(3,'0')}`;
-  el.innerHTML =
-    `<span class="date-badge">${fmtDateWithWeekday(date)}</span>`+
-    `<span class="site">${site}</span>`+
-    `<span class="sync">${syncLabel}</span>`;
-}
-    document.getElementById('dateInput')?.addEventListener('change', () => {
-      updateLeftSubtitleBySync(visibleMap[currentPos]?.url ?? 0);
-    });
-    document.getElementById('siteInput')?.addEventListener('change', () => {
-      // site 바뀌면 renderSyncButtons()가 다시 그린 뒤 setActiveSyncByPos(0)에서 갱신됨
-    });
-    function getDebugFrame(){ return document.getElementById('rightPage'); }
-    function getDebugDateFromURL(){
-      const f = getDebugFrame();
-      if (!f) return null;
-      try {
-        const src = f.getAttribute('src') || '';               // 속성 기준
-        if (!src) return null;
-        return new URL(src, window.location.href).searchParams.get('date');
-      } catch { return null; }
-    }
-
-    function buildDebugURL(site, date, baseSrc){
-      // baseSrc가 없으면 기본 도메인으로 시작
-      const base = baseSrc
-        ? new URL(baseSrc, window.location.href)
-        : new URL('https://playtag-debugging-tool.vercel.app/');
-      const sp = base.searchParams;
-
-      if (site) sp.set('site', site);
-      if (date) sp.set('date', date);
-
-      // 새로고침 보장용 캐시버스터
-      sp.set('_cb', Date.now().toString());
-      base.search = sp.toString();
-      return base.toString();
-    }
-
-    /** 오른쪽 프레임의 date만 바꾸어 재호출 (강제 리로드 보장) */
-    function updateDebugFrameDate(dateStr){
-      const f = getDebugFrame();
-      if (!f || !dateStr) return;
-
-      const currentSrc = f.getAttribute('src') || '';
-      const siteSel = document.getElementById('siteInput');
-      const site = siteSel?.value?.trim() || new URL(currentSrc, window.location.href).searchParams.get('site') || '';
-
-      const newURL = buildDebugURL(site, dateStr, currentSrc || null);
-
-      // 같은 문자열이라도 강제 리로드 되도록 about:blank → 새 URL 순서로 설정
-      if (currentSrc) {
-        f.setAttribute('src', 'about:blank');
-        // 아주 짧은 지연 후 새 URL 주입
-        setTimeout(() => { f.setAttribute('src', newURL); }, 0);
-      } else {
-        f.setAttribute('src', newURL);
-      }
-    }
-
-    // 우측 달력 초기화 + 이벤트
-    (function initRightCalendar(){
-      const input = document.getElementById('debugDateInput');
-      const f = getDebugFrame();
-      if (!input || !f) return;
-
-      // 초기값: 프레임 src의 date → 없으면 좌측 date → 오늘
-      input.value = getDebugDateFromURL()
-                 || document.getElementById('dateInput')?.value
-                 || new Date().toISOString().split('T')[0];
-
-      // 변경 시 프레임만 갱신
-      input.addEventListener('change', (e) => {
-        const d = e.target.value;
-        if (d) updateDebugFrameDate(d);
-      });
-
-      // 프레임이 외부 요인으로 바뀌었을 때 달력 동기화
-      f.addEventListener('load', () => {
-        const d = getDebugDateFromURL();
-        if (d) input.value = d;
-      });
-    })();
-</script>
+  // 바디 마진 제거(임베드에선 깔끔하게)
+  document.documentElement.style.margin = '0';
+  document.body.style.margin = '0';
+})();
+  
+  
+  
+  </script>
+  
 </body>
 </html>
