@@ -1,8 +1,167 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <meta charset="UTF-8" />
+  <title>캠인덱스비교v251218</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --gap: 12px;
+      --border: #ddd;
+      --muted: #666;
+    }
+    body { font-family: sans-serif; padding: 8px; line-height: 1.2; }
+    input[type="date"], input[type="text"], select {
+      height: 32px; padding: 4px 8px; font-size: 14px; box-sizing: border-box;
+    }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    h1 { margin: 0; font-size: 26px; }
+    .action-button {
+      background-color: lightgreen; border: 1px solid #ccc; padding: 6px 12px; margin-left: 4px;
+      cursor: pointer; font-weight: bold; border-radius: 4px;
+    }
+    .action-button:hover { background-color: #90ee90; }
+
+    .control-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .control-left { display: flex; align-items: center; gap: 12px; }
+    #siteSearch { padding: 4px 8px; }
+    .weekday-badge {
+      display: inline-block; padding: 4px 10px; border-radius: 20px; background-color: #e0f7fa;
+      color: #00796b; font-weight: bold; font-size: 13px; border: 1px solid #b2ebf2;
+    }
+
+   /* 한 줄(가로 스크롤 가능), 버튼 폭은 내용만큼 */
+    .sync-buttons {
+      display: flex;
+      gap: 6px;
+      margin: 10px 0;
+      overflow-x: auto;
+      flex-wrap: nowrap;     /* ← 줄바꿈 금지 */
+    }
+    .sync-buttons button { flex: 0 0 auto; }
+    .sync-buttons button .time { display:block; font-size:12px; opacity:.85; margin-top:2px }
+    .sync-buttons button.active { background: lightgreen !important; border-color:#5fbf5f !important; font-weight: 700; }
+
+    /* 구간별 색상 (색각친화) */
+    .sync-buttons button.win0 { background:#e6f3ff; border-color:#9ec9ff; }
+    .sync-buttons button.win1 { background:#eaf7e6; border-color:#a8d8a8; }
+    .sync-buttons button.win2 { background:#fff2cc; border-color:#f1c84b; }
+    .sync-buttons button.win0:hover { background:#d9ecff; }
+    .sync-buttons button.win1:hover { background:#def1d9; }
+    .sync-buttons button.win2:hover { background:#ffeaa6; }
+
+    /* 아래는 좌/우 프레임 구성 */
+    .split {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr; /* 왼쪽이 살짝 넓게 */
+      gap: var(--gap);
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .split { grid-template-columns: 1fr; }
+    }
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: var(--gap);
+      background: #fff;
+    }
+    .panel h2 {
+      margin: 0 0 8px 0; font-size: 16px; color: #111;
+      display:flex; align-items:center; gap:8px;
+    }
+    .panel .sub { color: var(--muted); font-size: 12px; }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      grid-auto-flow: row;
+    }
+    @media (max-width: 1300px) {
+      .video-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .video-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .video-wrapper { position: relative; }
+    video { width: 100%; height: auto; background: #000; }
+    .overlay-label {
+      position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.6); color: #fff;
+      padding: 3px 6px; font-size: 12px; font-weight: bold; border-radius: 4px;
+    }
+    .video-placeholder {
+      width: 100%; aspect-ratio: 16/9; background: #000; display: grid; place-items: center;
+      color: #fff; font-weight: bold;
+    }
+    iframe#rightPage {
+      width: 100%; height: 75vh; border: none; background: #f9fafb;
+    }
+
+    .shortcuts {
+      font-size: 13px; margin: 8px 0; color: #555;
+      background:#f9f9f9; border:1px solid #ddd; padding:8px 12px; border-radius:6px;
+    }
+    .kbd { background:#eee; padding:2px 6px; border-radius:4px; }
+    /* 왼쪽 비디오 상단 서브타이틀 */
+    #leftSubtitle{font-size:13px;color:#333;margin:4px 0;}
+    #leftSubtitle .date-badge{
+      display:inline-block;
+      padding:2px 8px;
+      border-radius:12px;
+      background:#222;      /* 강조 배경 */
+      color:#fff;           /* 텍스트 반전 */
+      font-weight:700;
+      margin-right:6px;
+    }
+    #leftSubtitle .site{opacity:.85;margin-right:6px;}
+    #leftSubtitle .sync{opacity:.7;}
+  
+  /* 날짜 강조용 작은 버튼 */
+    .date-badge {
+      background-color: lightgreen;   /* .action-button 기본과 동일 */
+      border: 1px solid #ccc;
+      padding: 2px 8px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: default; /* 클릭 안 되도록 */
+    }
+    .date-badge:hover {
+      background-color: #90ee90;
+    }
+    
+  </style>
+</head>
+<body>
+  <div class="header-bar">
+    <h1>카메라인덱스조회</h1>
+    <div id="actionButtons">
+        <button class="action-button" onclick="openDebugImages()">디버그 이미지</button>
+        <button class="action-button" onclick="openDebugTool()">선택교실디버그</button>
+        <button class="action-button" onclick="copySiteId()">SITE-ID 복사</button>
+        <button class="action-button" onclick="openImageTemplate()">이미지템플릿</button>
+        <button class="action-button" onclick="window.open('https://harayaong.github.io/cam/','_blank','noopener')">통합비디오조회</button>
+      </div>
+  </div>
+
+  <div class="control-bar">
+    <div class="control-left">
+      <label for="dateInput">📆</label>
+      <input type="date" id="dateInput" onchange="updateWeekday(); onSiteOrDateChange();" />
+      <span id="weekday" class="weekday-badge"></span>
+
+      <label for="siteSearch">🔎</label>
+      <input type="text" id="siteSearch" placeholder="검색어 입력" oninput="filterSiteOptions()" onkeydown="handleSearchEnter(event)" />
+
+      <label for="siteInput">SITE 선택</label>
+      <select id="siteInput" size="1" onchange="onSiteOrDateChange()">
+        <!-- 교실 옵션: 예시로 일부만 넣고, 나머지는 기존 페이지와 동일 구조로 확장 가능 -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
   <meta charset="UTF-8">
-  <title>통합카메라조회 v251106</title>
+  <title>통합카메라조회 v251218</title>
   <style>
     body {
       font-family: sans-serif;
@@ -172,7 +331,6 @@
 
       <label for="siteInput">SITE 선택</label>
       <select id="siteInput" size="1">
-<option value="cptp_1x1">cptp_1x1 / CathedralParkway / ??? / usa_poc_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="aeyuk_1x3">aeyuk_1x3 / 경산애육 / 민들레12 / nextday_1000-1200+1500-1600 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="aeyuk_2x1">aeyuk_2x1 / 경산애육 / 장미 / nextday_1300-1600 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="aeyuk_2x2">aeyuk_2x2 / 경산애육 / 무궁화 / nextday_1300-1600 / Mon, Tue, Wed, Thu, Fri</option>
@@ -187,6 +345,8 @@
 <option value="arasinan_1x1">arasinan_1x1 / 서구아라신안꿈꾸는 / 하늘나리 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="arasinan_1x2">arasinan_1x2 / 서구아라신안꿈꾸는 / 꽃마리 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="arasinan_1x3">arasinan_1x3 / 서구아라신안꿈꾸는 / 구름송이 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="aspamillie_520">aspamillie_520 / 안성파밀리에 / 푸른나무 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="aspamillie_521">aspamillie_521 / 안성파밀리에 / 풀잎가득 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="baekjo_2x1">baekjo_2x1 / 수원백조 / 꽃향기 / nextday_1230-1530 / Mon, Tue, Thu</option>
 <option value="baekjo_2x2">baekjo_2x2 / 수원백조 / 파란하늘 / nextday_1230-1530 / Mon, Tue, Thu</option>
 <option value="baekjo_3x1">baekjo_3x1 / 수원백조 / 풀내음 / nextday_1230-1530 / Mon, Tue, Thu</option>
@@ -219,6 +379,7 @@
 <option value="chungmu_1x1">chungmu_1x1 / 통영충무 / 고운&향기 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="chungmu_2x1">chungmu_2x1 / 통영충무 / 슬기 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="chungmu_2x3">chungmu_2x3 / 통영충무 / 지혜 / today_0900-1200 / Tue, Thu, Fri</option>
+<option value="cptp_1x1">cptp_1x1 /  /  / usa_poc_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="daegeon_1x1">daegeon_1x1 / 포항대건 / 창의인성 / nextday_1000-1200+1300-1400 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="daegeon_1x2">daegeon_1x2 / 포항대건 / 존중배려 / nextday_1000-1200+1300-1400 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="daegeon_2x1">daegeon_2x1 / 포항대건 / 행복나눔 / nextday_1000-1200+1300-1400 / Mon, Tue, Wed, Thu, Fri</option>
@@ -297,6 +458,7 @@
 <option value="edubyeol_1x4">edubyeol_1x4 / 화성에듀별 / 행복한 / today_0900-1200 / Mon, Tue, Thu</option>
 <option value="eoullim_1x2">eoullim_1x2 / 화성어울림2차 / 솔잎향기 / nextday_1000-1300 / Mon, Wed, Fri</option>
 <option value="eoullim_1x4">eoullim_1x4 / 화성어울림2차 / 푸른나무 / nextday_1000-1300 / Mon, Wed, Fri</option>
+<option value="epyeonhansupsok_493">epyeonhansupsok_493 / 아산이편한숲속 / 튼튼 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="ewha_1x1">ewha_1x1 / 포항이화 / 창의로운 / nextday_0900-1100+1300-1400 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="ewha_2x1">ewha_2x1 / 포항이화 / 지혜로운 / nextday_0900-1100+1300-1400 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="gangseogeullo_1x1">gangseogeullo_1x1 / 강서근로복지공단 / 풀잎 / today_0900-1200 / Mon, Wed, Fri</option>
@@ -308,6 +470,7 @@
 <option value="gapogeumho_1x2">gapogeumho_1x2 / 창원가포금호어울림 / 솔잎 / today_0930-1230 / Tue, Wed, Thu</option>
 <option value="gapogeumho_1x3">gapogeumho_1x3 / 창원가포금호어울림 / 꽃잎 / today_0930-1230 / Tue, Wed, Thu</option>
 <option value="gapoyubora_1x4">gapoyubora_1x4 / 창원가포유보라 / 하늘누리 / today_0900-1200 / Mon, Wed, Fri</option>
+<option value="garam_2x3">garam_2x3 / 춘천가람 / 지혜 / nextday_0830-0930+1300-1500 / Mon, Tue</option>
 <option value="gasan_1x4">gasan_1x4 / 포천가산 / 바다 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="gasan_1x6">gasan_1x6 / 포천가산 / 햇살 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="geullogomdallae_429">geullogomdallae_429 / 근로복지공단곰달래 / 가득찬 / nextday_0930-1130+1500-1600 / Mon, Wed, Fri</option>
@@ -327,6 +490,7 @@
 <option value="globalai_1x2">globalai_1x2 / 창원글로벌아이 / 하얀구름 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="globalai_2x1">globalai_2x1 / 창원글로벌아이 / 바다 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="globalai_2x2">globalai_2x2 / 창원글로벌아이 / 파란 / today_0900-1200 / Tue, Thu, Fri</option>
+<option value="goam_478">goam_478 / 양주고암 / 다솜 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="godeoklh_1x2">godeoklh_1x2 / 평택고덕LH2단지 / 배움 / nextday_1100-1200+1400-1600 / Mon, Wed, Fri</option>
 <option value="godeoklh_1x4">godeoklh_1x4 / 평택고덕LH2단지 / 나눔 / nextday_1100-1200+1400-1600 / Mon, Wed, Fri</option>
 <option value="godeoklh_1x6">godeoklh_1x6 / 평택고덕LH2단지 / 채움 / nextday_1100-1200+1400-1600 / Mon, Wed, Fri</option>
@@ -403,6 +567,8 @@
 <option value="jangheung_1x5">jangheung_1x5 / 양주장흥 / 대한민국 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="jayangsadong_2x1">jayangsadong_2x1 / 광진자양4동 / 열매 / today_0900-1200 / Mon, Thu, Fri</option>
 <option value="jayangsadong_2x2">jayangsadong_2x2 / 광진자양4동 / 꽃잎 / today_0900-1200 / Mon, Thu, Fri</option>
+<option value="jeongdaunyeonu_484">jeongdaunyeonu_484 / 경주정다운연우 / 우애좋은 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="jeongdaunyeonu_485">jeongdaunyeonu_485 / 경주정다운연우 / 우애나눔 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="jeongjung_2x1">jeongjung_2x1 / 청주정중 / 별하 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="jeongjung_2x2">jeongjung_2x2 / 청주정중 / 아름 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="jeonjugijeon_1x4">jeonjugijeon_1x4 / 전주기전부설대학 / 소망12 / nextday_0930-1130+1200-1300 / Mon, Tue, Wed, Thu, Fri</option>
@@ -444,7 +610,9 @@
 <option value="keunsarang_3x2">keunsarang_3x2 / 서구큰사랑 / 소망 / nextday_0930-1230 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="keunsarang_3x3">keunsarang_3x3 / 서구큰사랑 / 창의 / nextday_0930-1230 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="keurositihaengbok_1x1">keurositihaengbok_1x1 / 마포크로시티 / 똑똑2세 / today_0900-1200 / Mon, Wed, Fri</option>
+<option value="kidsfarm_496">kidsfarm_496 / 양주키즈팜 / 단비 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="kidsrkids_1x1">kidsrkids_1x1 / WMG / Stringrays / usa_poc_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="kidsvill_488">kidsvill_488 / 아산키즈빌 / 하늘 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="kinderheim_1x4">kinderheim_1x4 / 창원킨더하임 / 산새소리 / today_0900-1200 / Tue, Wed, Thu</option>
 <option value="kkume_1x1">kkume_1x1 / 수원꿈에 / 지혜 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="koaroo_1x3">koaroo_1x3 / 춘천코아루 / 슬기 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
@@ -452,10 +620,10 @@
 <option value="kokkiri_1x1">kokkiri_1x1 / 의정부호원코끼리 / 햇님 / nextday_1000-1200+1530-1630 / Mon, Wed, Fri</option>
 <option value="kokkiri_1x2">kokkiri_1x2 / 의정부호원코끼리 / 바다 / nextday_1000-1200+1500-1600 / Mon, Wed, Fri</option>
 <option value="kokkiri_2x2">kokkiri_2x2 / 의정부호원코끼리 / 하늘 / nextday_1000-1200+1400-1500 / Mon, Wed, Fri</option>
-<option value="koreaunivlyceum_316">koreaunivlyceum_316 / 고려대 / 고려대라이시움 / poc_koreauniv_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="koreaunivlyceum_316">koreaunivlyceum_316 / 고려대 / 고려대라이시움 / poc_koreauniv_0900-1100+1400-1600 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="lema_1x1">lema_1x1 / 전주레마 / 지혜 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="lema_1x2">lema_1x2 / 전주레마 / 행복 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="lggwanghwamun_1x3">lggwanghwamun_1x3 / 종로LG광화문 / 꽃잎열매 / today_0900-1200 / Mon, Tue, Wed</option>
+<option value="lggwanghwamun_1x3">lggwanghwamun_1x3 / 종로LG광화문 / 꽃잎열매 / nextday_1100-1400 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="littleforest_1x3">littleforest_1x3 / 성남리틀포레스트 / 한우리 / today_0900-1200 / Mon, Wed, Fri</option>
 <option value="littleforest_1x4">littleforest_1x4 / 성남리틀포레스트 / 한소망 / today_0900-1200 / Mon, Wed, Fri</option>
 <option value="littleforest_1x5">littleforest_1x5 / 성남리틀포레스트 / 한가람 / today_0900-1200 / Mon, Wed, Fri</option>
@@ -464,10 +632,10 @@
 <option value="mansong_1x6">mansong_1x6 / 양주만송 / 풀잎 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="mapoclassy_1x1">mapoclassy_1x1 / 마포더클래시 / 참좋은 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="mapoxithecenteuriji_1x5">mapoxithecenteuriji_1x5 / 마포자이더센트리지 / 파란하늘반 / today_0900-1200 / Mon, Wed, Fri</option>
-<option value="maribona_2x1">maribona_2x1 / 계양마리보나 / 활기찬 / nextday_0900-1100+1430-1530 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="maribona_2x1">maribona_2x1 / 계양마리보나 / 활기찬 / nextday_1030-1130+1230-1330+1500-1600 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="maribona_3x1">maribona_3x1 / 계양마리보나 / 힘찬 / nextday_0900-1100+1400-1500 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="maribona_3x2">maribona_3x2 / 계양마리보나 / 신나는 / nextday_1100-1200+1300-1500 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="maribona_3x3">maribona_3x3 / 계양마리보나 / 빛나는 / nextday_1100-1200+1400-1600 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="maribona_3x3">maribona_3x3 / 계양마리보나 / 빛나는 / nextday_1030-1130+1300-1500 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="masanjoy_1x2">masanjoy_1x2 / 창원마산조이 / 지혜쑥쑥 / nextday_1000-1300 / Tue, Wed, Thu</option>
 <option value="masanjoy_2x2">masanjoy_2x2 / 창원마산조이 / 글로벌리더 / nextday_1000-1300 / Mon, Wed, Thu</option>
 <option value="masanjoy_2x3">masanjoy_2x3 / 창원마산조이 / 생각쑥쑥 / nextday_1000-1300 / Tue, Wed, Thu</option>
@@ -477,6 +645,8 @@
 <option value="minrakyubora_1x1">minrakyubora_1x1 / 의정부민락유보라 / 새싹 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="minrakyubora_1x3">minrakyubora_1x3 / 의정부민락유보라 / 꽃잎12 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="minrakyubora_1x4">minrakyubora_1x4 / 의정부민락유보라 / 열매12 / today_0900-1200 / Tue, Thu, Fri</option>
+<option value="misojium_482">misojium_482 / 경주미소지움 / 이든 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="misojium_483">misojium_483 / 경주미소지움 / 수련 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="moaelga_1x1">moaelga_1x1 / 포천모아엘가 / 열매 / today_0900-1200 / Mon, Tue, Wed</option>
 <option value="myeongryunjai_1x1">myeongryunjai_1x1 / 동래명륜자이 / 하늘 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="myeongryunjai_1x2">myeongryunjai_1x2 / 동래명륜자이 / 해님 / today_0900-1200 / Tue, Thu, Fri</option>
@@ -531,6 +701,7 @@
 <option value="pastel_1x3">pastel_1x3 / 울진파스텔 / 꽃잎 / nextday_0900-1000+1230-1330+1430-1530 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="pastel_422">pastel_422 / 울진파스텔 / 줄기 / nextday_0900-1000+1200-1300+1330-1430 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="pinokio_1x1">pinokio_1x1 / 춘천피노키오 / 사랑12 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="playtag_000">playtag_000 /  /  / today_0900-1200 / Mon, Wed, Fri</option>
 <option value="poseung_1x4">poseung_1x4 / 평택포승 / 2025 분홍 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="punggyeongchae_1x3">punggyeongchae_1x3 / 평택풍경채2차에듀 / 맑은하늘 / today_0900-1200 / Tue, Wed, Thu</option>
 <option value="punggyeongchae_1x5">punggyeongchae_1x5 / 평택풍경채2차에듀 / 밝은달빛 / today_0900-1200 / Tue, Wed, Thu</option>
@@ -558,6 +729,7 @@
 <option value="royalduke_475">royalduke_475 / 기장동원1차 / 우리끼리 / today_0900-1200 / Tue, Wed, Thu</option>
 <option value="royalduke_476">royalduke_476 / 기장동원1차 / 꽃잎 / today_0900-1200 / Mon, Tue, Thu</option>
 <option value="royalduke_477">royalduke_477 / 기장동원1차 / 열매 / today_0900-1200 / Mon, Tue, Thu</option>
+<option value="saebitdetre_491">saebitdetre_491 / 양주새빛디에트르 / 행복해 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="saekdong_1x1">saekdong_1x1 / 대덕색동 / 예쁜 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="saekdong_1x2">saekdong_1x2 / 대덕색동 / 고은 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="saekdong_1x3">saekdong_1x3 / 대덕색동 / 착한 / today_0900-1200 / Tue, Thu, Fri</option>
@@ -566,6 +738,10 @@
 <option value="saekdong_2x3">saekdong_2x3 / 대덕색동 / 지혜 / today_0900-1200 / Tue, Thu, Fri</option>
 <option value="saintvincent_2x1">saintvincent_2x1 / 수원성빈센트병원 / 대한 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="saintvincent_2x2">saintvincent_2x2 / 수원성빈센트병원 / 민국 / today_0900-1200 / Mon, Wed, Thu</option>
+<option value="sambuthehill_498">sambuthehill_498 / 아산삼부더힐 / 햇님 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="sambuthehill_500">sambuthehill_500 / 아산삼부더힐 / 달님 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="sambuthehill_501">sambuthehill_501 / 아산삼부더힐 / 별님 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="sambuthehill_502">sambuthehill_502 / 아산삼부더힐 / 샛별 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="samjeongedupark_1x1">samjeongedupark_1x1 / 수성만촌삼정에듀파크 / 사랑 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="samjeongedupark_1x3">samjeongedupark_1x3 / 수성만촌삼정에듀파크 / 하늘바다 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="sanghyeon_1x1">sanghyeon_1x1 / 용인상현 / 기린초2 / today_0900-1200 / Tue, Thu, Fri</option>
@@ -597,7 +773,7 @@
 <option value="seohaegrandblue_1x4">seohaegrandblue_1x4 / 안성서해그랑블 / 풀잎 / today_0900-1200 / Mon, Wed, Fri</option>
 <option value="seohaegrandblue_1x5">seohaegrandblue_1x5 / 안성서해그랑블 / 꽃잎 / today_0900-1200 / Mon, Wed, Fri</option>
 <option value="seongmin_1x3">seongmin_1x3 / 남동성민 / 정다운 / nextday_1230-1530 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="seongmin_2x1">seongmin_2x1 / 남동성민 / 신나는 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="seongmin_2x1">seongmin_2x1 / 남동성민 / 신나는 / nextday_0900-1000+1300-1500 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="seongmohospital_2x1">seongmohospital_2x1 / 포항성모병원 / 햇살좋은 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="seongmohospital_2x2">seongmohospital_2x2 / 포항성모병원 / 행복가득한 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="seongnamsup_3x1">seongnamsup_3x1 / 성남숲 / 아름나무 / nextday_1000-1200+1330-1430 / Tue, Thu, Fri</option>
@@ -668,8 +844,9 @@
 <option value="yogebet_1x6">yogebet_1x6 / 구미요게벳 / 아장아장 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yuaenai_433">yuaenai_433 / 동래유앤아이 / 풀잎 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="yukyeongsup_1x3">yukyeongsup_1x3 / 경산육영숲 / 수선화 / nextday_1000-1300 / Mon, Tue, Wed, Thu, Fri</option>
-<option value="yukyeongsup_2x1">yukyeongsup_2x1 / 경산육영숲 / 요술꽃 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="yukyeongsup_2x1">yukyeongsup_2x1 / 경산육영숲 / 사용하지 않는 교실 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yukyeongsup_2x2">yukyeongsup_2x2 / 경산육영숲 / 자운영 / nextday_0900-1100+1200-1300 / Mon, Tue, Wed, Thu, Fri</option>
+<option value="yukyeongsup_462">yukyeongsup_462 / 경산육영숲 / 요술꽃 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yulha_1x1">yulha_1x1 / 동구율하 / 행복 / today_0900-1200 / Mon, Tue, Wed, Thu, Fri</option>
 <option value="yurim_399">yurim_399 / 용인유림 / 잎새 / today_0900-1200 / Mon, Wed, Thu</option>
 <option value="yurim_400">yurim_400 / 용인유림 / 푸름 / nextday_1000-1200+1500-1600 / Mon, Wed, Thu</option>
@@ -740,7 +917,6 @@
   <div style="margin:12px 0; font-size:13px; color:#333; background:#f9f9f9; border:1px solid #ddd; padding:8px 12px; border-radius:6px;">
   <strong>버전 변경사항</strong>
   <ul style="margin:6px 0 0 16px; padding:0;">
-    <li>1106-cptp_1x1 usa_poc 교실 임시 추가 </li>
     <li>1028-동영상과 디버그이미지 영역 위치를 변경, 비디오는 기본 숨김처리 </li>
     <li>1022-신규교실_서구수림 4교실 추가 + 디버그이미지를 페이지 하단에 호출기능 추가</li>
     <li>0919-신규교실 추가</li>
@@ -1341,5 +1517,553 @@ box.appendChild(cell);
   
   </script>
   
+</body>
+</html>
+
+      </select>
+    </div>
+  </div>
+
+  <!-- 싱크 버튼 (상단만) -->
+  <div class="sync-buttons" id="syncContainer"></div>
+
+  <!-- 좌/우 프레임 -->
+  <div class="split">
+    <!-- 왼쪽: 현재 페이지 비디오 -->
+    <div class="panel">
+      <h2>비디오조회 <span class="sub" id="leftSubtitle"></span></h2>
+      <div id="videoContainer" class="video-grid"></div>
+      <div class="shortcuts">
+        ⌨️ <strong>단축키</strong>:
+        <span class="kbd">Space</span> 재생/일시정지 |
+        <span class="kbd">←</span>/<span class="kbd">→</span> 싱크 이동 |
+        <span class="kbd">↑</span>/<span class="kbd">↓</span> SITE 이동 |
+        <span class="kbd">Q</span> 전날 | <span class="kbd">W</span> 다음날 |
+        <span class="kbd">1</span> 3분 되감기 | <span class="kbd">2</span> 30초 되감기 |
+        <span class="kbd">3</span> 30초 앞으로 | <span class="kbd">4</span> 3분 앞으로
+      </div>
+    </div>
+
+    <!-- 오른쪽: 규칙 URL 페이지(iframe) -->
+    <div class="panel">
+      <h2>디버그툴 <label for="debugDateInput">📆</label>
+          <input type="date" id="debugDateInput"></h2>
+        
+      <iframe id="rightPage" title="Debug/Index Page"></iframe>
+    </div>
+  </div>
+
+<script>
+/* ---------- 공통 상태 ---------- */
+let currentPos = 0;              // 표시되는 버튼 배열에서의 위치(0..n-1)
+let visibleMap = [];             // [{url:0, tMin:540, label:'09:00'} ...]
+const fmt2 = v => String(v).padStart(2, "0");
+
+/* ---------- 초기화 ---------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const today = new Date().toISOString().split('T')[0];
+  const dateEl = document.getElementById("dateInput");
+  dateEl.value = today;
+  updateWeekday();
+  renderSyncButtons();
+  setActiveSyncByPos(0);
+  updateRightPane();
+});
+
+/* ---------- 유틸 ---------- */
+function updateWeekday() {
+  const dateStr = document.getElementById("dateInput").value;
+  const weekdaySpan = document.getElementById("weekday");
+  if (!dateStr) { weekdaySpan.textContent = ""; return; }
+  const days = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+  const day = new Date(dateStr).getDay();
+  weekdaySpan.textContent = `${days[day]}`;
+}
+function copySiteId() {
+  const siteId = document.getElementById("siteInput").value || "";
+  if (!siteId) return alert("SITE-ID가 선택되지 않았습니다.");
+  navigator.clipboard.writeText(siteId).then(()=>alert("SITE-ID가 복사되었습니다."));
+}
+function openImageTemplate() {
+  const date = document.getElementById("dateInput").value;
+  const site = document.getElementById("siteInput").value.trim();
+  if (!date || !site) return alert("날짜와 SITE-ID를 선택해주세요.");
+  const url = `https://storyline-image-template.s3.ap-northeast-2.amazonaws.com/${date}/${site}.jpg`;
+  window.open(url, "_blank");
+}
+function openDebugTool() {
+  const site = document.getElementById("siteInput").value || "";
+  const date = document.getElementById("dateInput").value || new Date().toISOString().split('T')[0];
+  const url = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+  window.open(url, "_blank");
+}
+function openDebugImages() {
+  const siteEl = document.getElementById("siteInput");
+  const dateEl = document.getElementById("dateInput");
+
+  const site = siteEl ? siteEl.value.trim() : "";
+  let date = dateEl ? dateEl.value : "";
+
+  if (!site) {
+    alert("SITE-ID를 선택해주세요.");
+    return;
+  }
+  // 날짜가 비어 있으면 오늘 날짜로
+  if (!date) {
+    const d = new Date();
+    const pad = n => String(n).padStart(2, "0");
+    date = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  }
+
+  const url =
+    `http://52.20.164.148:7777/api/get_combined_debug_images` +
+    `?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+
+  window.open(url, "_blank", "noopener");
+}
+function filterSiteOptions() {
+  const input = document.getElementById("siteSearch").value.toLowerCase();
+  const select = document.getElementById("siteInput");
+  for (let option of select.options) {
+    const text = option.textContent.toLowerCase();
+    const value = option.value.toLowerCase();
+    option.style.display = (text.includes(input) || value.includes(input)) ? "" : "none";
+  }
+}
+function handleSearchEnter(e) {
+  if (e.key !== "Enter") return;
+  const q = document.getElementById("siteSearch").value.trim().toLowerCase();
+  const select = document.getElementById("siteInput");
+  const options = Array.from(select.options);
+  const matches = [];
+  options.forEach((opt, idx) => {
+    const value = opt.value.toLowerCase();
+    const text = opt.textContent.toLowerCase();
+    const hit = q === "" || value === q || text.includes(q);
+    opt.style.display = hit ? "" : "none";
+    if (hit) matches.push(idx);
+  });
+  if (matches.length === 0) return alert("일치하는 교실이 없습니다.");
+  select.selectedIndex = matches[0];
+  onSiteOrDateChange(true); // 재계산 + 첫 슬롯 활성화
+}
+
+/* ---------- 우측 프레임 업데이트 ---------- */
+function updateRightPane() {
+  const site = document.getElementById("siteInput").value || "";
+  const date = document.getElementById("dateInput").value || "";
+  const iframe = document.getElementById("rightPage");
+  if (!site || !date) return;
+  iframe.src = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+}
+
+/* ---------- 싱크 & 비디오 ---------- */
+function onSiteOrDateChange(resetPos=false) {
+  renderSyncButtons();
+  setActiveSyncByPos(resetPos ? 0 : Math.min(currentPos, visibleMap.length-1));
+  updateRightPane();
+}
+
+/* 사이트 옵션의 텍스트에서 '0900-1200', '1500-1600' 등 시간 구간 추출 */
+function getSiteWindows(){
+  const sel = document.getElementById("siteInput");
+  if (!sel) return [];
+  const txt = sel.options[sel.selectedIndex]?.textContent || "";
+  const ms = [...txt.matchAll(/(\d{4})-(\d{4})/g)];
+  const toMin = hhmm => parseInt(hhmm.slice(0,2),10)*60 + parseInt(hhmm.slice(2),10);
+  // 정렬
+  return ms.map(m => [toMin(m[1]), toMin(m[2])]).sort((a,b)=>a[0]-b[0]);
+}
+/* 특정 분이 어느 구간(winIdx)에 속하는지 */
+function windowIndexForTime(tMin){
+  const wins = getSiteWindows();
+  for (let i=0;i<wins.length;i++){
+    const [s,e] = wins[i];
+    if (tMin>=s && tMin<e) return i;
+  }
+  return -1;
+}
+/* 10분 간격 슬롯(최대 18개) 계산 */
+function computeSlotsMinutes(){
+  const wins = getSiteWindows();
+  const times = [];
+  for (const [s, e] of wins){
+    let t = Math.ceil(s/10)*10;
+    for (; t<e; t+=10) times.push(t);
+  }
+  const uniq = [...new Set(times)].sort((a,b)=>a-b);
+  if (uniq.length === 0) return Array.from({length:18}, (_,i)=> (9*60) + i*10); // 기본 09:00~(18개)
+  if (uniq.length <= 18) return uniq;
+
+  // 연속 그룹화 후 9+9 분배
+  const groups = [];
+  let cur = [];
+  for (let i=0;i<uniq.length;i++){
+    if (i===0 || uniq[i] === uniq[i-1] + 10) cur.push(uniq[i]);
+    else { groups.push(cur); cur = [uniq[i]]; }
+  }
+  if (cur.length) groups.push(cur);
+  if (groups.length === 1) return groups[0].slice(0,18);
+  const g0 = groups[0].slice(0,9);
+  const g1 = groups[1].slice(0,9);
+  let result = g0.concat(g1);
+  let needed = 18 - result.length;
+  if (needed>0){
+    const rest = [];
+    rest.push(...groups[0].slice(g0.length));
+    rest.push(...groups[1].slice(g1.length));
+    for (let gi=2; gi<groups.length; gi++) rest.push(...groups[gi]);
+    result.push(...rest.slice(0,needed));
+  }
+  return result;
+}
+function minutesToLabel(tMin){
+  const h = Math.floor(tMin/60), m = tMin%60;
+  return `${fmt2(h)}:${fmt2(m)}`;
+}
+/* 싱크 버튼 렌더링: 시간창 기반 슬롯 → (표시)sync NN, (URL)버튼순번(0..17) */
+function renderSyncButtons(){
+  // 어떤 페이지 구조든 안전하게 컨테이너를 찾음
+  const cont =
+    document.getElementById("syncContainerTop") ||
+    document.getElementById("syncContainer") ||
+    document.querySelector(".sync-buttons");
+
+  if (!cont) {
+    console.warn("[renderSyncButtons] 컨테이너(.sync-buttons or #syncContainerTop/#syncContainer) 없음");
+    return;
+  }
+
+  const bot = document.getElementById("syncContainerBottom");
+  if (bot) bot.innerHTML = ""; // 상단만 사용
+  cont.innerHTML = "";
+
+  const base = 9 * 60;   // 09:00 기준(분)
+  let slots = [];
+  try { slots = computeSlotsMinutes(); } catch (e) { slots = []; }
+
+  // 슬롯 계산이 비어도 버튼은 반드시 보이도록 fallback (0..17)
+  if (!Array.isArray(slots) || slots.length === 0) {
+    slots = Array.from({length: 18}, (_, i) => base + i * 10);
+  }
+
+  // 연속(10분 간격) 구간으로 분리 → 첫 구간 길이
+  const groups = [];
+  let cur = [];
+  for (let i=0;i<slots.length;i++){
+    if (i===0 || slots[i] === slots[i-1] + 10) cur.push(slots[i]);
+    else { groups.push(cur); cur=[slots[i]]; }
+  }
+  if (cur.length) groups.push(cur);
+  const firstGroupLen = groups[0]?.length || slots.length;
+
+  // 화면/URL 매핑 (URL sync 번호 = 버튼 순번 0..17)
+  visibleMap = slots.slice(0,18).map((t, pos) => ({
+    url: pos,                                  // ← URL에 들어갈 sync 번호
+    t,
+    global: Math.round((t - base)/10)          // 09:00 기준 실제 시간 인덱스
+  }));
+
+  const pad2 = v => String(v).padStart(2,"0");
+
+  visibleMap.forEach((item, pos) => {
+    const btn = document.createElement("button");
+    btn.id = `sync-btn-pos-${pos}`;
+    btn.dataset.pos = String(pos);
+
+    // 표시 번호: 첫 구간은 00부터 pos, 이후 구간은 실제 시간 인덱스(global)
+    const dispSync = (pos < firstGroupLen) ? pos : item.global;
+    btn.textContent = `sync ${pad2(dispSync)}`;     // 시간 텍스트 제거(원하면 hh:mm 다시 넣을 수 있음)
+
+    // 오전/오후 색상 유지 (가능할 때만)
+    const w = (typeof windowIndexForTime === "function") ? windowIndexForTime(item.t) : -1;
+    if (w >= 0) btn.classList.add(`win${w}`);
+
+    btn.addEventListener("click", () => setActiveSyncByPos(pos));
+    cont.appendChild(btn);
+  });
+
+  // 활성화
+  if (currentPos < 0 || currentPos >= visibleMap.length) {
+    setActiveSyncByPos(0);
+  } else {
+    const active = document.getElementById(`sync-btn-pos-${currentPos}`);
+    if (active) active.classList.add("active");
+  }
+}
+
+/* 선택/URL 로딩은 기존 로직 그대로: visibleMap[pos].url을 사용 */
+function setActiveSyncByPos(pos) {
+  if (!visibleMap.length) return;
+  pos = Math.max(0, Math.min(pos, visibleMap.length - 1));
+  currentPos = pos;
+
+  // URL에 쓰는 sync 번호는 '버튼 순번(0..17)'
+  const syncNum = visibleMap[pos].url;                // 숫자 그대로
+  loadVideos(syncNum);                                // loadVideos 안에서 padStart(3)
+
+  // active 표시
+  document.querySelectorAll(".sync-buttons button").forEach(b => b.classList.remove("active"));
+  const activeBtn = document.getElementById(`sync-btn-pos-${pos}`);
+  if (activeBtn) activeBtn.classList.add("active");
+}
+/* 싱크 선택 → 좌측 비디오 로딩 & active 스타일 */
+function setActiveSyncByPos(pos){
+  if (!visibleMap.length) return;
+  pos = Math.max(0, Math.min(pos, visibleMap.length - 1));
+  currentPos = pos;
+
+  const syncNum = visibleMap[pos].url;
+  loadVideos(syncNum);
+  updateLeftSubtitleBySync(syncNum);   // ← 날짜 강조 포함 서브타이틀 갱신
+
+  document.querySelectorAll(".sync-buttons button").forEach(b => b.classList.remove("active"));
+  const activeBtn = document.getElementById(`sync-btn-pos-${pos}`);
+  if (activeBtn) activeBtn.classList.add("active");
+}
+/** 비디오 존재 여부를 메타데이터 로드로 판별: 성공 시 실제 재생 가능한 <video> 엘리먼트를 반환, 실패 시 null */
+function probeVideo(url) {
+  return new Promise((resolve) => {
+    const v = document.createElement("video");
+    v.src = url;
+    v.preload = "metadata";
+    v.controls = true;
+    v.autoplay = false;
+    v.muted = true;
+    v.playsInline = true;
+
+    const timer = setTimeout(() => {
+      cleanup(false);
+      resolve(v);
+    }, 8000); // 최대 8초 대기 (환경에 맞게 조정 가능)
+
+    function cleanup(isError = false) {
+      clearTimeout(timer);
+      v.onloadedmetadata = null;
+      v.onerror = null;
+      if (isError) {
+        // 에러 경우 소스 해제하여 네트워크 사용 최소화
+        v.removeAttribute("src");
+        v.load();
+      }
+    }
+
+    v.onloadedmetadata = () => {
+      cleanup(false);
+      resolve(v); // 성공: 이 비디오 엘리먼트를 그대로 사용
+    };
+    v.onerror = () => {
+      cleanup(true);
+      resolve(null);
+    };
+  });
+}
+
+/** (교체) 선택된 sync에 대해 cam01..cam08을 검사하여 '존재하는 것만' 2열로 렌더 */
+async function loadVideos(syncNumber) {
+  const date = document.getElementById("dateInput").value;
+  const site = document.getElementById("siteInput").value.trim();
+  const container = document.getElementById("videoContainer");
+  if (!date || !site) {
+    alert("날짜와 교실을 선택해주세요.");
+    return;
+  }
+
+  const syncLabel = `sync${String(syncNumber).padStart(3,'0')}`;
+  const useNewURL = new Date(date) >= new Date("2025-06-16");
+  const baseURL = useNewURL
+    ? "https://d22x5o96gu3cuo.cloudfront.net"
+    : "https://d175ce76v5cwjf.cloudfront.net";
+
+  container.innerHTML = "";
+
+  // 1) 병렬로 모두 probe (cam01..08)
+  const cams = Array.from({length: 8}, (_, i) => i + 1);
+  const probes = cams.map(cam => {
+    const url = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
+    return probeVideo(url).then(v => ({ cam, videoEl: v }));
+  });
+
+  const results = await Promise.all(probes);
+
+  // 2) 존재하는 캠만 cam 번호 오름차순으로 정렬
+  const available = results
+    .filter(r => r.videoEl)
+    .sort((a, b) => a.cam - b.cam);
+
+  // 3) 일괄 렌더 (DOM 삽입 순서 = 표시 순서)
+  for (const { cam, videoEl } of available) {
+      showFirstFrame(videoEl);                 // ← 첫 프레임만 표시
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "video-wrapper";
+
+      const overlay = document.createElement("div");
+      overlay.className = "overlay-label";
+      overlay.textContent = `CAM${String(cam).padStart(2, "0")}`;
+
+      wrapper.appendChild(videoEl);
+      wrapper.appendChild(overlay);
+      container.appendChild(wrapper);
+    }
+
+  // 4) 아무 비디오도 없으면 안내만 표시
+  if (available.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "video-placeholder";
+    empty.textContent = "사용 가능한 비디오가 없습니다";
+    container.appendChild(empty);
+  }
+}
+
+/* ---------- 키보드 단축키 ---------- */
+document.addEventListener("keydown", (e) => {
+  const tag = document.activeElement.tagName.toLowerCase();
+  if ((tag === "input" || tag === "select") && e.key === " ") return;
+
+  const vids = document.querySelectorAll("#videoContainer video");
+  if (e.key === " ") {
+    e.preventDefault();
+    const anyPaused = Array.from(vids).some(v => v.paused);
+    vids.forEach(v => anyPaused ? v.play() : v.pause());
+  } else if (e.key === "ArrowRight") {
+    if (visibleMap.length) setActiveSyncByPos(Math.min(currentPos+1, visibleMap.length-1));
+  } else if (e.key === "ArrowLeft") {
+    if (visibleMap.length) setActiveSyncByPos(Math.max(currentPos-1, 0));
+  } else if (["ArrowUp","ArrowDown"].includes(e.key)) {
+    const siteSelect = document.getElementById("siteInput");
+    let i = siteSelect.selectedIndex;
+    if (e.key === "ArrowUp" && i > 0) siteSelect.selectedIndex = i - 1;
+    if (e.key === "ArrowDown" && i < siteSelect.options.length - 1) siteSelect.selectedIndex = i + 1;
+    onSiteOrDateChange(false);
+  } else if (["1","2","3","4"].includes(e.key)) {
+    const seek = {"1": -180, "2": -30, "3": 30, "4": 180}[e.key];
+    vids.forEach(v => v.currentTime = Math.max(0, v.currentTime + seek));
+  } else if (["q","Q","ㅂ"].includes(e.key)) {
+    const dateInput = document.getElementById("dateInput");
+    const d = new Date(dateInput.value || new Date());
+    d.setDate(d.getDate() - 1);
+    dateInput.value = d.toISOString().split('T')[0];
+    updateWeekday(); onSiteOrDateChange(false);
+  } else if (["w","W","ㅈ"].includes(e.key)) {
+    const dateInput = document.getElementById("dateInput");
+    const d = new Date(dateInput.value || new Date());
+    d.setDate(d.getDate() + 1);
+    dateInput.value = d.toISOString().split('T')[0];
+    updateWeekday(); onSiteOrDateChange(false);
+  }
+});
+// 메타데이터 로드 후 0초로 멈춰 '첫 프레임'만 보이게
+function showFirstFrame(videoEl) {
+  try { videoEl.autoplay = false; } catch {}
+  videoEl.preload = "metadata";
+  videoEl.playsInline = true;
+
+  // 이미 로드된 경우도 고려
+  const pauseAtZero = () => { videoEl.currentTime = 0; videoEl.pause(); };
+  if (videoEl.readyState >= 1) pauseAtZero();
+  else {
+    videoEl.addEventListener("loadedmetadata", pauseAtZero, { once: true });
+  }
+}
+    function fmtDateWithWeekday(dateStr){
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  const days = ['일','월','화','수','목','금','토'];
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}(${days[d.getDay()]})`;
+}
+
+function updateLeftSubtitleBySync(syncNum){
+  const date = document.getElementById('dateInput').value;
+  const site = document.getElementById('siteInput').value;
+  const el = document.getElementById('leftSubtitle');
+  if (!el) return;
+  const syncLabel = `sync${String(syncNum).padStart(3,'0')}`;
+  el.innerHTML =
+    `<span class="date-badge">${fmtDateWithWeekday(date)}</span>`+
+    `<span class="site">${site}</span>`+
+    `<span class="sync">${syncLabel}</span>`;
+}
+    document.getElementById('dateInput')?.addEventListener('change', () => {
+      updateLeftSubtitleBySync(visibleMap[currentPos]?.url ?? 0);
+    });
+    document.getElementById('siteInput')?.addEventListener('change', () => {
+      // site 바뀌면 renderSyncButtons()가 다시 그린 뒤 setActiveSyncByPos(0)에서 갱신됨
+    });
+    function getDebugFrame(){ return document.getElementById('rightPage'); }
+    function getDebugDateFromURL(){
+      const f = getDebugFrame();
+      if (!f) return null;
+      try {
+        const src = f.getAttribute('src') || '';               // 속성 기준
+        if (!src) return null;
+        return new URL(src, window.location.href).searchParams.get('date');
+      } catch { return null; }
+    }
+
+    function buildDebugURL(site, date, baseSrc){
+      // baseSrc가 없으면 기본 도메인으로 시작
+      const base = baseSrc
+        ? new URL(baseSrc, window.location.href)
+        : new URL('https://playtag-debugging-tool.vercel.app/');
+      const sp = base.searchParams;
+
+      if (site) sp.set('site', site);
+      if (date) sp.set('date', date);
+
+      // 새로고침 보장용 캐시버스터
+      sp.set('_cb', Date.now().toString());
+      base.search = sp.toString();
+      return base.toString();
+    }
+
+    /** 오른쪽 프레임의 date만 바꾸어 재호출 (강제 리로드 보장) */
+    function updateDebugFrameDate(dateStr){
+      const f = getDebugFrame();
+      if (!f || !dateStr) return;
+
+      const currentSrc = f.getAttribute('src') || '';
+      const siteSel = document.getElementById('siteInput');
+      const site = siteSel?.value?.trim() || new URL(currentSrc, window.location.href).searchParams.get('site') || '';
+
+      const newURL = buildDebugURL(site, dateStr, currentSrc || null);
+
+      // 같은 문자열이라도 강제 리로드 되도록 about:blank → 새 URL 순서로 설정
+      if (currentSrc) {
+        f.setAttribute('src', 'about:blank');
+        // 아주 짧은 지연 후 새 URL 주입
+        setTimeout(() => { f.setAttribute('src', newURL); }, 0);
+      } else {
+        f.setAttribute('src', newURL);
+      }
+    }
+
+    // 우측 달력 초기화 + 이벤트
+    (function initRightCalendar(){
+      const input = document.getElementById('debugDateInput');
+      const f = getDebugFrame();
+      if (!input || !f) return;
+
+      // 초기값: 프레임 src의 date → 없으면 좌측 date → 오늘
+      input.value = getDebugDateFromURL()
+                 || document.getElementById('dateInput')?.value
+                 || new Date().toISOString().split('T')[0];
+
+      // 변경 시 프레임만 갱신
+      input.addEventListener('change', (e) => {
+        const d = e.target.value;
+        if (d) updateDebugFrameDate(d);
+      });
+
+      // 프레임이 외부 요인으로 바뀌었을 때 달력 동기화
+      f.addEventListener('load', () => {
+        const d = getDebugDateFromURL();
+        if (d) input.value = d;
+      });
+    })();
+</script>
 </body>
 </html>
