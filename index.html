@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>통합카메라조회 v251218</title>
+  <title>통합카메라조회 v260102</title>
   <style>
     body {
       font-family: sans-serif;
@@ -877,10 +877,12 @@
       return;
     }
     const syncLabel = `sync${syncNumber.padStart(3, '0')}`;
-    const useNewURL = new Date(date) >= new Date("2025-06-16");
-    const baseURL = useNewURL
-      ? "https://d22x5o96gu3cuo.cloudfront.net"
-      : "https://d175ce76v5cwjf.cloudfront.net";
+    const selectedDate = new Date(date);
+    const baseURL = selectedDate >= new Date("2025-12-31")
+      ? "https://d3j9wzynvd2br9.cloudfront.net"
+      : selectedDate >= new Date("2025-06-16")
+        ? "https://d22x5o96gu3cuo.cloudfront.net"
+        : "https://d175ce76v5cwjf.cloudfront.net";
 
     container.innerHTML = "";
 
