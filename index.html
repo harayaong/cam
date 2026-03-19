@@ -1620,7 +1620,6 @@
   }
 
   function computeSlotsMinutes() {
-    const base = 9*60;
     const wins = getSiteWindows();
     const times = [];
     for (const [s, e] of wins) {
@@ -1628,47 +1627,37 @@
       for (; t < e; t += 10) times.push(t);
     }
     const uniq = [...new Set(times)].sort((a,b)=>a-b);
-    if (uniq.length === 0) return Array.from({length:18}, (_,i)=> base + i*10);
-    if (uniq.length <= 18) return uniq;
-    const groups = [];
-    let cur = [];
-    for (let i=0;i<uniq.length;i++){
-      if (i===0 || uniq[i] === uniq[i-1] + 10) cur.push(uniq[i]);
-      else { groups.push(cur); cur=[uniq[i]]; }
-    }
-    if (cur.length) groups.push(cur);
-    if (groups.length === 1) return groups[0].slice(0,18);
-    const g0 = groups[0].slice(0,9), g1 = groups[1].slice(0,9);
-    let result = g0.concat(g1);
-    let needed = 18 - result.length;
-    if (needed > 0) {
-      const rest = [];
-      rest.push(...groups[0].slice(g0.length));
-      rest.push(...groups[1].slice(g1.length));
-      for (let gi=2; gi<groups.length; gi++) rest.push(...groups[gi]);
-      result.push(...rest.slice(0,needed));
-    }
-    return result;
+    // 구간이 없으면 0900부터 18개 기본값
+    if (uniq.length === 0) return Array.from({length:18}, (_,i)=> 9*60 + i*10);
+    return uniq;
   }
 
   function renderSyncButtons() {
     const top = document.getElementById("syncContainerTop");
     top.innerHTML = "";
 
-    const base = 9*60;
     const slots = computeSlotsMinutes();
     if (!slots.length) return;
 
+    // 기준점: 첫 구간의 시작 시간 (sync000에 해당)
+    const wins = getSiteWindows();
+    const base = wins.length > 0 ? Math.ceil(wins[0][0]/10)*10 : 9*60;
+
+    // visibleMap: url = 실제 sync 번호(절대 오프셋), t = 시각(분), pos = 버튼 배열 인덱스
+    visibleMap = slots.map((t, pos) => ({
+      url: Math.round((t - base) / 10),  // 실제 S3 sync 번호
+      t,
+      pos
+    }));
+
+    // 구간 그룹화 (색상 구분용)
     const groups = [];
     let cur = [];
-    for (let i=0;i<slots.length;i++){
-      if (i===0 || slots[i] === slots[i-1] + 10) cur.push(slots[i]);
+    for (let i=0; i<slots.length; i++) {
+      if (i===0 || slots[i] === slots[i-1]+10) cur.push(slots[i]);
       else { groups.push(cur); cur=[slots[i]]; }
     }
     if (cur.length) groups.push(cur);
-    const firstGroupLen = groups[0]?.length || slots.length;
-
-    visibleMap = slots.map((t, pos) => ({ url: pos, t, global: Math.round((t - base)/10) }));
 
     const pad2 = v => String(v).padStart(2,"0");
     slots.forEach((t, pos) => {
@@ -1678,8 +1667,8 @@
 
       const hh = pad2(Math.floor(t/60));
       const mm = pad2(t % 60);
-      const dispSync = (pos < firstGroupLen) ? pos : visibleMap[pos].global;
-      btn.textContent = `sync ${pad2(dispSync)} ${hh}:${mm}`;
+      const syncNum = visibleMap[pos].url;
+      btn.textContent = `sync${pad2(syncNum)} ${hh}:${mm}`;
 
       const w = windowIndexForTime(t);
       if (w >= 0) btn.classList.add(`win${w}`);
