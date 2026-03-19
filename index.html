@@ -469,8 +469,8 @@
       border: 1px solid var(--border);
       background: #f3f4f6;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-start;
+      justify-content: flex-start;
     }
     .imgtpl-canvas.grabbing { cursor: grabbing; }
     .imgtpl-canvas img {
@@ -688,25 +688,26 @@
     <button class="imgtpl-close" onclick="toggleImgTpl(false)">✕</button>
   </div>
   <div class="imgtpl-body">
+    <div style="font-size:11px; color:var(--text-muted); display:flex; gap:14px; flex-wrap:wrap; align-items:center; flex-shrink:0;">
+      <span>🖱️ 휠 — 스크롤</span>
+      <span>⇧ + 휠 — 확대/축소</span>
+      <span>🖱️ 드래그 — 이동</span>
+      <div class="imgtpl-zoom-btns" style="margin-left:auto;">
+        <button class="btn" id="btnImgPrev" onclick="loadImgTplPrev()">예전</button>
+        <button class="btn" id="btnImgToday" onclick="loadImgTplToday()">오늘</button>
+        <button class="btn" onclick="imgTplZoom(1.2)">🔍 확대</button>
+        <button class="btn" onclick="imgTplZoom(1/1.2)">🔎 축소</button>
+        <button class="btn" onclick="imgTplResetZoom()">원래대로</button>
+        <button class="btn btn-accent imgtpl-open-btn" onclick="openImgTplInNew()">새 탭으로 열기 ↗</button>
+      </div>
+    </div>
     <div class="imgtpl-canvas" id="imgTplCanvas">
       <img id="imgTplImg" alt="이미지템플릿"
         onerror="this.style.display='none'; document.getElementById('imgTplError').style.display='flex';">
     </div>
     <div id="imgTplError" class="imgtpl-img-error" style="display:none;">
       <span>🚫</span>
-      <span>이미지를 불러올 수 없습니다</span>
-    </div>
-    <div class="imgtpl-zoom-btns">
-      <button class="btn" onclick="imgTplZoom(1.2)">🔍 확대</button>
-      <button class="btn" onclick="imgTplZoom(1/1.2)">🔎 축소</button>
-      <button class="btn" onclick="imgTplResetZoom()">원래대로</button>
-      <button class="btn btn-accent imgtpl-open-btn" onclick="openImgTplInNew()">새 탭으로 열기 ↗</button>
-    </div>
-    <div style="font-size:11px; color:var(--text-muted); display:flex; gap:14px; flex-wrap:wrap;">
-      <span>🖱️ 휠 — 위아래 스크롤</span>
-      <span>⇧ + 휠 — 확대/축소</span>
-      <span>🖱️ 클릭 후 이동 — 화면 이동</span>
-      <span>↩ 원래대로 — 초기화</span>
+      <span>이미지템플릿이 없습니다. 서비스요일이 아니거나 파이프라인이 동작하지 않았습니다.</span>
     </div>
   </div>
 </div>
@@ -1881,7 +1882,12 @@
     if (e.shiftKey) {
       imgTplZoom(e.deltaY < 0 ? 1.1 : 1/1.1);
     } else {
-      tplY -= e.deltaY;
+      const img = $("imgTplImg");
+      const canvas = $("imgTplCanvas");
+      const renderedH = img.offsetHeight * tplScale;
+      const canvasH = canvas.clientHeight;
+      const minY = Math.min(0, canvasH - renderedH);
+      tplY = Math.min(0, Math.max(minY, tplY - e.deltaY));
       applyImgTransform();
     }
   }, { passive: false });
@@ -1904,24 +1910,29 @@
     $("imgTplCanvas").classList.remove("grabbing");
   });
 
-  function updateImgTplPanel() {
+  function loadImgTplByDate(date) {
     const site = $("siteInput").value.trim();
     if (!site) return;
-    const date = getLastServiceDate();
     const url = getImgTplUrl(date, site);
     imgTplCurrentUrl = url;
-
     const days = ['일','월','화','수','목','금','토'];
     const d = new Date(date);
     $("imgTplMeta").textContent = `${date} (${days[d.getDay()]}) — ${site}`;
-
     const img = $("imgTplImg");
-    const err = $("imgTplError");
     img.style.display = "block";
-    err.style.display = "none";
+    $("imgTplError").style.display = "none";
     img.src = url;
     imgTplResetZoom();
+
+    // 활성 버튼 강조
+    const isToday = date === todayStr();
+    $("btnImgToday").classList.toggle("btn-accent", isToday);
+    $("btnImgPrev").classList.toggle("btn-accent", !isToday);
   }
+
+  function updateImgTplPanel() { loadImgTplByDate(getLastServiceDate()); }
+  function loadImgTplPrev()    { loadImgTplByDate(getLastServiceDate()); }
+  function loadImgTplToday()   { loadImgTplByDate(todayStr()); }
 
   function toggleImgTpl(open) {
     imgTplOpen = open;
