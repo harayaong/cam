@@ -1576,7 +1576,25 @@
   // ── 초기화 ──
   document.addEventListener("DOMContentLoaded", () => {
     const dateEl = $("dateInput");
-    if (!dateEl.value) dateEl.value = todayStr();
+    const siteEl = $("siteInput");
+
+    // URL 파라미터 우선 적용
+    const sp = new URLSearchParams(location.search);
+    const paramDate = sp.get("date");
+    const paramSite = sp.get("site");
+
+    if (paramDate) {
+      dateEl.value = paramDate;
+    } else if (!dateEl.value) {
+      dateEl.value = todayStr();
+    }
+
+    if (paramSite) {
+      // 일치하는 option 찾아서 선택
+      const opt = Array.from(siteEl.options).find(o => o.value === paramSite);
+      if (opt) siteEl.value = paramSite;
+    }
+
     updateWeekday();
     renderSyncButtons();
     setActiveSyncByPos(0);
