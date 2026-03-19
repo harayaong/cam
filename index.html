@@ -40,6 +40,10 @@
       padding: 0;
       line-height: 1.5;
       font-size: 14px;
+      transition: margin-right 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    body.imgtpl-open {
+      margin-right: 50vw;
     }
 
     /* ── 상단 헤더 ── */
@@ -356,8 +360,7 @@
     }
     .iframe-clip {
       width: 100%;
-      height: 756px;
-      overflow-y: auto;
+      overflow: hidden;
       border-radius: var(--radius);
       border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
@@ -366,9 +369,10 @@
     }
     .iframe-clip iframe {
       width: 100%;
-      height: 1920px;
+      height: 5000px;
       border: none;
       margin-top: -120px;
+      display: block;
       pointer-events: auto;
     }
     .iframe-loading {
@@ -470,8 +474,8 @@
     }
     .imgtpl-canvas.grabbing { cursor: grabbing; }
     .imgtpl-canvas img {
-      max-width: 100%;
-      max-height: 100%;
+      width: 100%;
+      height: auto;
       display: block;
       user-select: none;
       -webkit-user-drag: none;
@@ -699,7 +703,8 @@
       <button class="btn btn-accent imgtpl-open-btn" onclick="openImgTplInNew()">새 탭으로 열기 ↗</button>
     </div>
     <div style="font-size:11px; color:var(--text-muted); display:flex; gap:14px; flex-wrap:wrap;">
-      <span>🖱️ 휠 — 확대/축소</span>
+      <span>🖱️ 휠 — 위아래 스크롤</span>
+      <span>⇧ + 휠 — 확대/축소</span>
       <span>🖱️ 클릭 후 이동 — 화면 이동</span>
       <span>↩ 원래대로 — 초기화</span>
     </div>
@@ -1868,10 +1873,15 @@
     applyImgTransform();
   }
 
-  // 휠 줌
+  // 휠: 스크롤 / shift+휠: 줌
   $("imgTplCanvas").addEventListener("wheel", e => {
     e.preventDefault();
-    imgTplZoom(e.deltaY < 0 ? 1.1 : 1/1.1);
+    if (e.shiftKey) {
+      imgTplZoom(e.deltaY < 0 ? 1.1 : 1/1.1);
+    } else {
+      tplY -= e.deltaY;
+      applyImgTransform();
+    }
   }, { passive: false });
 
   // 드래그 팬
@@ -1915,6 +1925,7 @@
     imgTplOpen = open;
     $("imgTplPanel").classList.toggle("open", open);
     $("imgTplTab").classList.toggle("hidden", open);
+    document.body.classList.toggle("imgtpl-open", open);
     if (open) updateImgTplPanel();
   }
 
@@ -2114,7 +2125,8 @@
       video.controls = true;
       video.preload = "metadata";
       video.muted = true;
-      video.onerror = () => { wrapper.innerHTML = `<div class="video-placeholder">🚫 비디오 없음</div>`; };
+      video.onerror = () => { wrapper.style.display = "none"; };
+      video.onloadedmetadata = () => { wrapper.style.display = ""; };
 
       const overlayEl = document.createElement("div");
       overlayEl.className = "overlay-label";
