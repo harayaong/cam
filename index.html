@@ -729,6 +729,7 @@
     <h1>통합카메라조회</h1>
     <div class="header-actions">
       <button class="btn" onclick="openImageTemplate()">이미지템플릿 <kbd class="kbd">T</kbd></button>
+      <button class="btn" onclick="openTrainsetManager()">트레인셋매니저 <kbd class="kbd">M</kbd></button>
     </div>
   </div>
 </div>
@@ -1755,6 +1756,7 @@
 <!-- 단축키 안내 -->
 <div class="shortcut-bar">
   <span class="shortcut-item"><kbd class="kbd">T</kbd> 이미지템플릿</span>
+  <span class="shortcut-item"><kbd class="kbd">M</kbd> 트레인셋매니저</span>
   <span class="shortcut-item"><kbd class="kbd">D</kbd> 디버그툴</span>
   <span class="shortcut-item"><kbd class="kbd">I</kbd> 디버그이미지 패널</span>
   <span class="shortcut-item"><kbd class="kbd">Y</kbd> 이전회차 이미지템플릿 패널</span>
@@ -2158,6 +2160,12 @@
     window.open(`https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`, '_blank');
   }
 
+  function openTrainsetManager() {
+    const { site } = getSiteAndDate();
+    if (!site) { alert("SITE-ID를 선택해주세요."); return; }
+    window.open(`https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true&siteid=${encodeURIComponent(site)}`, "_blank");
+  }
+
   function openDebugTool() {
     const { site, date } = getSiteAndDate();
     window.open(`https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`, "_blank");
@@ -2199,7 +2207,7 @@
     }
 
     // 바로가기
-    if (["t","T","ㅅ"].includes(e.key)) { openImageTemplate(); return; }
+    if (["m","M","ㅡ"].includes(e.key)) { openTrainsetManager(); return; }
     if (["d","D","ㅇ"].includes(e.key)) { openDebugTool(); return; }
     if (["y","Y","ㅛ"].includes(e.key)) { toggleImgTpl(!imgTplOpen); return; }
     if (["i","I","ㅣ"].includes(e.key)) { toggleDebugImgPanel(!debugImgOpen); return; }
