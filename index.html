@@ -333,6 +333,65 @@
       .main-content { padding: 14px 16px; }
     }
 
+    /* ── 클래스룸 정보 패널 ── */
+    .classroom-panel {
+      margin-bottom: 16px;
+    }
+    .classroom-panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .classroom-panel-title::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 14px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+    .iframe-clip {
+      width: 100%;
+      height: 756px;
+      overflow: hidden;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      background: var(--surface);
+      position: relative;
+    }
+    .iframe-clip iframe {
+      width: 100%;
+      height: 1920px;
+      border: none;
+      margin-top: -120px;
+      pointer-events: none;
+    }
+    .iframe-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 13px;
+      gap: 8px;
+    }
+    .iframe-loading.hidden { display: none; }
+    .iframe-spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* ── 버전 노트 ── */
     .version-note {
       margin-top: 20px;
@@ -401,7 +460,7 @@
 <div class="control-bar">
   <div class="control-group">
     <label for="dateInput">📆 날짜</label>
-    <input type="date" id="dateInput" onchange="updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);">
+    <input type="date" id="dateInput" onchange="updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0); updateClassroomIframe();">
     <span id="weekday" class="weekday-badge"></span>
   </div>
   <div class="control-group">
@@ -1447,6 +1506,18 @@
     <div id="videoContainer" class="video-grid"></div>
   </div>
 
+  <!-- 클래스룸 정보 -->
+  <div class="classroom-panel">
+    <div class="classroom-panel-title">클래스룸 정보</div>
+    <div class="iframe-clip">
+      <div class="iframe-loading" id="classroomLoading">
+        <div class="iframe-spinner"></div>
+        불러오는 중...
+      </div>
+      <iframe id="classroomIframe" onload="document.getElementById('classroomLoading').classList.add('hidden')"></iframe>
+    </div>
+  </div>
+
   <!-- 버전 노트 -->
   <div class="version-note">
     <strong>버전 변경사항</strong>
@@ -1493,6 +1564,16 @@
   let currentPos = 0;
   let visibleMap = [];
 
+  function updateClassroomIframe() {
+    const site = document.getElementById("siteInput")?.value.trim() || "";
+    let date = document.getElementById("dateInput")?.value || "";
+    if (!site || !date) return;
+    const iframe = document.getElementById("classroomIframe");
+    const loading = document.getElementById("classroomLoading");
+    loading.classList.remove("hidden");
+    iframe.src = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     const dateEl = document.getElementById("dateInput");
     if (dateEl && !dateEl.value) {
@@ -1503,11 +1584,13 @@
     updateWeekday();
     renderSyncButtons();
     setActiveSyncByPos(0);
+    updateClassroomIframe();
 
-    // 교실 변경 시 싱크 버튼 + 비디오 자동 갱신
+    // 교실 변경 시 싱크 버튼 + 비디오 + iframe 자동 갱신
     document.getElementById("siteInput").addEventListener("change", () => {
       renderSyncButtons();
       setActiveSyncByPos(0);
+      updateClassroomIframe();
     });
   });
 
