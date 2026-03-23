@@ -744,6 +744,7 @@
     <div class="header-actions">
       <button class="btn" onclick="openImageTemplate()">이미지템플릿 <kbd class="kbd">T</kbd></button>
       <button class="btn" onclick="openTrainsetManager()">트레인셋매니저 <kbd class="kbd">M</kbd></button>
+      <button class="btn" id="btnCopySiteId" onclick="copySiteId()">SITE-ID 복사 <kbd class="kbd">C</kbd></button>
     </div>
   </div>
 </div>
@@ -1771,6 +1772,7 @@
 <div class="shortcut-bar">
   <span class="shortcut-item"><kbd class="kbd">T</kbd> 이미지템플릿</span>
   <span class="shortcut-item"><kbd class="kbd">M</kbd> 트레인셋매니저</span>
+  <span class="shortcut-item"><kbd class="kbd">C</kbd> SITE-ID 복사</span>
   <span class="shortcut-item"><kbd class="kbd">D</kbd> 디버그툴</span>
   <span class="shortcut-item"><kbd class="kbd">I</kbd> 디버그이미지 패널</span>
   <span class="shortcut-item"><kbd class="kbd">Y</kbd> 이전회차 이미지템플릿 패널</span>
@@ -1999,7 +2001,7 @@
   }
 
   // ── 초기화 ──
-  document.addEventListener("DOMContentLoaded", () => {
+  (function init() {
     const dateEl = $("dateInput");
     const siteEl = $("siteInput");
 
@@ -2010,12 +2012,11 @@
 
     if (paramDate) {
       dateEl.value = paramDate;
-    } else if (!dateEl.value) {
+    } else {
       dateEl.value = todayStr();
     }
 
     if (paramSite) {
-      // 일치하는 option 찾아서 선택
       const opt = Array.from(siteEl.options).find(o => o.value === paramSite);
       if (opt) siteEl.value = paramSite;
     }
@@ -2024,6 +2025,7 @@
     renderSyncButtons();
     setActiveSyncByPos(0);
     updateClassroomIframe();
+    updateSiteIdBtn();
 
     $("siteInput").addEventListener("change", () => {
       renderSyncButtons();
@@ -2031,8 +2033,9 @@
       updateClassroomIframe();
       if (imgTplOpen) updateImgTplPanel();
       if (debugImgOpen) updateDebugImgPanel();
+      updateSiteIdBtn();
     });
-  });
+  })();
 
   // ── 요일 표시 ──
   function updateWeekday() {
@@ -2196,6 +2199,22 @@
     window.open(`https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true&siteid=${encodeURIComponent(site)}`, "_blank");
   }
 
+  function copySiteId() {
+    const site = $("siteInput").value.trim();
+    if (!site) { alert("SITE-ID를 선택해주세요."); return; }
+    navigator.clipboard.writeText(site).then(() => {
+      const btn = $("btnCopySiteId");
+      const prev = btn.innerHTML;
+      btn.innerHTML = `✅ 복사됨!`;
+      setTimeout(() => { btn.innerHTML = prev; }, 1500);
+    });
+  }
+
+  function updateSiteIdBtn() {
+    const site = $("siteInput").value.trim();
+    $("btnCopySiteId").innerHTML = `${site || 'SITE-ID'} 복사 <kbd class="kbd">C</kbd>`;
+  }
+
   function openDebugTool() {
     const { site, date } = getSiteAndDate();
     window.open(`https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`, "_blank");
@@ -2239,6 +2258,7 @@
 
     // 바로가기
     if (["m","M","ㅡ"].includes(e.key)) { openTrainsetManager(); return; }
+    if (["c","C","ㅊ"].includes(e.key)) { copySiteId(); return; }
     if (["d","D","ㅇ"].includes(e.key)) { openDebugTool(); return; }
     if (["y","Y","ㅛ"].includes(e.key)) { toggleImgTpl(!imgTplOpen); return; }
     if (["i","I","ㅣ","ㅑ"].includes(e.key)) { toggleDebugImgPanel(!debugImgOpen); return; }
@@ -2283,7 +2303,6 @@
   });
 
   // ── iframe 포커스 시 메인 window로 복구 ──
-  // iframe 클릭 시 포커스가 iframe 내부로 들어가 단축키가 동작 안하는 문제 해결
   window.addEventListener("blur", () => {
     setTimeout(() => window.focus(), 0);
   });
