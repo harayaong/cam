@@ -695,7 +695,7 @@
 <div id="imgTplPanel">
   <div class="imgtpl-header">
     <div class="imgtpl-header-left">
-      <span class="imgtpl-title">예전 이미지템플릿</span>
+      <span class="imgtpl-title">이미지템플릿</span>
       <span class="imgtpl-meta" id="imgTplMeta">—</span>
     </div>
     <button class="imgtpl-close" onclick="toggleImgTpl(false)">✕</button>
@@ -706,8 +706,9 @@
       <span>⇧ + 휠 — 확대/축소</span>
       <span>🖱️ 드래그 — 이동</span>
       <div class="imgtpl-zoom-btns" style="margin-left:auto;">
-        <button class="btn" id="btnImgPrev" onclick="loadImgTplPrev()">예전</button>
         <button class="btn" id="btnImgToday" onclick="loadImgTplToday()">오늘</button>
+        <button class="btn" id="btnImgPrev1" onclick="loadImgTplPrevN(1)">1회차전</button>
+        <button class="btn" id="btnImgPrev2" onclick="loadImgTplPrevN(2)">2회차전</button>
         <button class="btn" onclick="imgTplZoom(1.2)">🔍 확대</button>
         <button class="btn" onclick="imgTplZoom(1/1.2)">🔎 축소</button>
         <button class="btn" onclick="imgTplResetZoom()">원래대로</button>
@@ -1947,12 +1948,31 @@
 
     // 활성 버튼 강조
     const isToday = date === todayStr();
+    const isPrev1 = date === getNthPrevServiceDate(1);
     $("btnImgToday").classList.toggle("btn-accent", isToday);
-    $("btnImgPrev").classList.toggle("btn-accent", !isToday);
+    $("btnImgPrev1").classList.toggle("btn-accent", !isToday && isPrev1);
+    $("btnImgPrev2").classList.toggle("btn-accent", !isToday && !isPrev1);
+  }
+
+  // 오늘 기준 N번째 이전 서비스일 계산
+  function getNthPrevServiceDate(n) {
+    const serviceDays = getServiceDays();
+    if (!serviceDays.length) return todayStr();
+    const today = new Date();
+    let found = 0;
+    for (let i = 1; i <= 30; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      if (serviceDays.includes(d.getDay())) {
+        found++;
+        if (found === n) return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+      }
+    }
+    return todayStr();
   }
 
   function updateImgTplPanel() { loadImgTplByDate(todayStr()); }
-  function loadImgTplPrev()    { loadImgTplByDate(getLastServiceDate()); }
+  function loadImgTplPrevN(n)  { loadImgTplByDate(getNthPrevServiceDate(n)); }
   function loadImgTplToday()   { loadImgTplByDate(todayStr()); }
 
   function toggleImgTpl(open) {
