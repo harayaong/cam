@@ -1951,7 +1951,7 @@
     $("btnImgPrev").classList.toggle("btn-accent", !isToday);
   }
 
-  function updateImgTplPanel() { loadImgTplByDate(getLastServiceDate()); }
+  function updateImgTplPanel() { loadImgTplByDate(todayStr()); }
   function loadImgTplPrev()    { loadImgTplByDate(getLastServiceDate()); }
   function loadImgTplToday()   { loadImgTplByDate(todayStr()); }
 
