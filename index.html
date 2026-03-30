@@ -764,7 +764,7 @@
     <div class="header-actions">
       <button class="btn" onclick="openImageTemplate()">이미지템플릿 <kbd class="kbd">T</kbd></button>
       <button class="btn" onclick="openTrainsetManager()">트레인셋매니저 <kbd class="kbd">M</kbd></button>
-      <button class="btn" id="btnCopySiteId" onclick="copySiteId()">SITE-ID 복사 <kbd class="kbd">C</kbd></button>
+      <button class="btn" id="btnCopySiteId" onclick="copySiteId()">SITE-ID 복사 <kbd class="kbd">X</kbd></button>
     </div>
   </div>
 </div>
@@ -1792,7 +1792,7 @@
 <div class="shortcut-bar">
   <span class="shortcut-item"><kbd class="kbd">T</kbd> 이미지템플릿</span>
   <span class="shortcut-item"><kbd class="kbd">M</kbd> 트레인셋매니저</span>
-  <span class="shortcut-item"><kbd class="kbd">C</kbd> SITE-ID 복사</span>
+  <span class="shortcut-item"><kbd class="kbd">X</kbd> SITE-ID 복사</span>
   <span class="shortcut-item"><kbd class="kbd">D</kbd> 디버그툴</span>
   <span class="shortcut-item"><kbd class="kbd">I</kbd> 디버그이미지 패널</span>
   <span class="shortcut-item"><kbd class="kbd">Y</kbd> 이전회차 이미지템플릿 패널</span>
@@ -2258,7 +2258,7 @@
 
   function updateSiteIdBtn() {
     const site = $("siteInput").value.trim();
-    $("btnCopySiteId").innerHTML = `${site || 'SITE-ID'} 복사 <kbd class="kbd">C</kbd>`;
+    $("btnCopySiteId").innerHTML = `${site || 'SITE-ID'} 복사 <kbd class="kbd">X</kbd>`;
   }
 
   function openDebugTool() {
