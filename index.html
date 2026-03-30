@@ -706,7 +706,7 @@
       <span>⇧ + 휠 — 확대/축소</span>
       <span>🖱️ 드래그 — 이동</span>
       <div class="imgtpl-zoom-btns" style="margin-left:auto;">
-        <button class="btn" id="btnImgToday" onclick="loadImgTplToday()">오늘</button>
+        <input type="date" id="imgTplDateInput" style="height:34px; padding:0 8px; font-size:12px; font-family:inherit; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); outline:none;" onchange="loadImgTplByDate(this.value)">
         <button class="btn" id="btnImgPrev1" onclick="loadImgTplPrevN(1)">1회차전</button>
         <button class="btn" id="btnImgPrev2" onclick="loadImgTplPrevN(2)">2회차전</button>
         <button class="btn" onclick="imgTplZoom(1.2)">🔍 확대</button>
@@ -1934,7 +1934,7 @@
 
   function loadImgTplByDate(date) {
     const site = $("siteInput").value.trim();
-    if (!site) return;
+    if (!site || !date) return;
     const url = getImgTplUrl(date, site);
     imgTplCurrentUrl = url;
     const days = ['일','월','화','수','목','금','토'];
@@ -1946,12 +1946,15 @@
     img.src = url;
     imgTplResetZoom();
 
+    // 날짜 입력박스 동기화
+    const dateInput = $("imgTplDateInput");
+    if (dateInput) dateInput.value = date;
+
     // 활성 버튼 강조
-    const isToday = date === todayStr();
     const isPrev1 = date === getNthPrevServiceDate(1);
-    $("btnImgToday").classList.toggle("btn-accent", isToday);
-    $("btnImgPrev1").classList.toggle("btn-accent", !isToday && isPrev1);
-    $("btnImgPrev2").classList.toggle("btn-accent", !isToday && !isPrev1);
+    const isPrev2 = date === getNthPrevServiceDate(2);
+    $("btnImgPrev1").classList.toggle("btn-accent", isPrev1);
+    $("btnImgPrev2").classList.toggle("btn-accent", isPrev2);
   }
 
   // 오늘 기준 N번째 이전 서비스일 계산
@@ -1980,7 +1983,11 @@
     $("imgTplPanel").classList.toggle("open", open);
     $("imgTplTab").classList.toggle("hidden", open);
     document.body.classList.toggle("imgtpl-open", open);
-    if (open) updateImgTplPanel();
+    if (open) {
+      const dateInput = $("imgTplDateInput");
+      if (dateInput && !dateInput.value) dateInput.value = todayStr();
+      updateImgTplPanel();
+    }
   }
 
   function openImgTplInNew() {
