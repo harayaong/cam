@@ -409,6 +409,23 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ── 사이드패널 리사이즈 핸들 ── */
+    .resize-handle {
+      position: absolute;
+      top: 0; left: 0;
+      width: 5px;
+      height: 100%;
+      cursor: ew-resize;
+      background: transparent;
+      z-index: 10;
+      transition: background 0.2s;
+    }
+    .resize-handle:hover,
+    .resize-handle.dragging {
+      background: var(--accent);
+      opacity: 0.5;
+    }
+
     /* ── 이미지템플릿 사이드 패널 ── */
     #imgTplPanel {
       position: fixed;
@@ -693,6 +710,7 @@
 
 <!-- 이미지템플릿 사이드 패널 -->
 <div id="imgTplPanel">
+  <div class="resize-handle" id="imgTplResizeHandle"></div>
   <div class="imgtpl-header">
     <div class="imgtpl-header-left">
       <span class="imgtpl-title">이미지템플릿</span>
@@ -705,6 +723,7 @@
       <span>🖱️ 휠 — 스크롤</span>
       <span>⇧ + 휠 — 확대/축소</span>
       <span>🖱️ 드래그 — 이동</span>
+      <span>↔ 왼쪽 끝 드래그 — 너비 조절</span>
       <div class="imgtpl-zoom-btns" style="margin-left:auto;">
         <input type="date" id="imgTplDateInput" style="height:34px; padding:0 8px; font-size:12px; font-family:inherit; border:1.5px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); color:var(--text); outline:none;" onchange="loadImgTplByDate(this.value)">
         <button class="btn" id="btnImgPrev1" onclick="loadImgTplPrevN(1)">1회차전</button>
@@ -2285,7 +2304,7 @@
 
     // 바로가기
     if (["m","M","ㅡ"].includes(e.key)) { openTrainsetManager(); return; }
-    if (["c","C","ㅊ"].includes(e.key)) { copySiteId(); return; }
+    if (["x","X","ㅌ"].includes(e.key)) { copySiteId(); return; }
     if (["d","D","ㅇ"].includes(e.key)) { openDebugTool(); return; }
     if (["y","Y","ㅛ"].includes(e.key)) { toggleImgTpl(!imgTplOpen); return; }
     if (["i","I","ㅣ","ㅑ"].includes(e.key)) { toggleDebugImgPanel(!debugImgOpen); return; }
@@ -2333,6 +2352,39 @@
   window.addEventListener("blur", () => {
     setTimeout(() => window.focus(), 0);
   });
+
+  // ── 사이드패널 리사이즈 ──
+  (function() {
+    const handle = $("imgTplResizeHandle");
+    const panel  = $("imgTplPanel");
+    let dragging = false, startX = 0, startW = 0;
+
+    handle.addEventListener("mousedown", e => {
+      dragging = true;
+      startX = e.clientX;
+      startW = panel.offsetWidth;
+      handle.classList.add("dragging");
+      document.body.style.userSelect = "none";
+      e.preventDefault();
+    });
+
+    window.addEventListener("mousemove", e => {
+      if (!dragging) return;
+      const delta = startX - e.clientX;
+      const newW = Math.min(Math.max(startW + delta, 300), window.innerWidth * 0.9);
+      panel.style.width = newW + "px";
+      if (document.body.classList.contains("imgtpl-open")) {
+        document.body.style.marginRight = newW + "px";
+      }
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (!dragging) return;
+      dragging = false;
+      handle.classList.remove("dragging");
+      document.body.style.userSelect = "";
+    });
+  })();
   (function() {
     const sp = new URLSearchParams(location.search);
     if (sp.get("embed") !== "1") return;
