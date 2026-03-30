@@ -200,7 +200,19 @@
     if (document.activeElement===document.getElementById('siteInput')) return;
     if (document.activeElement===document.getElementById('dateInput'))  return;
     if (e.key==='x'||e.key==='X') copySiteID();
-    if (e.key==='y'||e.key==='Y') openTemplate();
+    if (e.key==='y'||e.key==='Y') {
+      // keydown에서 window.open은 팝업차단됨 → a태그 클릭으로 우회
+      const site = document.getElementById('siteInput').value.trim();
+      const date = document.getElementById('dateInput').value;
+      if (!site) { alert('Site ID를 입력해 주세요.'); return; }
+      if (!date) { alert('날짜를 입력해 주세요.'); return; }
+      const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
+      const a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
   });
 
   function openTemplate() {
@@ -209,7 +221,11 @@
     if (!site) { alert('Site ID를 입력해 주세요.'); return; }
     if (!date) { alert('날짜를 입력해 주세요.'); return; }
     const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
-    window.open(url, '_blank');
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   }
 
   // ── 클립보드 A / B ──
