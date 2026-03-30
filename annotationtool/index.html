@@ -85,6 +85,10 @@
   <button class="btn-copy" onclick="copySiteID()" title="단축키: X">
     <span id="copyBtnLabel">Site ID 복사하기</span><kbd>[X]</kbd>
   </button>
+  <div class="h-divider"></div>
+  <button class="btn-copy" onclick="openTemplate()" title="단축키: Y" id="templateBtn">
+    🖼 이미지 템플릿 <kbd>[Y]</kbd>
+  </button>
   <div id="copyToast" class="copy-toast"></div>
 </header>
 
@@ -196,7 +200,17 @@
     if (document.activeElement===document.getElementById('siteInput')) return;
     if (document.activeElement===document.getElementById('dateInput'))  return;
     if (e.key==='x'||e.key==='X') copySiteID();
+    if (e.key==='y'||e.key==='Y') openTemplate();
   });
+
+  function openTemplate() {
+    const site = document.getElementById('siteInput').value.trim();
+    const date = document.getElementById('dateInput').value;
+    if (!site) { alert('Site ID를 입력해 주세요.'); return; }
+    if (!date) { alert('날짜를 입력해 주세요.'); return; }
+    const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
+    window.open(url, '_blank');
+  }
 
   // ── 클립보드 A / B ──
   let activeSlot = 'A';
