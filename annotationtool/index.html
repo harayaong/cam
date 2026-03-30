@@ -199,8 +199,8 @@
   document.addEventListener('keydown', e => {
     if (document.activeElement===document.getElementById('siteInput')) return;
     if (document.activeElement===document.getElementById('dateInput'))  return;
-    if (e.key==='x'||e.key==='X') copySiteID();
-    if (e.key==='y'||e.key==='Y') {
+    if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
+    if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') {
       // keydown에서 window.open은 팝업차단됨 → a태그 클릭으로 우회
       const site = document.getElementById('siteInput').value.trim();
       const date = document.getElementById('dateInput').value;
