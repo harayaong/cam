@@ -138,9 +138,9 @@
     </div>
 
     <div class="left-bottom">
-      <div class="sub-frame"><div class="panel-label">⚙ Worker 1</div><iframe id="frame-w1" src="worker.html"></iframe></div>
-      <div class="sub-frame"><div class="panel-label">⚙ Worker 2</div><iframe id="frame-w2" src="worker.html"></iframe></div>
-      <div class="sub-frame"><div class="panel-label">⚙ Worker 3</div><iframe id="frame-w3" src="worker.html"></iframe></div>
+      <div class="sub-frame"><div class="panel-label">⚙ Worker 1</div><iframe id="frame-w1" src="http://54.211.199.218:8080/"></iframe></div>
+      <div class="sub-frame"><div class="panel-label">⚙ Worker 2</div><iframe id="frame-w2" src="http://54.211.199.218:8080/"></iframe></div>
+      <div class="sub-frame"><div class="panel-label">⚙ Worker 3</div><iframe id="frame-w3" src="http://54.211.199.218:8080/"></iframe></div>
     </div>
   </div>
 
@@ -179,9 +179,7 @@
     fDebug.src = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${date}`;
     fDebug.style.display = 'block';
     document.getElementById('ph-debug').style.display = 'none';
-    ['w1','w2','w3'].forEach(id => {
-      document.getElementById(`frame-${id}`).src = `worker.html?site=${encodeURIComponent(site)}&date=${date}`;
-    });
+    // Workers: http://54.211.199.218:8080/ 고정
   }
   ['siteInput','dateInput'].forEach(id => {
     document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') applyAll(); });
