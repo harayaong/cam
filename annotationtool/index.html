@@ -565,8 +565,20 @@
     if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openTrainset();
   });
 
-  // iframe 포커스 복구 (단축키가 iframe 안에서 안 먹히는 문제 방지)
+  // iframe 포커스 복구
+  // - 단축키(X/Y/M/A)가 iframe 안에서 안 먹히는 문제 방지
+  // - 단, iframe 클릭 후 2초간은 복구 안 함 (iframe 내부 ESC 등 기능 보호)
+  let iframeClickedAt = 0;
+
+  document.querySelectorAll('iframe').forEach(function(fr) {
+    fr.addEventListener('mouseenter', function() {
+      iframeClickedAt = Date.now();
+    });
+  });
+
   setInterval(function() {
+    // iframe 위에 마우스가 올라간 지 2초 이내면 포커스 복구 안 함
+    if (Date.now() - iframeClickedAt < 2000) return;
     if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
       window.focus();
     }
