@@ -243,6 +243,9 @@
   <button class="btn-copy" id="templateToggleBtn" onclick="toggleTemplatePanel()" title="단축키: Y / ㅛ">
     🖼 이미지 템플릿 <kbd>[Y]</kbd>
   </button>
+  <button class="btn-copy" onclick="openAnnotation()" title="단축키: M / ㅡ">
+    ✏️ 매뉴얼 어노테이션 <kbd>[M]</kbd>
+  </button>
   <div id="copyToast" class="copy-toast"></div>
 </header>
 
@@ -467,11 +470,32 @@
     updateTemplatePanel(site, newDate);
   }
 
+  // ── 매뉴얼 어노테이션 열기 (4열 2행 중 4번 위치: 오른쪽 끝 상단) ──
+  function openAnnotation() {
+    const colW = Math.floor(screen.width  / 4);  // 열 너비
+    const rowH = Math.floor(screen.height / 2);  // 행 높이
+    const left = colW * 3;  // 4번째 열 시작 (0-indexed: 3)
+    const top  = 0;          // 1행 (상단)
+    const popup = window.open(
+      'https://54.211.199.218:8080/',
+      'manual_annotation',
+      `width=${colW},height=${rowH},left=${left},top=${top},resizable=yes,scrollbars=yes`
+    );
+    // 팝업 차단 시 새 탭으로 폴백
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      const a = document.createElement('a');
+      a.href = 'https://54.211.199.218:8080/';
+      a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+  }
+
   // ── 단축키 ──
   document.addEventListener('keydown', e => {
     if (['siteInput','dateInput'].includes(document.activeElement.id)) return;
     if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
     if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') toggleTemplatePanel();
+    if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openAnnotation();
   });
 
   // ── 클립보드 A/B/C/D ──
