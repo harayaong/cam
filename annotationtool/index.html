@@ -67,6 +67,15 @@
       gap: 10px;
     }
     .img-panel-title-text { white-space: nowrap; flex-shrink: 0; }
+    .img-panel-zoom-reset {
+      background: rgba(255,255,255,.2);
+      border: none; color: #fff;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 8px; border-radius: 4px;
+      cursor: pointer; transition: background .15s;
+      flex-shrink: 0; white-space: nowrap;
+    }
+    .img-panel-zoom-reset:hover { background: rgba(255,255,255,.4); }
     .img-panel-close {
       background: rgba(255,255,255,.2);
       border: none; color: #fff;
@@ -105,6 +114,8 @@
       height: auto;
       display: none;
       object-fit: contain;
+      transform-origin: top center;
+      transition: transform .15s ease;
     }
     .img-panel-empty {
       flex: 1;
@@ -350,6 +361,8 @@
         <input type="date" class="img-panel-date" id="imgPanelDate"
                onchange="onPanelDateChange(this.value)" />
         <span id="imgPanelSiteLabel" style="font-size:11px; opacity:.8; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
+        <span style="font-size:10px; opacity:.7; white-space:nowrap; flex-shrink:0;">⇧+휠: 확대/축소</span>
+        <button class="img-panel-zoom-reset" onclick="resetZoom()" title="배율 초기화">⊙ <span id="zoomLabel">100%</span></button>
         <button class="img-panel-close" onclick="toggleTemplatePanel()">✕ [Y]</button>
       </div>
       <div class="img-panel-body">
@@ -443,6 +456,8 @@
     img.src = url;
     document.getElementById('imgPanelDate').value = date;
     document.getElementById('imgPanelSiteLabel').textContent = site;
+    // 이미지 변경 시 줌 초기화
+    resetZoom();
   }
 
   // ── 이미지 템플릿 패널 토글 ──
@@ -471,6 +486,34 @@
     updateTemplatePanel(site, newDate);
   }
 
+  // ── 이미지 템플릿 확대/축소 (Shift + 휠) ──
+  let imgZoomScale = 1.0;
+  const ZOOM_MIN = 0.3;
+  const ZOOM_MAX = 5.0;
+  const ZOOM_STEP = 0.15;
+
+  function applyZoom() {
+    const img = document.getElementById('imgPanelImg');
+    img.style.transform = 'scale(' + imgZoomScale + ')';
+    document.getElementById('zoomLabel').textContent = Math.round(imgZoomScale * 100) + '%';
+  }
+
+  function resetZoom() {
+    imgZoomScale = 1.0;
+    applyZoom();
+  }
+
+  document.getElementById('imgPanel').addEventListener('wheel', function(e) {
+    if (!e.shiftKey) return;
+    e.preventDefault();
+    if (e.deltaY < 0) {
+      imgZoomScale = Math.min(ZOOM_MAX, imgZoomScale + ZOOM_STEP);
+    } else {
+      imgZoomScale = Math.max(ZOOM_MIN, imgZoomScale - ZOOM_STEP);
+    }
+    applyZoom();
+  }, { passive: false });
+
   // ── 매뉴얼 어노테이션 (4→8→3→7 순환) ──  단축키: A
   function openAnnotation() {
     const colW = Math.floor(screen.width  / 4);
@@ -492,22 +535,20 @@
     }
   }
 
-  // ── 트레인셋 매니저 (4→8→3→7 순환) ──  단축키: M
+  // ── 트레인셋 매니저 (화면 중앙, 2/3 크기) ──  단축키: M
   function openTrainset() {
     const site = document.getElementById('siteInput').value.trim();
-    const colW = Math.floor(screen.width  / 4);
-    const rowH = Math.floor(screen.height / 2);
-    const pos  = ANNOTATION_POSITIONS[trainsetPosIdx];
-    const left = colW * pos.col;
-    const top  = rowH * pos.row;
-    trainsetPosIdx = (trainsetPosIdx + 1) % ANNOTATION_POSITIONS.length;
+    const w    = Math.floor(screen.width  * 2 / 3);
+    const h    = Math.floor(screen.height * 2 / 3);
+    const left = Math.floor((screen.width  - w) / 2);
+    const top  = Math.floor((screen.height - h) / 2);
 
     const url = 'https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true'
               + (site ? '&siteid='+encodeURIComponent(site) : '');
     const popup = window.open(
       url,
       'trainset_'+Date.now(),
-      'width='+colW+',height='+rowH+',left='+left+',top='+top+',resizable=yes,scrollbars=yes'
+      'width='+w+',height='+h+',left='+left+',top='+top+',resizable=yes,scrollbars=yes'
     );
     if (!popup || popup.closed || typeof popup.closed === 'undefined') {
       const a = document.createElement('a');
