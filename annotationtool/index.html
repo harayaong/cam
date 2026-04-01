@@ -243,8 +243,11 @@
   <button class="btn-copy" id="templateToggleBtn" onclick="toggleTemplatePanel()" title="단축키: Y / ㅛ">
     🖼 이미지 템플릿 <kbd>[Y]</kbd>
   </button>
-  <button class="btn-copy" onclick="openAnnotation()" title="단축키: M / ㅡ">
-    ✏️ 매뉴얼 어노테이션 <kbd>[M]</kbd>
+  <button class="btn-copy" onclick="openAnnotation()" title="단축키: A / ㅁ">
+    ✏️ 매뉴얼 어노테이션 <kbd>[A]</kbd>
+  </button>
+  <button class="btn-copy" onclick="openTrainset()" title="단축키: M / ㅡ">
+    🗂 트레인셋 매니저 <kbd>[M]</kbd>
   </button>
   <div id="copyToast" class="copy-toast"></div>
 </header>
@@ -376,6 +379,7 @@
     { col: 2, row: 1 },  // 7번
   ];
   let annotationPosIdx = 0;
+  let trainsetPosIdx = 0;
 
   const SLOTS = ['A','B','C','D'];
   let activeSlot = 'A';
@@ -467,7 +471,7 @@
     updateTemplatePanel(site, newDate);
   }
 
-  // ── 매뉴얼 어노테이션 (4→8→3→7 순환) ──
+  // ── 매뉴얼 어노테이션 (4→8→3→7 순환) ──  단축키: A
   function openAnnotation() {
     const colW = Math.floor(screen.width  / 4);
     const rowH = Math.floor(screen.height / 2);
@@ -484,6 +488,30 @@
     if (!popup || popup.closed || typeof popup.closed === 'undefined') {
       const a = document.createElement('a');
       a.href = 'https://54.211.199.218:8080/'; a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+  }
+
+  // ── 트레인셋 매니저 (4→8→3→7 순환) ──  단축키: M
+  function openTrainset() {
+    const site = document.getElementById('siteInput').value.trim();
+    const colW = Math.floor(screen.width  / 4);
+    const rowH = Math.floor(screen.height / 2);
+    const pos  = ANNOTATION_POSITIONS[trainsetPosIdx];
+    const left = colW * pos.col;
+    const top  = rowH * pos.row;
+    trainsetPosIdx = (trainsetPosIdx + 1) % ANNOTATION_POSITIONS.length;
+
+    const url = 'https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true'
+              + (site ? '&siteid='+encodeURIComponent(site) : '');
+    const popup = window.open(
+      url,
+      'trainset_'+Date.now(),
+      'width='+colW+',height='+rowH+',left='+left+',top='+top+',resizable=yes,scrollbars=yes'
+    );
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      const a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
   }
@@ -533,7 +561,8 @@
     if (document.activeElement.id === 'dateInput')  return;
     if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
     if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') toggleTemplatePanel();
-    if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openAnnotation();
+    if (e.key==='a'||e.key==='A'||e.key==='ㅁ') openAnnotation();
+    if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openTrainset();
   });
 
   // iframe 포커스 복구 (단축키가 iframe 안에서 안 먹히는 문제 방지)
