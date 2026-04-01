@@ -33,6 +33,70 @@
     .copy-toast { position:fixed; top:64px; left:50%; transform:translateX(-50%) translateY(-6px); background:#1a1008; color:#fff; font-size:12px; font-weight:600; padding:6px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; z-index:200; white-space:nowrap; }
     .copy-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
+    /* ─── 이미지 템플릿 사이드 패널 ─── */
+    .img-panel {
+      position: fixed;
+      top: var(--header-h); right: 0; bottom: 0;
+      width: 50%;
+      background: #111;
+      border-left: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      z-index: 150;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      box-shadow: -8px 0 32px rgba(0,0,0,.3);
+    }
+    .img-panel.open { transform: translateX(0); }
+
+    .img-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .img-panel-header span { opacity: .85; font-size: 11px; font-weight: 400; }
+    .img-panel-close {
+      background: rgba(255,255,255,.2);
+      border: none; color: #fff;
+      font-size: 13px; font-weight: 700;
+      padding: 3px 10px; border-radius: 4px;
+      cursor: pointer; transition: background .15s;
+    }
+    .img-panel-close:hover { background: rgba(255,255,255,.4); }
+
+    .img-panel-body {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #1a1a1a;
+    }
+    .img-panel-body img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .img-panel-empty {
+      color: #555;
+      font-size: 13px;
+      text-align: center;
+      line-height: 2;
+    }
+
+    /* 패널 열릴 때 우측 패널 축소 */
+    .workspace.panel-open .right-panel {
+      margin-right: 50%;
+      transition: margin-right .3s cubic-bezier(.4,0,.2,1);
+    }
+    .workspace .right-panel { transition: margin-right .3s cubic-bezier(.4,0,.2,1); }
+
     /* ─── WORKSPACE ─── */
     .workspace {
       margin-top: var(--header-h);
@@ -156,7 +220,7 @@
     <span id="copyBtnLabel">Site ID 복사하기</span><kbd>[X]</kbd>
   </button>
   <div class="h-divider"></div>
-  <button class="btn-copy" onclick="openTemplate()" title="단축키: Y / ㅛ">
+  <button class="btn-copy" id="templateToggleBtn" onclick="toggleTemplatePanel()" title="단축키: Y / ㅛ">
     🖼 이미지 템플릿 <kbd>[Y]</kbd>
   </button>
   <div id="copyToast" class="copy-toast"></div>
@@ -256,6 +320,22 @@
 
 </div><!-- /.workspace -->
 
+<!-- ═══ 이미지 템플릿 사이드 패널 ═══ -->
+<div class="img-panel" id="imgPanel">
+  <div class="img-panel-header">
+    <div>🖼 이미지 템플릿 <span id="imgPanelTitle"></span></div>
+    <button class="img-panel-close" onclick="toggleTemplatePanel()">✕ 닫기 [Y]</button>
+  </div>
+  <div class="img-panel-body" id="imgPanelBody">
+    <div class="img-panel-empty" id="imgPanelEmpty">
+      Site ID와 날짜를 입력 후<br>[적용] 버튼을 누르세요
+    </div>
+    <img id="imgPanelImg" src="" alt="이미지 템플릿" style="display:none;"
+         onload="this.style.display='block'; document.getElementById('imgPanelEmpty').style.display='none';"
+         onerror="document.getElementById('imgPanelEmpty').textContent='이미지를 찾을 수 없습니다.'; this.style.display='none';" />
+  </div>
+</div>
+
 <script>
   // ── 날짜 기본값 ──
   function getLastWorkday() {
@@ -267,6 +347,18 @@
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
   document.getElementById('dateInput').value = formatDate(getLastWorkday());
+
+  // ── URL 파라미터 자동 주입 ──
+  // 사용 예: ?site=jinhaejoy_1x9&date=2026-03-27
+  (function applyUrlParams() {
+    const p = new URLSearchParams(window.location.search);
+    const site = p.get('site');
+    const date = p.get('date');
+    if (site) document.getElementById('siteInput').value = site;
+    if (date) document.getElementById('dateInput').value = date;
+    // 둘 다 있으면 자동으로 적용
+    if (site && date) applyAll();
+  })();
 
   // ── 적용 ──
   function applyAll() {
@@ -304,32 +396,70 @@
     });
   }
 
-  // ── 이미지 템플릿 ──
-  function openTemplate() {
-    const site = document.getElementById('siteInput').value.trim();
-    const date = document.getElementById('dateInput').value;
-    if (!site) { alert('Site ID를 입력해 주세요.'); return; }
-    if (!date) { alert('날짜를 입력해 주세요.'); return; }
-    const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
-    const a = document.createElement('a');
-    a.href = url; a.target = '_blank'; a.rel = 'noopener';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  // ── 이미지 템플릿 사이드 패널 ──
+  let templatePanelOpen = false;
+
+  function toggleTemplatePanel() {
+    const panel     = document.getElementById('imgPanel');
+    const workspace = document.querySelector('.workspace');
+    const btn       = document.getElementById('templateToggleBtn');
+
+    if (templatePanelOpen) {
+      // 닫기
+      panel.classList.remove('open');
+      workspace.classList.remove('panel-open');
+      btn.style.background = '';
+      btn.style.color = '';
+      templatePanelOpen = false;
+    } else {
+      // 열기: 먼저 이미지 로드
+      const site = document.getElementById('siteInput').value.trim();
+      const date = document.getElementById('dateInput').value;
+      if (!site || !date) { alert('Site ID와 날짜를 먼저 입력해 주세요.'); return; }
+
+      const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
+      const img   = document.getElementById('imgPanelImg');
+      const empty = document.getElementById('imgPanelEmpty');
+
+      img.style.display   = 'none';
+      empty.style.display = 'block';
+      empty.textContent   = '이미지 로딩 중...';
+      img.src = url;
+
+      document.getElementById('imgPanelTitle').textContent = `— ${site} / ${date}`;
+      panel.classList.add('open');
+      workspace.classList.add('panel-open');
+      btn.style.background = 'var(--accent)';
+      btn.style.color = '#fff';
+      templatePanelOpen = true;
+    }
+  }
+
+  // applyAll 호출 시 패널이 열려있으면 이미지도 갱신
+  const _origApplyAll = applyAll;
+  function applyAll() {
+    _origApplyAll();
+    if (templatePanelOpen) {
+      const site = document.getElementById('siteInput').value.trim();
+      const date = document.getElementById('dateInput').value;
+      if (site && date) {
+        const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
+        const img   = document.getElementById('imgPanelImg');
+        const empty = document.getElementById('imgPanelEmpty');
+        img.style.display = 'none';
+        empty.style.display = 'block';
+        empty.textContent = '이미지 로딩 중...';
+        img.src = url;
+        document.getElementById('imgPanelTitle').textContent = `— ${site} / ${date}`;
+      }
+    }
   }
 
   // ── 단축키 ──
   document.addEventListener('keydown', e => {
     if (['siteInput','dateInput'].includes(document.activeElement.id)) return;
     if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
-    if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') {
-      const site = document.getElementById('siteInput').value.trim();
-      const date = document.getElementById('dateInput').value;
-      if (!site) { alert('Site ID를 입력해 주세요.'); return; }
-      if (!date) { alert('날짜를 입력해 주세요.'); return; }
-      const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
-      const a = document.createElement('a');
-      a.href = url; a.target = '_blank'; a.rel = 'noopener';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
+    if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') toggleTemplatePanel();
   });
 
   // ── 클립보드 A/B/C/D ──
