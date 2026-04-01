@@ -364,114 +364,11 @@
 </div><!-- /.workspace -->
 
 <script>
-  // ── 날짜 기본값 ──
-  function getLastWorkday() {
-    const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-1);
-    while(d.getDay()===0||d.getDay()===6) d.setDate(d.getDate()-1);
-    return d;
-  }
-  function formatDate(d) {
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  }
-  document.getElementById('dateInput').value = formatDate(getLastWorkday());
-
-  // ── 적용 ──
-  function applyAll() {
-    const site = document.getElementById('siteInput').value.trim();
-    const date = document.getElementById('dateInput').value;
-    if (!site) { alert('Site ID를 입력해 주세요.'); return; }
-    if (!date) { alert('날짜를 입력해 주세요.'); return; }
-    document.getElementById('copyBtnLabel').textContent = `${site} 복사하기`;
-
-    // Sync Image Viewer
-    const fImg = document.getElementById('frame-img');
-    fImg.src = `https://playtag-debugging-tool.vercel.app/sync-images.html?mode=all&date=${date}&site=${encodeURIComponent(site)}`;
-    fImg.style.display = 'block';
-    document.getElementById('ph-img').style.display = 'none';
-
-    // Debug Tool
-    const fDebug = document.getElementById('frame-debug');
-    fDebug.src = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${date}`;
-    fDebug.style.display = 'block';
-    document.getElementById('ph-debug').style.display = 'none';
-
-    // 이미지 템플릿 패널이 열려있으면 이미지 갱신
-    if (templatePanelOpen) updateTemplatePanel(site, date);
-  }
-
-  // ── URL 파라미터 자동 주입 ──
-  // 사용 예: ?site=jinhaejoy_1x9&date=2026-03-27
-  (function applyUrlParams() {
-    const p = new URLSearchParams(window.location.search);
-    const site = p.get('site');
-    const date = p.get('date');
-    if (site) document.getElementById('siteInput').value = site;
-    if (date) document.getElementById('dateInput').value = date;
-    if (site && date) applyAll();
-  })();
-
-  ['siteInput','dateInput'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') applyAll(); });
-  });
-
-  // ── Site ID 복사 ──
-  function copySiteID() {
-    const site = document.getElementById('siteInput').value.trim();
-    if (!site) { alert('먼저 Site ID를 입력하고 [적용]을 눌러주세요.'); return; }
-    navigator.clipboard.writeText(site).then(() => {
-      const t = document.getElementById('copyToast');
-      t.textContent = `✓ "${site}" 복사됨!`; t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 1800);
-    });
-  }
-
-  // ── 이미지 템플릿 사이드 패널 ──
+  // ══════════════════════════════════════════
+  // 1. 변수/상수 — 가장 먼저 선언
+  // ══════════════════════════════════════════
   let templatePanelOpen = false;
 
-  function toggleTemplatePanel() {
-    const panel = document.getElementById('imgPanel');
-    const btn   = document.getElementById('templateToggleBtn');
-
-    if (templatePanelOpen) {
-      panel.classList.remove('open');
-      btn.style.background = '';
-      btn.style.color = '';
-      templatePanelOpen = false;
-    } else {
-      const site = document.getElementById('siteInput').value.trim();
-      const date = document.getElementById('dateInput').value;
-      if (!site || !date) { alert('Site ID와 날짜를 먼저 입력해 주세요.'); return; }
-      updateTemplatePanel(site, date);
-      panel.classList.add('open');
-      btn.style.background = 'var(--accent)';
-      btn.style.color = '#fff';
-      templatePanelOpen = true;
-    }
-  }
-
-  // ── 이미지 템플릿 패널 갱신 헬퍼 ──
-  function updateTemplatePanel(site, date) {
-    const url   = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
-    const img   = document.getElementById('imgPanelImg');
-    const empty = document.getElementById('imgPanelEmpty');
-    img.style.display   = 'none';
-    empty.style.display = 'flex';
-    empty.textContent   = '이미지 로딩 중...';
-    img.src = url;
-    // 캘린더 & 사이트 라벨 업데이트
-    document.getElementById('imgPanelDate').value       = date;
-    document.getElementById('imgPanelSiteLabel').textContent = site;
-  }
-
-  // 패널 내 캘린더 변경 시 이미지 갱신
-  function onPanelDateChange(newDate) {
-    const site = document.getElementById('siteInput').value.trim();
-    if (!site) return;
-    updateTemplatePanel(site, newDate);
-  }
-
-  // ── 매뉴얼 어노테이션 열기 (M 누를 때마다 4→8→3→7 순환) ──
-  // 4열 2행 기준 위치 (col: 0-indexed, row: 0-indexed)
   const ANNOTATION_POSITIONS = [
     { col: 3, row: 0 },  // 4번
     { col: 3, row: 1 },  // 8번
@@ -480,81 +377,187 @@
   ];
   let annotationPosIdx = 0;
 
+  const SLOTS = ['A','B','C','D'];
+  let activeSlot = 'A';
+
+  // ══════════════════════════════════════════
+  // 2. 유틸 함수
+  // ══════════════════════════════════════════
+  function getLastWorkday() {
+    const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-1);
+    while(d.getDay()===0||d.getDay()===6) d.setDate(d.getDate()-1);
+    return d;
+  }
+  function formatDate(d) {
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+
+  // ══════════════════════════════════════════
+  // 3. 핵심 함수
+  // ══════════════════════════════════════════
+
+  // ── 적용 ──
+  function applyAll() {
+    const site = document.getElementById('siteInput').value.trim();
+    const date = document.getElementById('dateInput').value;
+    if (!site) { alert('Site ID를 입력해 주세요.'); return; }
+    if (!date) { alert('날짜를 입력해 주세요.'); return; }
+    document.getElementById('copyBtnLabel').textContent = site+' 복사하기';
+
+    const fImg = document.getElementById('frame-img');
+    fImg.src = 'https://playtag-debugging-tool.vercel.app/sync-images.html?mode=all&date='+date+'&site='+encodeURIComponent(site);
+    fImg.style.display = 'block';
+    document.getElementById('ph-img').style.display = 'none';
+
+    const fDebug = document.getElementById('frame-debug');
+    fDebug.src = 'https://playtag-debugging-tool.vercel.app/?site='+encodeURIComponent(site)+'&date='+date;
+    fDebug.style.display = 'block';
+    document.getElementById('ph-debug').style.display = 'none';
+
+    if (templatePanelOpen) updateTemplatePanel(site, date);
+  }
+
+  // ── Site ID 복사 ──
+  function copySiteID() {
+    const site = document.getElementById('siteInput').value.trim();
+    if (!site) { alert('먼저 Site ID를 입력하고 [적용]을 눌러주세요.'); return; }
+    navigator.clipboard.writeText(site).then(() => {
+      const t = document.getElementById('copyToast');
+      t.textContent = '✓ "'+site+'" 복사됨!'; t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1800);
+    });
+  }
+
+  // ── 이미지 템플릿 패널 갱신 ──
+  function updateTemplatePanel(site, date) {
+    const url = 'https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/'+date+'/'+site+'.jpg';
+    const img   = document.getElementById('imgPanelImg');
+    const empty = document.getElementById('imgPanelEmpty');
+    img.style.display   = 'none';
+    empty.style.display = 'flex';
+    empty.textContent   = '이미지 로딩 중...';
+    img.src = url;
+    document.getElementById('imgPanelDate').value = date;
+    document.getElementById('imgPanelSiteLabel').textContent = site;
+  }
+
+  // ── 이미지 템플릿 패널 토글 ──
+  function toggleTemplatePanel() {
+    const panel = document.getElementById('imgPanel');
+    const btn   = document.getElementById('templateToggleBtn');
+    if (templatePanelOpen) {
+      panel.classList.remove('open');
+      btn.style.background = ''; btn.style.color = '';
+      templatePanelOpen = false;
+    } else {
+      const site = document.getElementById('siteInput').value.trim();
+      const date = document.getElementById('dateInput').value;
+      if (!site || !date) { alert('Site ID와 날짜를 먼저 입력해 주세요.'); return; }
+      updateTemplatePanel(site, date);
+      panel.classList.add('open');
+      btn.style.background = 'var(--accent)'; btn.style.color = '#fff';
+      templatePanelOpen = true;
+    }
+  }
+
+  // ── 패널 내 날짜 변경 ──
+  function onPanelDateChange(newDate) {
+    const site = document.getElementById('siteInput').value.trim();
+    if (!site) return;
+    updateTemplatePanel(site, newDate);
+  }
+
+  // ── 매뉴얼 어노테이션 (4→8→3→7 순환) ──
   function openAnnotation() {
     const colW = Math.floor(screen.width  / 4);
     const rowH = Math.floor(screen.height / 2);
     const pos  = ANNOTATION_POSITIONS[annotationPosIdx];
     const left = colW * pos.col;
     const top  = rowH * pos.row;
-
-    // 다음 호출을 위해 인덱스 순환
     annotationPosIdx = (annotationPosIdx + 1) % ANNOTATION_POSITIONS.length;
 
     const popup = window.open(
       'https://54.211.199.218:8080/',
-      `manual_annotation_${Date.now()}`,  // 매번 새 창으로
-      `width=${colW},height=${rowH},left=${left},top=${top},resizable=yes,scrollbars=yes`
+      'ann_'+Date.now(),
+      'width='+colW+',height='+rowH+',left='+left+',top='+top+',resizable=yes,scrollbars=yes'
     );
-    // 팝업 차단 시 새 탭으로 폴백
     if (!popup || popup.closed || typeof popup.closed === 'undefined') {
       const a = document.createElement('a');
-      a.href = 'https://54.211.199.218:8080/';
-      a.target = '_blank'; a.rel = 'noopener';
+      a.href = 'https://54.211.199.218:8080/'; a.target = '_blank'; a.rel = 'noopener';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
   }
 
-  // ── 단축키 ──
-  function handleKey(e) {
-    if (['siteInput','dateInput'].includes(document.activeElement.id)) return;
+  // ── 클립보드 슬롯 ──
+  function activateSlot(slot) {
+    activeSlot = slot;
+    SLOTS.forEach(s => {
+      document.getElementById('clipSlot'+s).classList.toggle('is-active', s===slot);
+      document.getElementById('badge'+s).textContent = s===slot ? '▶ '+s : s;
+    });
+  }
+
+  function clearClip(slot) {
+    document.getElementById('clipImg'+slot).style.display   = 'none';
+    document.getElementById('clipImg'+slot).src             = '';
+    document.getElementById('clipHint'+slot).style.display  = 'flex';
+    document.getElementById('clipClear'+slot).style.display = 'none';
+    document.getElementById('clipArea'+slot).classList.remove('has-image');
+  }
+
+  // ══════════════════════════════════════════
+  // 4. 초기화 (함수 선언 후 실행)
+  // ══════════════════════════════════════════
+  document.getElementById('dateInput').value = formatDate(getLastWorkday());
+
+  // URL 파라미터 자동 주입
+  (function() {
+    const p = new URLSearchParams(window.location.search);
+    const site = p.get('site');
+    const date = p.get('date');
+    if (site) document.getElementById('siteInput').value = site;
+    if (date) document.getElementById('dateInput').value = date;
+    if (site && date) applyAll();
+  })();
+
+  // Enter 키
+  ['siteInput','dateInput'].forEach(function(id) {
+    document.getElementById(id).addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') applyAll();
+    });
+  });
+
+  // 단축키
+  document.addEventListener('keydown', function(e) {
+    if (document.activeElement.id === 'siteInput') return;
+    if (document.activeElement.id === 'dateInput')  return;
     if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
     if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') toggleTemplatePanel();
     if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openAnnotation();
-  }
-  document.addEventListener('keydown', handleKey);
+  });
 
-  // iframe 클릭 시 포커스가 iframe 내부로 들어가 단축키가 안 먹히는 문제 해결
-  // → 주기적으로 체크해서 iframe에 포커스가 있으면 window로 복귀
-  setInterval(() => {
+  // iframe 포커스 복구 (단축키가 iframe 안에서 안 먹히는 문제 방지)
+  setInterval(function() {
     if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
       window.focus();
     }
   }, 500);
 
-  // ── 클립보드 A/B/C/D ──
-  const SLOTS = ['A','B','C','D'];
-  let activeSlot = 'A';
-
-  function activateSlot(slot) {
-    activeSlot = slot;
-    SLOTS.forEach(s => {
-      document.getElementById(`clipSlot${s}`).classList.toggle('is-active', s===slot);
-      document.getElementById(`badge${s}`).textContent = s===slot ? `▶ ${s}` : s;
-    });
-  }
-
-  function clearClip(slot) {
-    document.getElementById(`clipImg${slot}`).style.display   = 'none';
-    document.getElementById(`clipImg${slot}`).src             = '';
-    document.getElementById(`clipHint${slot}`).style.display  = 'flex';
-    document.getElementById(`clipClear${slot}`).style.display = 'none';
-    document.getElementById(`clipArea${slot}`).classList.remove('has-image');
-  }
-
-  document.addEventListener('paste', e => {
+  // 클립보드 붙여넣기
+  document.addEventListener('paste', function(e) {
     const items = e.clipboardData && e.clipboardData.items;
     if (!items) return;
-    for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        const url = URL.createObjectURL(item.getAsFile());
-        const s   = activeSlot;
-        document.getElementById(`clipImg${s}`).src             = url;
-        document.getElementById(`clipImg${s}`).style.display   = 'block';
-        document.getElementById(`clipHint${s}`).style.display  = 'none';
-        document.getElementById(`clipClear${s}`).style.display = 'block';
-        const area = document.getElementById(`clipArea${s}`);
-        area.classList.add('has-image','paste-flash');
-        setTimeout(() => area.classList.remove('paste-flash'), 300);
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        var url  = URL.createObjectURL(items[i].getAsFile());
+        var s    = activeSlot;
+        document.getElementById('clipImg'+s).src           = url;
+        document.getElementById('clipImg'+s).style.display = 'block';
+        document.getElementById('clipHint'+s).style.display  = 'none';
+        document.getElementById('clipClear'+s).style.display = 'block';
+        var area = document.getElementById('clipArea'+s);
+        area.classList.add('has-image', 'paste-flash');
+        setTimeout(function(){ area.classList.remove('paste-flash'); }, 300);
         break;
       }
     }
