@@ -138,9 +138,9 @@
     </div>
 
     <div class="left-bottom">
-      <div class="sub-frame"><div class="panel-label">⚙ Worker 1</div><iframe id="frame-w1" src="https://54.211.199.218:8080/"></iframe></div>
-      <div class="sub-frame"><div class="panel-label">⚙ Worker 2</div><iframe id="frame-w2" src="https://54.211.199.218:8080/"></iframe></div>
-      <div class="sub-frame"><div class="panel-label">⚙ Worker 3</div><iframe id="frame-w3" src="https://54.211.199.218:8080/"></iframe></div>
+      <div class="sub-frame"><div class="panel-label">⚙ Worker 1</div><iframe id="frame-w1" src="about:blank"></iframe></div>
+      <div class="sub-frame"><div class="panel-label">⚙ Worker 2</div><iframe id="frame-w2" src="about:blank"></iframe></div>
+      <div class="sub-frame"><div class="panel-label">⚙ Worker 3</div><iframe id="frame-w3" src="about:blank"></iframe></div>
     </div>
   </div>
 
@@ -155,6 +155,22 @@
 </div>
 
 <script>
+  // ── Worker 서버 사전 인증 ──
+  // HTTPS끼리라 fetch 가능 → 인증 캐시 등록 후 iframe 로드
+  (function preAuth() {
+    fetch('https://54.211.199.218:8080/', {
+      method: 'GET',
+      headers: { 'Authorization': 'Basic ' + btoa(':storyline0214$') },
+      credentials: 'include'
+    })
+    .finally(() => {
+      // 성공/실패 무관하게 iframe 로드 (이미 캐시됐거나 안됐거나)
+      ['w1','w2','w3'].forEach(id => {
+        document.getElementById('frame-' + id).src = 'https://54.211.199.218:8080/';
+      });
+    });
+  })();
+
   function getLastWorkday() {
     const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-1);
     while(d.getDay()===0||d.getDay()===6) d.setDate(d.getDate()-1);
