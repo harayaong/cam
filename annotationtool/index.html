@@ -513,16 +513,13 @@
   }
   document.addEventListener('keydown', handleKey);
 
-  // iframe에 포커스가 가면 키 이벤트가 부모에 안 전달됨
-  // → window blur 감지로 포커스를 window에 되돌림
-  window.addEventListener('blur', () => {
-    // 잠깐 후 포커스가 iframe으로 갔는지 확인 후 window로 복귀
-    setTimeout(() => {
-      if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
-        window.focus();
-      }
-    }, 100);
-  });
+  // iframe 클릭 시 포커스가 iframe 내부로 들어가 단축키가 안 먹히는 문제 해결
+  // → 주기적으로 체크해서 iframe에 포커스가 있으면 window로 복귀
+  setInterval(() => {
+    if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
+      window.focus();
+    }
+  }, 500);
 
   // ── 클립보드 A/B/C/D ──
   const SLOTS = ['A','B','C','D'];
