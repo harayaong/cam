@@ -491,11 +491,23 @@
   }
 
   // ── 단축키 ──
-  document.addEventListener('keydown', e => {
+  function handleKey(e) {
     if (['siteInput','dateInput'].includes(document.activeElement.id)) return;
     if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
     if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') toggleTemplatePanel();
     if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openAnnotation();
+  }
+  document.addEventListener('keydown', handleKey);
+
+  // iframe에 포커스가 가면 키 이벤트가 부모에 안 전달됨
+  // → window blur 감지로 포커스를 window에 되돌림
+  window.addEventListener('blur', () => {
+    // 잠깐 후 포커스가 iframe으로 갔는지 확인 후 window로 복귀
+    setTimeout(() => {
+      if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
+        window.focus();
+      }
+    }, 100);
   });
 
   // ── 클립보드 A/B/C/D ──
