@@ -470,15 +470,29 @@
     updateTemplatePanel(site, newDate);
   }
 
-  // ── 매뉴얼 어노테이션 열기 (4열 2행 중 4번 위치: 오른쪽 끝 상단) ──
+  // ── 매뉴얼 어노테이션 열기 (M 누를 때마다 4→8→3→7 순환) ──
+  // 4열 2행 기준 위치 (col: 0-indexed, row: 0-indexed)
+  const ANNOTATION_POSITIONS = [
+    { col: 3, row: 0 },  // 4번
+    { col: 3, row: 1 },  // 8번
+    { col: 2, row: 0 },  // 3번
+    { col: 2, row: 1 },  // 7번
+  ];
+  let annotationPosIdx = 0;
+
   function openAnnotation() {
-    const colW = Math.floor(screen.width  / 4);  // 열 너비
-    const rowH = Math.floor(screen.height / 2);  // 행 높이
-    const left = colW * 3;  // 4번째 열 시작 (0-indexed: 3)
-    const top  = 0;          // 1행 (상단)
+    const colW = Math.floor(screen.width  / 4);
+    const rowH = Math.floor(screen.height / 2);
+    const pos  = ANNOTATION_POSITIONS[annotationPosIdx];
+    const left = colW * pos.col;
+    const top  = rowH * pos.row;
+
+    // 다음 호출을 위해 인덱스 순환
+    annotationPosIdx = (annotationPosIdx + 1) % ANNOTATION_POSITIONS.length;
+
     const popup = window.open(
       'https://54.211.199.218:8080/',
-      'manual_annotation',
+      `manual_annotation_${Date.now()}`,  // 매번 새 창으로
       `width=${colW},height=${rowH},left=${left},top=${top},resizable=yes,scrollbars=yes`
     );
     // 팝업 차단 시 새 탭으로 폴백
