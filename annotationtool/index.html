@@ -86,8 +86,8 @@
       width: 100%;
       height: calc(100vh - var(--header-h));
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
+      grid-template-columns: 1fr 3fr;
+      grid-template-rows: 0.8fr 1.2fr;
     }
 
     /* 공통 셀 */
@@ -107,29 +107,20 @@
       border-bottom: none;
     }
 
-    /* 2: 클립 AB — 2열 1행 */
-    .cell-clip-ab {
+    /* 2: 클립 A~E — 2열 1행 (가로 5슬롯) */
+    .cell-clip {
       grid-column: 2;
-      grid-row: 1;
-      border-right: 1px solid var(--border);
-      border-bottom: 2px solid var(--accent);
-      display: flex; flex-direction: column;
-      background: #fafafa;
-    }
-
-    /* 3: 클립 CD — 3열 1행 */
-    .cell-clip-cd {
-      grid-column: 3;
       grid-row: 1;
       border-right: none;
       border-bottom: 2px solid var(--accent);
-      display: flex; flex-direction: column;
+      display: flex; flex-direction: row;
       background: #fafafa;
+      position: relative;
     }
 
-    /* 5+6: 이미지뷰어 — 2~3열 2행 */
+    /* 5+6: 이미지뷰어 — 2열 2행 */
     .cell-viewer {
-      grid-column: 2 / 4;
+      grid-column: 2;
       grid-row: 2;
       border-right: none;
       border-bottom: none;
@@ -162,7 +153,7 @@
 
     /* ─── 클립보드 슬롯 ─── */
     .clip-col-label {
-      position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
+      position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
       font-size: 9px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
       color: var(--accent); background: var(--panel-label);
       border: 1px solid var(--accent); border-radius: 3px; padding: 1px 6px;
@@ -171,10 +162,11 @@
     .clip-slot {
       flex: 1; display: flex; flex-direction: column;
       position: relative; cursor: pointer;
-      border-bottom: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-bottom: none;
       transition: background .15s;
     }
-    .clip-slot:last-child { border-bottom: none; }
+    .clip-slot:last-child { border-right: none; }
     .clip-slot.is-active { background: #fffaf7; }
     .clip-slot.is-active::before {
       content: ''; position: absolute; left: 0; top: 0; bottom: 0;
@@ -201,7 +193,7 @@
     .clip-hint svg { opacity: .2; color: var(--accent); }
     .clip-hint p { font-size: 9px; line-height: 1.4; opacity: .55; color: var(--text-muted); }
     .clip-hint kbd { font-size: 9px; background: var(--accent); color: #fff; border-radius: 3px; padding: 1px 4px; }
-    .clip-img { display: none; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 3px; }
+    .clip-img { display: none; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 3px; }
     .clip-clear-btn {
       position: absolute; top: 2px; right: 2px;
       background: var(--accent); color: #fff; border: none;
@@ -304,15 +296,15 @@
     <iframe id="frame-debug" src="about:blank" style="display:none;"></iframe>
   </div>
 
-  <!-- 2: 클립보드 A/B (2열 상단) -->
-  <div class="cell cell-clip-ab">
-    <div class="clip-col-label">📋 A · B</div>
+  <!-- 2: 클립보드 A~E (2열 상단, 가로 5슬롯) -->
+  <div class="cell cell-clip">
+    <div class="clip-col-label">📋 클립보드</div>
     <div class="clip-slot is-active" id="clipSlotA" onclick="activateSlot('A')">
       <span class="clip-slot-label" id="badgeA">▶ A</span>
       <div class="clip-drop-area" id="clipAreaA">
         <button class="clip-clear-btn" id="clipClearA" onclick="clearClip('A');event.stopPropagation()">✕</button>
         <div class="clip-hint" id="clipHintA">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgA" alt="A" />
@@ -323,23 +315,18 @@
       <div class="clip-drop-area" id="clipAreaB">
         <button class="clip-clear-btn" id="clipClearB" onclick="clearClip('B');event.stopPropagation()">✕</button>
         <div class="clip-hint" id="clipHintB">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgB" alt="B" />
       </div>
     </div>
-  </div>
-
-  <!-- 3: 클립보드 C/D (3열 상단) -->
-  <div class="cell cell-clip-cd">
-    <div class="clip-col-label">📋 C · D</div>
     <div class="clip-slot" id="clipSlotC" onclick="activateSlot('C')">
       <span class="clip-slot-label" id="badgeC">C</span>
       <div class="clip-drop-area" id="clipAreaC">
         <button class="clip-clear-btn" id="clipClearC" onclick="clearClip('C');event.stopPropagation()">✕</button>
         <div class="clip-hint" id="clipHintC">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgC" alt="C" />
@@ -350,10 +337,21 @@
       <div class="clip-drop-area" id="clipAreaD">
         <button class="clip-clear-btn" id="clipClearD" onclick="clearClip('D');event.stopPropagation()">✕</button>
         <div class="clip-hint" id="clipHintD">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgD" alt="D" />
+      </div>
+    </div>
+    <div class="clip-slot" id="clipSlotE" onclick="activateSlot('E')">
+      <span class="clip-slot-label" id="badgeE">E</span>
+      <div class="clip-drop-area" id="clipAreaE">
+        <button class="clip-clear-btn" id="clipClearE" onclick="clearClip('E');event.stopPropagation()">✕</button>
+        <div class="clip-hint" id="clipHintE">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
+        </div>
+        <img class="clip-img" id="clipImgE" alt="E" />
       </div>
     </div>
   </div>
@@ -403,7 +401,7 @@
   ];
   let annotationPosIdx = 0;
   let trainsetPosIdx   = 0;
-  const SLOTS = ['A','B','C','D'];
+  const SLOTS = ['A','B','C','D','E'];
   let activeSlot = 'A';
   let imgZoomScale = 1.0;
   const ZOOM_MIN = 0.3, ZOOM_MAX = 5.0, ZOOM_STEP = 0.15;
@@ -561,30 +559,38 @@
     });
   });
 
-  // 단축키 (ESC: frame-img에 포커스 넘기기)
+  // 단축키
   document.addEventListener('keydown', function(e) {
     if (document.activeElement.id==='siteInput') return;
     if (document.activeElement.id==='dateInput')  return;
+    // ESC는 이미지뷰어 iframe에서만 동작 — 포커스 이동 후 전파 차단
+    if (e.key==='Escape') {
+      var fr = document.getElementById('frame-img');
+      if (fr) {
+        e.stopPropagation();
+        e.preventDefault();
+        fr.focus();
+      }
+      return; // 다른 단축키 처리 안 함
+    }
+    // iframe에 포커스가 있으면 단축키 무시 (iframe 내부 기능 우선)
+    if (document.activeElement && document.activeElement.tagName==='IFRAME') return;
     if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
     if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') toggleTemplatePanel();
     if (e.key==='a'||e.key==='A'||e.key==='ㅁ') openAnnotation();
     if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openTrainset();
-    if (e.key==='Escape') {
-      // ESC → Sync Image Viewer iframe에 포커스
-      var fr = document.getElementById('frame-img');
-      if (fr) { fr.focus(); iframeClickedAt = Date.now(); }
-    }
   });
 
-  // iframe 포커스 복구 (단, mouseenter 후 2초간 유예 — ESC 등 내부 기능 보호)
-  let iframeClickedAt = 0;
-  document.querySelectorAll('iframe').forEach(function(fr) {
-    fr.addEventListener('mouseenter', function() { iframeClickedAt = Date.now(); });
+  // iframe에 포커스가 가도 단축키(X/Y/A/M)는 window에서 잡음
+  // ESC는 예외 — 이미지뷰어 전용
+  window.addEventListener('blur', function() {
+    setTimeout(function() {
+      var ae = document.activeElement;
+      if (ae && ae.tagName === 'IFRAME' && ae.id !== 'frame-img') {
+        window.focus(); // frame-img 외 iframe은 즉시 복귀
+      }
+    }, 100);
   });
-  setInterval(function() {
-    if (Date.now() - iframeClickedAt < 2000) return;
-    if (document.activeElement && document.activeElement.tagName==='IFRAME') window.focus();
-  }, 500);
 
   // 클립보드 붙여넣기
   document.addEventListener('paste', function(e) {
