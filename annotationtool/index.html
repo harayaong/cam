@@ -524,13 +524,13 @@
     annotationPosIdx = (annotationPosIdx + 1) % ANNOTATION_POSITIONS.length;
 
     const popup = window.open(
-      'https://54.211.199.218:8080/',
+      'http://54.211.199.218:8080/',
       'ann_'+Date.now(),
       'width='+colW+',height='+rowH+',left='+left+',top='+top+',resizable=yes,scrollbars=yes'
     );
     if (!popup || popup.closed || typeof popup.closed === 'undefined') {
       const a = document.createElement('a');
-      a.href = 'https://54.211.199.218:8080/'; a.target = '_blank'; a.rel = 'noopener';
+      a.href = 'http://54.211.199.218:8080/'; a.target = '_blank'; a.rel = 'noopener';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
   }
