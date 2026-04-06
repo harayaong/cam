@@ -559,37 +559,66 @@
     });
   });
 
-  // 단축키
-  document.addEventListener('keydown', function(e) {
+  // ── 전역 단축키 핸들러 ──
+  // iframe에 포커스가 있어도 동작하도록
+  // ESC만 예외: frame-img(이미지뷰어)에 포커스를 넘김
+  function globalKeyHandler(e) {
     if (document.activeElement.id==='siteInput') return;
     if (document.activeElement.id==='dateInput')  return;
-    // ESC는 이미지뷰어 iframe에서만 동작 — 포커스 이동 후 전파 차단
-    if (e.key==='Escape') {
-      var fr = document.getElementById('frame-img');
-      if (fr) {
-        e.stopPropagation();
-        e.preventDefault();
-        fr.focus();
-      }
-      return; // 다른 단축키 처리 안 함
-    }
-    // iframe에 포커스가 있으면 단축키 무시 (iframe 내부 기능 우선)
-    if (document.activeElement && document.activeElement.tagName==='IFRAME') return;
-    if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
-    if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') toggleTemplatePanel();
-    if (e.key==='a'||e.key==='A'||e.key==='ㅁ') openAnnotation();
-    if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openTrainset();
-  });
 
-  // iframe에 포커스가 가도 단축키(X/Y/A/M)는 window에서 잡음
-  // ESC는 예외 — 이미지뷰어 전용
+    if (e.key==='x'||e.key==='X'||e.key==='ㅌ') { e.preventDefault(); copySiteID(); return; }
+    if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') { e.preventDefault(); toggleTemplatePanel(); return; }
+    if (e.key==='a'||e.key==='A'||e.key==='ㅁ') { e.preventDefault(); openAnnotation(); return; }
+    if (e.key==='m'||e.key==='M'||e.key==='ㅡ') { e.preventDefault(); openTrainset(); return; }
+  }
+
+  // 부모 페이지 keydown
+  document.addEventListener('keydown', globalKeyHandler, true);
+
+  // iframe 내부 keydown을 부모로 전달
+  // (iframe이 로드된 후 contentDocument에 이벤트 리스너 추가)
+  function attachIframeKeyHandler(iframe) {
+    if (!iframe) return;
+    iframe.addEventListener('load', function() {
+      try {
+        var iDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iDoc.addEventListener('keydown', function(e) {
+          // ESC는 frame-img 내부에서만 자체 처리 — 전달 안 함
+          if (e.key === 'Escape' && iframe.id === 'frame-img') return;
+          // 나머지 키는 부모로 이벤트 전달
+          var cloned = new KeyboardEvent('keydown', {
+            key: e.key, code: e.code,
+            shiftKey: e.shiftKey, ctrlKey: e.ctrlKey,
+            altKey: e.altKey, metaKey: e.metaKey,
+            bubbles: true, cancelable: true
+          });
+          document.dispatchEvent(cloned);
+        }, true);
+      } catch(err) {
+        // cross-origin iframe은 접근 불가 — 무시
+      }
+    });
+  }
+
+  // 모든 iframe에 핸들러 부착
+  document.querySelectorAll('iframe').forEach(attachIframeKeyHandler);
+
+  // ESC: 항상 frame-img에 포커스 (어디서 눌러도)
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var fr = document.getElementById('frame-img');
+      if (fr) { fr.focus(); }
+    }
+  }, true);
+
+  // window blur시 frame-img 외 iframe → 즉시 window 포커스 복귀
   window.addEventListener('blur', function() {
     setTimeout(function() {
       var ae = document.activeElement;
-      if (ae && ae.tagName === 'IFRAME' && ae.id !== 'frame-img') {
-        window.focus(); // frame-img 외 iframe은 즉시 복귀
+      if (ae && ae.tagName==='IFRAME' && ae.id!=='frame-img') {
+        window.focus();
       }
-    }, 100);
+    }, 50);
   });
 
   // 클립보드 붙여넣기
