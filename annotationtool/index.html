@@ -12,228 +12,254 @@
       --header-h: 56px; --panel-label: #fff4ed;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI','Noto Sans KR',sans-serif; background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; flex-direction:column; }
+    body {
+      font-family: 'Segoe UI','Noto Sans KR',sans-serif;
+      background: var(--bg); color: var(--text);
+      height: 100vh; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
 
     /* ─── HEADER ─── */
-    header { position:fixed; top:0; left:0; right:0; height:var(--header-h); background:var(--surface); border-bottom:2px solid var(--accent); display:flex; align-items:center; padding:0 16px; gap:12px; z-index:100; box-shadow:0 2px 18px rgba(249,115,22,.25); }
-    .header-title { font-size:14px; font-weight:700; color:var(--accent); white-space:nowrap; flex-shrink:0; }
-    .header-title span { color:var(--text-muted); font-weight:400; }
-    .h-label { font-size:11px; color:var(--text-muted); white-space:nowrap; flex-shrink:0; }
-    .h-input { background:#fff; border:1px solid var(--border); border-radius:6px; color:var(--text); font-size:13px; padding:5px 10px; outline:none; transition:border-color .2s; flex-shrink:0; }
-    .h-input:focus { border-color:var(--accent); }
-    .h-input::placeholder { color:var(--text-muted); }
-    #siteInput { width:180px; } #dateInput { width:140px; }
-    .h-divider { width:1px; height:28px; background:var(--border); flex-shrink:0; }
-    .btn { background:var(--accent); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; flex-shrink:0; box-shadow:0 0 10px rgba(249,115,22,.3); transition:opacity .2s; }
-    .btn:hover { opacity:.85; }
-    .btn-copy { display:flex; align-items:center; gap:5px; background:#fff; color:var(--accent); border:1.5px solid var(--accent); border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; flex-shrink:0; transition:background .15s,color .15s; }
-    .btn-copy:hover { background:var(--accent); color:#fff; }
-    .btn-copy kbd { font-family:inherit; font-size:10px; font-weight:700; background:var(--accent); color:#fff; border-radius:3px; padding:1px 4px; }
-    .btn-copy:hover kbd { background:rgba(255,255,255,.3); }
-    .copy-toast { position:fixed; top:64px; left:50%; transform:translateX(-50%) translateY(-6px); background:#1a1008; color:#fff; font-size:12px; font-weight:600; padding:6px 16px; border-radius:20px; opacity:0; pointer-events:none; transition:opacity .2s,transform .2s; z-index:200; white-space:nowrap; }
-    .copy-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    header {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--header-h);
+      background: var(--surface);
+      border-bottom: 2px solid var(--accent);
+      display: flex; align-items: center;
+      padding: 0 16px; gap: 10px;
+      z-index: 100;
+      box-shadow: 0 2px 18px rgba(249,115,22,.25);
+      flex-wrap: nowrap; overflow: hidden;
+    }
+    .header-title { font-size: 13px; font-weight: 700; color: var(--accent); white-space: nowrap; flex-shrink: 0; }
+    .header-title span { color: var(--text-muted); font-weight: 400; }
+    .h-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+    .h-input {
+      background: #fff; border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text); font-size: 13px; padding: 5px 10px;
+      outline: none; transition: border-color .2s; flex-shrink: 0;
+    }
+    .h-input:focus { border-color: var(--accent); }
+    .h-input::placeholder { color: var(--text-muted); }
+    #siteInput { width: 160px; } #dateInput { width: 135px; }
+    .h-divider { width: 1px; height: 26px; background: var(--border); flex-shrink: 0; }
+    .btn {
+      background: var(--accent); color: #fff; border: none; border-radius: 6px;
+      padding: 6px 12px; font-size: 12px; font-weight: 700;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      box-shadow: 0 0 8px rgba(249,115,22,.3); transition: opacity .2s;
+    }
+    .btn:hover { opacity: .85; }
+    .btn-copy {
+      display: flex; align-items: center; gap: 4px;
+      background: #fff; color: var(--accent);
+      border: 1.5px solid var(--accent); border-radius: 6px;
+      padding: 4px 10px; font-size: 11px; font-weight: 600;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background .15s, color .15s;
+    }
+    .btn-copy:hover { background: var(--accent); color: #fff; }
+    .btn-copy kbd {
+      font-family: inherit; font-size: 10px; font-weight: 700;
+      background: var(--accent); color: #fff;
+      border-radius: 3px; padding: 1px 4px;
+    }
+    .btn-copy:hover kbd { background: rgba(255,255,255,.3); }
+    .copy-toast {
+      position: fixed; top: 64px; left: 50%;
+      transform: translateX(-50%) translateY(-6px);
+      background: #1a1008; color: #fff;
+      font-size: 12px; font-weight: 600;
+      padding: 6px 16px; border-radius: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      z-index: 200; white-space: nowrap;
+    }
+    .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ─── 이미지 템플릿 사이드 패널 ─── */
-    /* right-panel 위에 absolute로 겹침 */
-    .right-panel { position: relative; }
-
-    .img-panel {
-      position: absolute;
-      inset: 0;
-      background: #fff;
-      border-left: 3px solid var(--accent);
-      display: flex;
-      flex-direction: column;
-      z-index: 50;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .25s ease;
-    }
-    .img-panel.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .img-panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 12px;
-      background: var(--accent);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      flex-shrink: 0;
-      gap: 10px;
-    }
-    .img-panel-title-text { white-space: nowrap; flex-shrink: 0; }
-    .img-panel-zoom-reset {
-      background: rgba(255,255,255,.2);
-      border: none; color: #fff;
-      font-size: 11px; font-weight: 600;
-      padding: 3px 8px; border-radius: 4px;
-      cursor: pointer; transition: background .15s;
-      flex-shrink: 0; white-space: nowrap;
-    }
-    .img-panel-zoom-reset:hover { background: rgba(255,255,255,.4); }
-    .img-panel-close {
-      background: rgba(255,255,255,.2);
-      border: none; color: #fff;
-      font-size: 12px; font-weight: 700;
-      padding: 3px 10px; border-radius: 4px;
-      cursor: pointer; transition: background .15s;
-      flex-shrink: 0;
-    }
-    .img-panel-close:hover { background: rgba(255,255,255,.4); }
-
-    /* 캘린더 입력 */
-    .img-panel-date {
-      background: rgba(255,255,255,.2);
-      border: 1px solid rgba(255,255,255,.4);
-      border-radius: 4px;
-      color: #fff;
-      font-size: 12px;
-      padding: 3px 8px;
-      outline: none;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .img-panel-date::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-
-    .img-panel-body {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-y: auto;
-      background: #f0f0f0;
-    }
-    /* 이미지 가로폭 꽉차게 */
-    .img-panel-body img {
-      width: 100%;
-      height: auto;
-      display: none;
-      object-fit: contain;
-      transform-origin: top center;
-      transition: transform .15s ease;
-    }
-    .img-panel-empty {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #999;
-      font-size: 13px;
-      text-align: center;
-      line-height: 2;
-    }
-
-    /* ─── WORKSPACE ─── */
+    /* ─── WORKSPACE: 3열 2행 그리드 ───
+       [ 1:debug  ][ 2:clipAB ][ 3:clipCD ]
+       [ 4:debug  ][ 5~6:viewer           ]
+    */
     .workspace {
       margin-top: var(--header-h);
-      display: flex;
-      height: calc(100vh - var(--header-h));
       width: 100%;
+      height: calc(100vh - var(--header-h));
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
     }
 
-    /* 좌측 패널: Debug Tool(flex:2) + 클립보드(flex:1) */
-    .left-panel {
-      width: 50%;
-      display: flex;
-      border-right: 2px solid var(--accent);
-    }
-
-    /* Debug Tool: 전체 높이 */
-    .debug-col {
-      flex: 2;
+    /* 공통 셀 */
+    .cell {
       position: relative;
-      border-right: 2px solid var(--accent);
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: #fff;
     }
 
-    /* 클립보드 컬럼: 4슬롯 (2x2) */
-    .clip-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+    /* 1+4: 디버그툴 — 1열 전체 높이 */
+    .cell-debug {
+      grid-column: 1;
+      grid-row: 1 / 3;
+      border-right: 2px solid var(--accent);
+      border-bottom: none;
+    }
+
+    /* 2: 클립 AB — 2열 1행 */
+    .cell-clip-ab {
+      grid-column: 2;
+      grid-row: 1;
+      border-right: 1px solid var(--border);
+      border-bottom: 2px solid var(--accent);
+      display: flex; flex-direction: column;
       background: #fafafa;
+    }
+
+    /* 3: 클립 CD — 3열 1행 */
+    .cell-clip-cd {
+      grid-column: 3;
+      grid-row: 1;
+      border-right: none;
+      border-bottom: 2px solid var(--accent);
+      display: flex; flex-direction: column;
+      background: #fafafa;
+    }
+
+    /* 5+6: 이미지뷰어 — 2~3열 2행 */
+    .cell-viewer {
+      grid-column: 2 / 4;
+      grid-row: 2;
+      border-right: none;
+      border-bottom: none;
       position: relative;
     }
 
+    /* 패널 라벨 */
+    .panel-label {
+      position: absolute; top: 6px; left: 8px;
+      font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+      color: var(--accent); background: var(--panel-label);
+      border: 1px solid var(--accent); border-radius: 4px;
+      padding: 2px 7px; z-index: 10; pointer-events: none;
+      box-shadow: 0 0 6px rgba(249,115,22,.2);
+    }
+
+    /* placeholder */
+    .placeholder {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 10px; color: var(--text-muted); font-size: 13px;
+      background: #fafafa; z-index: 5;
+    }
+    .placeholder svg { opacity: .3; color: var(--accent); }
+    .placeholder p { opacity: .6; }
+
+    /* iframe */
+    iframe { width: 100%; height: 100%; border: none; display: block; background: #f0f0f0; }
+
+    /* ─── 클립보드 슬롯 ─── */
     .clip-col-label {
-      position: absolute;
-      top: 5px; left: 50%; transform: translateX(-50%);
+      position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
       font-size: 9px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
       color: var(--accent); background: var(--panel-label);
       border: 1px solid var(--accent); border-radius: 3px; padding: 1px 6px;
       z-index: 20; pointer-events: none; white-space: nowrap;
     }
-
-    /* 슬롯 */
     .clip-slot {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      cursor: pointer;
-      transition: background .15s;
+      flex: 1; display: flex; flex-direction: column;
+      position: relative; cursor: pointer;
       border-bottom: 1px solid var(--border);
+      transition: background .15s;
     }
     .clip-slot:last-child { border-bottom: none; }
     .clip-slot.is-active { background: #fffaf7; }
     .clip-slot.is-active::before {
-      content: '';
-      position: absolute; left: 0; top: 0; bottom: 0;
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
       width: 3px; background: var(--accent);
     }
-
     .clip-slot-label {
       position: absolute; top: 3px; left: 8px;
-      font-size: 9px; font-weight: 800; letter-spacing: .4px;
-      color: var(--text-muted); z-index: 10; pointer-events: none;
-      transition: color .15s;
+      font-size: 9px; font-weight: 800; color: var(--text-muted);
+      z-index: 10; pointer-events: none; transition: color .15s;
     }
     .clip-slot.is-active .clip-slot-label { color: var(--accent); }
-
     .clip-drop-area {
-      flex: 1;
-      margin: 18px 6px 4px;
-      border: 1.5px dashed var(--border);
-      border-radius: 4px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 3px;
-      position: relative;
-      overflow: hidden;
+      flex: 1; margin: 18px 6px 4px;
+      border: 1.5px dashed var(--border); border-radius: 4px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 3px; position: relative; overflow: hidden;
       transition: border-color .15s, background .15s;
     }
     .clip-slot.is-active .clip-drop-area { border-color: var(--accent); border-style: solid; }
     .clip-drop-area.has-image { background: #fff8f4; }
     .clip-drop-area.paste-flash { background: #ffe8d6; }
-
-    .clip-hint { display:flex; flex-direction:column; align-items:center; gap:3px; text-align:center; }
-    .clip-hint svg { opacity:.2; color:var(--accent); }
-    .clip-hint p { font-size:9px; line-height:1.4; opacity:.55; color:var(--text-muted); }
-    .clip-hint kbd { font-size:9px; background:var(--accent); color:#fff; border-radius:3px; padding:1px 4px; }
-    .clip-img { display:none; max-width:100%; max-height:100%; object-fit:contain; border-radius:3px; }
+    .clip-hint { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
+    .clip-hint svg { opacity: .2; color: var(--accent); }
+    .clip-hint p { font-size: 9px; line-height: 1.4; opacity: .55; color: var(--text-muted); }
+    .clip-hint kbd { font-size: 9px; background: var(--accent); color: #fff; border-radius: 3px; padding: 1px 4px; }
+    .clip-img { display: none; max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 3px; }
     .clip-clear-btn {
-      position:absolute; top:2px; right:2px;
-      background:var(--accent); color:#fff;
-      border:none; border-radius:3px;
-      font-size:9px; padding:1px 5px;
-      cursor:pointer; display:none; z-index:10;
+      position: absolute; top: 2px; right: 2px;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 3px; font-size: 9px; padding: 1px 5px;
+      cursor: pointer; display: none; z-index: 10;
     }
-    .clip-clear-btn:hover { opacity:.8; }
+    .clip-clear-btn:hover { opacity: .8; }
 
-    /* 우측 패널 */
-    .right-panel { width:50%; position:relative; }
+    /* ─── 이미지 템플릿 패널 (viewer 위에 겹침) ─── */
+    .img-panel {
+      position: absolute; inset: 0;
+      background: #fff;
+      border-left: 3px solid var(--accent);
+      display: flex; flex-direction: column;
+      z-index: 50;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s ease;
+    }
+    .img-panel.open { opacity: 1; pointer-events: all; }
 
-    .panel-label { position:absolute; top:6px; left:8px; font-size:10px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; color:var(--accent); background:var(--panel-label); border:1px solid var(--accent); border-radius:4px; padding:2px 7px; z-index:10; pointer-events:none; box-shadow:0 0 6px rgba(249,115,22,.2); }
-    iframe { width:100%; height:100%; border:none; display:block; background:#f0f0f0; }
-    .placeholder { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:var(--text-muted); font-size:13px; background:#fafafa; z-index:5; }
-    .placeholder svg { opacity:.3; color:var(--accent); }
-    .placeholder p { opacity:.6; }
+    .img-panel-header {
+      display: flex; align-items: center;
+      padding: 6px 12px; gap: 8px;
+      background: var(--accent); color: #fff;
+      font-size: 12px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .img-panel-title-text { white-space: nowrap; flex-shrink: 0; }
+    .img-panel-date {
+      background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.4);
+      border-radius: 4px; color: #fff; font-size: 12px; padding: 3px 8px;
+      outline: none; cursor: pointer; flex-shrink: 0;
+    }
+    .img-panel-date::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    .img-panel-zoom-reset {
+      background: rgba(255,255,255,.2); border: none; color: #fff;
+      font-size: 11px; font-weight: 600; padding: 3px 8px;
+      border-radius: 4px; cursor: pointer; flex-shrink: 0; white-space: nowrap;
+    }
+    .img-panel-zoom-reset:hover { background: rgba(255,255,255,.4); }
+    .img-panel-close {
+      background: rgba(255,255,255,.2); border: none; color: #fff;
+      font-size: 12px; font-weight: 700; padding: 3px 10px;
+      border-radius: 4px; cursor: pointer; flex-shrink: 0;
+    }
+    .img-panel-close:hover { background: rgba(255,255,255,.4); }
+    .img-panel-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; overflow-y: auto; background: #f0f0f0;
+    }
+    .img-panel-body img {
+      width: 100%; height: auto; display: none;
+      object-fit: contain; transform-origin: top center; transition: transform .15s ease;
+    }
+    .img-panel-empty {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      color: #999; font-size: 13px; text-align: center; line-height: 2;
+    }
   </style>
 </head>
 <body>
@@ -248,7 +274,7 @@
   <input id="dateInput" class="h-input" type="date" />
   <button class="btn" onclick="applyAll()">적용</button>
   <button class="btn-copy" onclick="copySiteID()" title="단축키: X / ㅌ">
-    <span id="copyBtnLabel">Site ID 복사하기</span><kbd>[X]</kbd>
+    <span id="copyBtnLabel">Site ID 복사</span><kbd>[X]</kbd>
   </button>
   <div class="h-divider"></div>
   <button class="btn-copy" id="templateToggleBtn" onclick="toggleTemplatePanel()" title="단축키: Y / ㅛ">
@@ -266,83 +292,74 @@
 <!-- ═══ WORKSPACE ═══ -->
 <div class="workspace">
 
-  <!-- 좌측: Debug Tool + 클립보드 4슬롯 -->
-  <div class="left-panel">
-
-    <!-- Debug Tool (전체 높이) -->
-    <div class="debug-col">
-      <div class="panel-label">🛠 Debug Tool</div>
-      <div class="placeholder" id="ph-debug">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
-        </svg>
-        <p>Site ID와 날짜 입력 후 [적용]</p>
-      </div>
-      <iframe id="frame-debug" src="about:blank" style="display:none;"></iframe>
+  <!-- 1+4: 디버그툴 (1열 전체) -->
+  <div class="cell cell-debug">
+    <div class="panel-label">🛠 Debug Tool</div>
+    <div class="placeholder" id="ph-debug">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+      </svg>
+      <p>Site ID와 날짜 입력 후 [적용]</p>
     </div>
+    <iframe id="frame-debug" src="about:blank" style="display:none;"></iframe>
+  </div>
 
-    <!-- 클립보드 컬럼 (A/B/C/D 4슬롯) -->
-    <div class="clip-col">
-      <div class="clip-col-label">📋 클립보드</div>
-
-      <!-- 슬롯 A -->
-      <div class="clip-slot is-active" id="clipSlotA" onclick="activateSlot('A')">
-        <span class="clip-slot-label" id="badgeA">▶ A</span>
-        <div class="clip-drop-area" id="clipAreaA">
-          <button class="clip-clear-btn" id="clipClearA" onclick="clearClip('A');event.stopPropagation()">✕</button>
-          <div class="clip-hint" id="clipHintA">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
-            <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
-          </div>
-          <img class="clip-img" id="clipImgA" alt="A" />
+  <!-- 2: 클립보드 A/B (2열 상단) -->
+  <div class="cell cell-clip-ab">
+    <div class="clip-col-label">📋 A · B</div>
+    <div class="clip-slot is-active" id="clipSlotA" onclick="activateSlot('A')">
+      <span class="clip-slot-label" id="badgeA">▶ A</span>
+      <div class="clip-drop-area" id="clipAreaA">
+        <button class="clip-clear-btn" id="clipClearA" onclick="clearClip('A');event.stopPropagation()">✕</button>
+        <div class="clip-hint" id="clipHintA">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
+        <img class="clip-img" id="clipImgA" alt="A" />
       </div>
-
-      <!-- 슬롯 B -->
-      <div class="clip-slot" id="clipSlotB" onclick="activateSlot('B')">
-        <span class="clip-slot-label" id="badgeB">B</span>
-        <div class="clip-drop-area" id="clipAreaB">
-          <button class="clip-clear-btn" id="clipClearB" onclick="clearClip('B');event.stopPropagation()">✕</button>
-          <div class="clip-hint" id="clipHintB">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
-            <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
-          </div>
-          <img class="clip-img" id="clipImgB" alt="B" />
+    </div>
+    <div class="clip-slot" id="clipSlotB" onclick="activateSlot('B')">
+      <span class="clip-slot-label" id="badgeB">B</span>
+      <div class="clip-drop-area" id="clipAreaB">
+        <button class="clip-clear-btn" id="clipClearB" onclick="clearClip('B');event.stopPropagation()">✕</button>
+        <div class="clip-hint" id="clipHintB">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
+        <img class="clip-img" id="clipImgB" alt="B" />
       </div>
+    </div>
+  </div>
 
-      <!-- 슬롯 C -->
-      <div class="clip-slot" id="clipSlotC" onclick="activateSlot('C')">
-        <span class="clip-slot-label" id="badgeC">C</span>
-        <div class="clip-drop-area" id="clipAreaC">
-          <button class="clip-clear-btn" id="clipClearC" onclick="clearClip('C');event.stopPropagation()">✕</button>
-          <div class="clip-hint" id="clipHintC">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
-            <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
-          </div>
-          <img class="clip-img" id="clipImgC" alt="C" />
+  <!-- 3: 클립보드 C/D (3열 상단) -->
+  <div class="cell cell-clip-cd">
+    <div class="clip-col-label">📋 C · D</div>
+    <div class="clip-slot" id="clipSlotC" onclick="activateSlot('C')">
+      <span class="clip-slot-label" id="badgeC">C</span>
+      <div class="clip-drop-area" id="clipAreaC">
+        <button class="clip-clear-btn" id="clipClearC" onclick="clearClip('C');event.stopPropagation()">✕</button>
+        <div class="clip-hint" id="clipHintC">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
+        <img class="clip-img" id="clipImgC" alt="C" />
       </div>
-
-      <!-- 슬롯 D -->
-      <div class="clip-slot" id="clipSlotD" onclick="activateSlot('D')">
-        <span class="clip-slot-label" id="badgeD">D</span>
-        <div class="clip-drop-area" id="clipAreaD">
-          <button class="clip-clear-btn" id="clipClearD" onclick="clearClip('D');event.stopPropagation()">✕</button>
-          <div class="clip-hint" id="clipHintD">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
-            <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
-          </div>
-          <img class="clip-img" id="clipImgD" alt="D" />
+    </div>
+    <div class="clip-slot" id="clipSlotD" onclick="activateSlot('D')">
+      <span class="clip-slot-label" id="badgeD">D</span>
+      <div class="clip-drop-area" id="clipAreaD">
+        <button class="clip-clear-btn" id="clipClearD" onclick="clearClip('D');event.stopPropagation()">✕</button>
+        <div class="clip-hint" id="clipHintD">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6M9 14l3-3 3 3"/></svg>
+          <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
+        <img class="clip-img" id="clipImgD" alt="D" />
       </div>
+    </div>
+  </div>
 
-    </div><!-- /.clip-col -->
-
-  </div><!-- /.left-panel -->
-
-  <!-- 우측: Sync Image Viewer + 이미지 템플릿 패널 (겹침) -->
-  <div class="right-panel">
+  <!-- 5+6: Sync Image Viewer (2~3열 하단) -->
+  <div class="cell cell-viewer">
     <div class="panel-label">🖼 Sync Image Viewer</div>
     <div class="placeholder" id="ph-img">
       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -354,52 +371,44 @@
     </div>
     <iframe id="frame-img" src="about:blank" style="display:none;"></iframe>
 
-    <!-- 이미지 템플릿 패널 (right-panel 위에 겹침) -->
+    <!-- 이미지 템플릿 패널 -->
     <div class="img-panel" id="imgPanel">
       <div class="img-panel-header">
         <span class="img-panel-title-text">🖼 이미지 템플릿</span>
-        <input type="date" class="img-panel-date" id="imgPanelDate"
-               onchange="onPanelDateChange(this.value)" />
-        <span id="imgPanelSiteLabel" style="font-size:11px; opacity:.8; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></span>
-        <span style="font-size:10px; opacity:.7; white-space:nowrap; flex-shrink:0;">⇧+휠: 확대/축소</span>
-        <button class="img-panel-zoom-reset" onclick="resetZoom()" title="배율 초기화">⊙ <span id="zoomLabel">100%</span></button>
+        <input type="date" class="img-panel-date" id="imgPanelDate" onchange="onPanelDateChange(this.value)" />
+        <span id="imgPanelSiteLabel" style="font-size:11px;opacity:.8;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+        <span style="font-size:10px;opacity:.7;white-space:nowrap;flex-shrink:0;">⇧+휠: 확대/축소</span>
+        <button class="img-panel-zoom-reset" onclick="resetZoom()">⊙ <span id="zoomLabel">100%</span></button>
         <button class="img-panel-close" onclick="toggleTemplatePanel()">✕ [Y]</button>
       </div>
       <div class="img-panel-body">
-        <div class="img-panel-empty" id="imgPanelEmpty">
-          Site ID와 날짜를 입력 후<br>[적용] 버튼을 누르세요
-        </div>
+        <div class="img-panel-empty" id="imgPanelEmpty">Site ID와 날짜를 입력 후<br>[적용] 버튼을 누르세요</div>
         <img id="imgPanelImg" src="" alt="이미지 템플릿"
              onload="this.style.display='block'; document.getElementById('imgPanelEmpty').style.display='none';"
              onerror="document.getElementById('imgPanelEmpty').innerHTML='이미지를 찾을 수 없습니다.'; this.style.display='none'; document.getElementById('imgPanelEmpty').style.display='flex';" />
       </div>
     </div>
-
   </div>
 
 </div><!-- /.workspace -->
 
 <script>
-  // ══════════════════════════════════════════
-  // 1. 변수/상수 — 가장 먼저 선언
-  // ══════════════════════════════════════════
+  // ══ 1. 변수/상수 ══
   let templatePanelOpen = false;
-
   const ANNOTATION_POSITIONS = [
-    { col: 3, row: 0 },  // 4번
-    { col: 3, row: 1 },  // 8번
-    { col: 2, row: 0 },  // 3번
-    { col: 2, row: 1 },  // 7번
+    { col: 3, row: 0 }, // 4번
+    { col: 3, row: 1 }, // 8번
+    { col: 2, row: 0 }, // 3번
+    { col: 2, row: 1 }, // 7번
   ];
   let annotationPosIdx = 0;
-  let trainsetPosIdx = 0;
-
+  let trainsetPosIdx   = 0;
   const SLOTS = ['A','B','C','D'];
   let activeSlot = 'A';
+  let imgZoomScale = 1.0;
+  const ZOOM_MIN = 0.3, ZOOM_MAX = 5.0, ZOOM_STEP = 0.15;
 
-  // ══════════════════════════════════════════
-  // 2. 유틸 함수
-  // ══════════════════════════════════════════
+  // ══ 2. 유틸 ══
   function getLastWorkday() {
     const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-1);
     while(d.getDay()===0||d.getDay()===6) d.setDate(d.getDate()-1);
@@ -409,17 +418,14 @@
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   }
 
-  // ══════════════════════════════════════════
-  // 3. 핵심 함수
-  // ══════════════════════════════════════════
+  // ══ 3. 핵심 함수 ══
 
-  // ── 적용 ──
   function applyAll() {
     const site = document.getElementById('siteInput').value.trim();
     const date = document.getElementById('dateInput').value;
     if (!site) { alert('Site ID를 입력해 주세요.'); return; }
     if (!date) { alert('날짜를 입력해 주세요.'); return; }
-    document.getElementById('copyBtnLabel').textContent = site+' 복사하기';
+    document.getElementById('copyBtnLabel').textContent = site+' 복사';
 
     const fImg = document.getElementById('frame-img');
     fImg.src = 'https://playtag-debugging-tool.vercel.app/sync-images.html?mode=all&date='+date+'&site='+encodeURIComponent(site);
@@ -434,18 +440,16 @@
     if (templatePanelOpen) updateTemplatePanel(site, date);
   }
 
-  // ── Site ID 복사 ──
   function copySiteID() {
     const site = document.getElementById('siteInput').value.trim();
     if (!site) { alert('먼저 Site ID를 입력하고 [적용]을 눌러주세요.'); return; }
-    navigator.clipboard.writeText(site).then(() => {
+    navigator.clipboard.writeText(site).then(function() {
       const t = document.getElementById('copyToast');
       t.textContent = '✓ "'+site+'" 복사됨!'; t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 1800);
+      setTimeout(function(){ t.classList.remove('show'); }, 1800);
     });
   }
 
-  // ── 이미지 템플릿 패널 갱신 ──
   function updateTemplatePanel(site, date) {
     const url = 'https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/'+date+'/'+site+'.jpg';
     const img   = document.getElementById('imgPanelImg');
@@ -456,11 +460,9 @@
     img.src = url;
     document.getElementById('imgPanelDate').value = date;
     document.getElementById('imgPanelSiteLabel').textContent = site;
-    // 이미지 변경 시 줌 초기화
     resetZoom();
   }
 
-  // ── 이미지 템플릿 패널 토글 ──
   function toggleTemplatePanel() {
     const panel = document.getElementById('imgPanel');
     const btn   = document.getElementById('templateToggleBtn');
@@ -479,93 +481,61 @@
     }
   }
 
-  // ── 패널 내 날짜 변경 ──
   function onPanelDateChange(newDate) {
     const site = document.getElementById('siteInput').value.trim();
     if (!site) return;
     updateTemplatePanel(site, newDate);
   }
 
-  // ── 이미지 템플릿 확대/축소 (Shift + 휠) ──
-  let imgZoomScale = 1.0;
-  const ZOOM_MIN = 0.3;
-  const ZOOM_MAX = 5.0;
-  const ZOOM_STEP = 0.15;
-
   function applyZoom() {
     const img = document.getElementById('imgPanelImg');
-    img.style.transform = 'scale(' + imgZoomScale + ')';
-    document.getElementById('zoomLabel').textContent = Math.round(imgZoomScale * 100) + '%';
+    img.style.transform = 'scale('+imgZoomScale+')';
+    document.getElementById('zoomLabel').textContent = Math.round(imgZoomScale*100)+'%';
   }
-
-  function resetZoom() {
-    imgZoomScale = 1.0;
-    applyZoom();
-  }
+  function resetZoom() { imgZoomScale = 1.0; applyZoom(); }
 
   document.getElementById('imgPanel').addEventListener('wheel', function(e) {
     if (!e.shiftKey) return;
     e.preventDefault();
-    if (e.deltaY < 0) {
-      imgZoomScale = Math.min(ZOOM_MAX, imgZoomScale + ZOOM_STEP);
-    } else {
-      imgZoomScale = Math.max(ZOOM_MIN, imgZoomScale - ZOOM_STEP);
-    }
+    imgZoomScale = e.deltaY < 0
+      ? Math.min(ZOOM_MAX, imgZoomScale + ZOOM_STEP)
+      : Math.max(ZOOM_MIN, imgZoomScale - ZOOM_STEP);
     applyZoom();
   }, { passive: false });
 
-  // ── 매뉴얼 어노테이션 (4→8→3→7 순환) ──  단축키: A
   function openAnnotation() {
     const colW = Math.floor(screen.width  / 4);
     const rowH = Math.floor(screen.height / 2);
     const pos  = ANNOTATION_POSITIONS[annotationPosIdx];
-    const left = colW * pos.col;
-    const top  = rowH * pos.row;
     annotationPosIdx = (annotationPosIdx + 1) % ANNOTATION_POSITIONS.length;
-
-    const popup = window.open(
-      'http://54.211.199.218:8080/',
-      'ann_'+Date.now(),
-      'width='+colW+',height='+rowH+',left='+left+',top='+top+',resizable=yes,scrollbars=yes'
-    );
-    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+    const popup = window.open('http://54.211.199.218:8080/', 'ann_'+Date.now(),
+      'width='+colW+',height='+rowH+',left='+(colW*pos.col)+',top='+(rowH*pos.row)+',resizable=yes,scrollbars=yes');
+    if (!popup || popup.closed || typeof popup.closed==='undefined') {
       const a = document.createElement('a');
-      a.href = 'http://54.211.199.218:8080/'; a.target = '_blank'; a.rel = 'noopener';
+      a.href='http://54.211.199.218:8080/'; a.target='_blank'; a.rel='noopener';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
   }
 
-  // ── 트레인셋 매니저 (화면 중앙, 2/3 크기) ──  단축키: M
   function openTrainset() {
     const site = document.getElementById('siteInput').value.trim();
-    const w    = Math.floor(screen.width  * 2 / 3);
-    const h    = Math.floor(screen.height * 2 / 3);
-    const left = Math.floor((screen.width  - w) / 2);
-    const top  = Math.floor((screen.height - h) / 2);
-
-    const url = 'https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true'
-              + (site ? '&siteid='+encodeURIComponent(site) : '');
-    const popup = window.open(
-      url,
-      'trainset_'+Date.now(),
-      'width='+w+',height='+h+',left='+left+',top='+top+',resizable=yes,scrollbars=yes'
-    );
-    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-      const a = document.createElement('a');
-      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    const w = Math.floor(screen.width*2/3), h = Math.floor(screen.height*2/3);
+    const left = Math.floor((screen.width-w)/2), top = Math.floor((screen.height-h)/2);
+    const url = 'https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true'+(site?'&siteid='+encodeURIComponent(site):'');
+    const popup = window.open(url,'trainset_'+Date.now(),'width='+w+',height='+h+',left='+left+',top='+top+',resizable=yes,scrollbars=yes');
+    if (!popup || popup.closed || typeof popup.closed==='undefined') {
+      const a = document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener';
       document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
   }
 
-  // ── 클립보드 슬롯 ──
   function activateSlot(slot) {
     activeSlot = slot;
-    SLOTS.forEach(s => {
+    SLOTS.forEach(function(s) {
       document.getElementById('clipSlot'+s).classList.toggle('is-active', s===slot);
       document.getElementById('badge'+s).textContent = s===slot ? '▶ '+s : s;
     });
   }
-
   function clearClip(slot) {
     document.getElementById('clipImg'+slot).style.display   = 'none';
     document.getElementById('clipImg'+slot).src             = '';
@@ -574,71 +544,62 @@
     document.getElementById('clipArea'+slot).classList.remove('has-image');
   }
 
-  // ══════════════════════════════════════════
-  // 4. 초기화 (함수 선언 후 실행)
-  // ══════════════════════════════════════════
+  // ══ 4. 초기화 ══
   document.getElementById('dateInput').value = formatDate(getLastWorkday());
 
-  // URL 파라미터 자동 주입
   (function() {
     const p = new URLSearchParams(window.location.search);
-    const site = p.get('site');
-    const date = p.get('date');
+    const site = p.get('site'), date = p.get('date');
     if (site) document.getElementById('siteInput').value = site;
     if (date) document.getElementById('dateInput').value = date;
     if (site && date) applyAll();
   })();
 
-  // Enter 키
   ['siteInput','dateInput'].forEach(function(id) {
     document.getElementById(id).addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') applyAll();
+      if (e.key==='Enter') applyAll();
     });
   });
 
-  // 단축키
+  // 단축키 (ESC: frame-img에 포커스 넘기기)
   document.addEventListener('keydown', function(e) {
-    if (document.activeElement.id === 'siteInput') return;
-    if (document.activeElement.id === 'dateInput')  return;
+    if (document.activeElement.id==='siteInput') return;
+    if (document.activeElement.id==='dateInput')  return;
     if (e.key==='x'||e.key==='X'||e.key==='ㅌ') copySiteID();
     if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') toggleTemplatePanel();
     if (e.key==='a'||e.key==='A'||e.key==='ㅁ') openAnnotation();
     if (e.key==='m'||e.key==='M'||e.key==='ㅡ') openTrainset();
-  });
-
-  // iframe 포커스 복구
-  // - 단축키(X/Y/M/A)가 iframe 안에서 안 먹히는 문제 방지
-  // - 단, iframe 클릭 후 2초간은 복구 안 함 (iframe 내부 ESC 등 기능 보호)
-  let iframeClickedAt = 0;
-
-  document.querySelectorAll('iframe').forEach(function(fr) {
-    fr.addEventListener('mouseenter', function() {
-      iframeClickedAt = Date.now();
-    });
-  });
-
-  setInterval(function() {
-    // iframe 위에 마우스가 올라간 지 2초 이내면 포커스 복구 안 함
-    if (Date.now() - iframeClickedAt < 2000) return;
-    if (document.activeElement && document.activeElement.tagName === 'IFRAME') {
-      window.focus();
+    if (e.key==='Escape') {
+      // ESC → Sync Image Viewer iframe에 포커스
+      var fr = document.getElementById('frame-img');
+      if (fr) { fr.focus(); iframeClickedAt = Date.now(); }
     }
+  });
+
+  // iframe 포커스 복구 (단, mouseenter 후 2초간 유예 — ESC 등 내부 기능 보호)
+  let iframeClickedAt = 0;
+  document.querySelectorAll('iframe').forEach(function(fr) {
+    fr.addEventListener('mouseenter', function() { iframeClickedAt = Date.now(); });
+  });
+  setInterval(function() {
+    if (Date.now() - iframeClickedAt < 2000) return;
+    if (document.activeElement && document.activeElement.tagName==='IFRAME') window.focus();
   }, 500);
 
   // 클립보드 붙여넣기
   document.addEventListener('paste', function(e) {
     const items = e.clipboardData && e.clipboardData.items;
     if (!items) return;
-    for (var i = 0; i < items.length; i++) {
+    for (var i=0; i<items.length; i++) {
       if (items[i].type.startsWith('image/')) {
-        var url  = URL.createObjectURL(items[i].getAsFile());
-        var s    = activeSlot;
-        document.getElementById('clipImg'+s).src           = url;
-        document.getElementById('clipImg'+s).style.display = 'block';
+        var url = URL.createObjectURL(items[i].getAsFile());
+        var s   = activeSlot;
+        document.getElementById('clipImg'+s).src             = url;
+        document.getElementById('clipImg'+s).style.display   = 'block';
         document.getElementById('clipHint'+s).style.display  = 'none';
         document.getElementById('clipClear'+s).style.display = 'block';
         var area = document.getElementById('clipArea'+s);
-        area.classList.add('has-image', 'paste-flash');
+        area.classList.add('has-image','paste-flash');
         setTimeout(function(){ area.classList.remove('paste-flash'); }, 300);
         break;
       }
