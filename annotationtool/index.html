@@ -240,6 +240,32 @@
       border-radius: 4px; cursor: pointer; flex-shrink: 0;
     }
     .img-panel-close:hover { background: rgba(255,255,255,.4); }
+
+    /* 요일 버튼 행 */
+    .img-panel-days {
+      display: flex; gap: 4px; padding: 5px 12px;
+      background: var(--accent2); flex-shrink: 0;
+    }
+    .day-btn {
+      flex: 1; padding: 4px 2px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 4px; color: #fff;
+      font-size: 11px; font-weight: 600;
+      cursor: pointer; text-align: center;
+      transition: background .15s;
+      line-height: 1.3;
+    }
+    .day-btn:hover { background: rgba(255,255,255,.3); }
+    .day-btn.today {
+      background: #fff;
+      color: var(--accent);
+      border-color: #fff;
+      font-weight: 800;
+    }
+    .day-btn .day-name { display: block; font-size: 12px; }
+    .day-btn .day-date { display: block; font-size: 9px; opacity: .8; }
+    .day-btn.today .day-date { opacity: 1; color: var(--accent2); }
     .img-panel-body {
       flex: 1; display: flex; flex-direction: column;
       align-items: center; overflow-y: auto; background: #f0f0f0;
@@ -379,6 +405,8 @@
         <button class="img-panel-zoom-reset" onclick="resetZoom()">⊙ <span id="zoomLabel">100%</span></button>
         <button class="img-panel-close" onclick="toggleTemplatePanel()">✕ [Y]</button>
       </div>
+      <!-- 요일 버튼 -->
+      <div class="img-panel-days" id="imgPanelDays"></div>
       <div class="img-panel-body">
         <div class="img-panel-empty" id="imgPanelEmpty">Site ID와 날짜를 입력 후<br>[적용] 버튼을 누르세요</div>
         <img id="imgPanelImg" src="" alt="이미지 템플릿"
@@ -459,6 +487,52 @@
     document.getElementById('imgPanelDate').value = date;
     document.getElementById('imgPanelSiteLabel').textContent = site;
     resetZoom();
+    buildDayButtons(site, date);
+  }
+
+  // 요일 버튼 생성 (월~금, 현재 날짜 강조, 나머지는 지난주 해당 요일)
+  function buildDayButtons(site, currentDate) {
+    var container = document.getElementById('imgPanelDays');
+    container.innerHTML = '';
+
+    var DAYS = ['월','화','수','목','금'];
+    // 현재 선택된 날짜 기준
+    var cur = new Date(currentDate);
+    var curDay = cur.getDay(); // 0=일,1=월,...,6=토
+
+    // 월=1 ~ 금=5 매핑
+    var dayMap = [1, 2, 3, 4, 5]; // 월화수목금 → getDay()값
+
+    dayMap.forEach(function(targetDay, idx) {
+      var d = new Date(cur);
+      var diff = targetDay - curDay;
+
+      if (diff === 0) {
+        // 오늘 (현재 선택 날짜)
+      } else if (diff > 0) {
+        // 지난주로 이동 (미래는 안 씀)
+        diff -= 7;
+      }
+      d.setDate(d.getDate() + diff);
+
+      var dateStr = formatDate(d);
+      var isToday = (diff === 0);
+
+      var mm = String(d.getMonth()+1).padStart(2,'0');
+      var dd = String(d.getDate()).padStart(2,'0');
+
+      var btn = document.createElement('button');
+      btn.className = 'day-btn' + (isToday ? ' today' : '');
+      btn.innerHTML =
+        '<span class="day-name">'+DAYS[idx]+'</span>'+
+        '<span class="day-date">'+mm+'/'+dd+'</span>';
+      btn.title = dateStr;
+      btn.addEventListener('click', function() {
+        document.getElementById('imgPanelDate').value = dateStr;
+        updateTemplatePanel(site, dateStr);
+      });
+      container.appendChild(btn);
+    });
   }
 
   function toggleTemplatePanel() {
