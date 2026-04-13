@@ -555,7 +555,10 @@
 
   ['siteInput','dateInput'].forEach(function(id) {
     document.getElementById(id).addEventListener('keydown', function(e) {
-      if (e.key==='Enter') applyAll();
+      if (e.key==='Enter') {
+        applyAll();
+        e.target.blur(); // 포커스 해제 → 단축키 즉시 동작
+      }
     });
   });
 
