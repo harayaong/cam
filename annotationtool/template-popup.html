@@ -94,11 +94,13 @@
   <div class="header-title">🖼 이미지 템플릿</div>
   <div class="header-site" id="siteLabel"></div>
   <input type="date" class="h-date" id="dateInput" onchange="loadImage()" />
-  <button class="zoom-btn" onclick="resetZoom()">⊙ <span id="zoomLabel">100%</span></button>
+  <button class="zoom-btn" onclick="zoomScale=Math.max(0.3,zoomScale-0.15);applyZoom()" title="축소 (-)">－</button>
+  <button class="zoom-btn" onclick="resetZoom()" title="초기화 (0)">⊙ <span id="zoomLabel">100%</span></button>
+  <button class="zoom-btn" onclick="zoomScale=Math.min(5.0,zoomScale+0.15);applyZoom()" title="확대 (+)">＋</button>
   <button class="zoom-btn" id="baseBtn" onclick="goBase()" title="최초 기준일로 돌아가기" style="background:rgba(255,255,255,.35);font-weight:800;">
     ↩ 기준일 <span id="baseDateLabel"></span>
   </button>
-  <span style="font-size:10px;opacity:.7;white-space:nowrap;flex-shrink:0;">⇧+휠: 확대/축소</span>
+  <span style="font-size:10px;opacity:.7;white-space:nowrap;flex-shrink:0;">＋/－·⇧+휠</span>
 </div>
 
 <!-- 요일 버튼 -->
@@ -212,6 +214,24 @@
       : Math.max(ZOOM_MIN, zoomScale - ZOOM_STEP);
     applyZoom();
   }, { passive: false });
+
+  // ── 단축키: + / - 확대축소, 0 초기화 ──
+  document.addEventListener('keydown', function(e) {
+    if (e.key === '+' || e.key === '=' || e.key === 'ㅂ') {
+      e.preventDefault();
+      zoomScale = Math.min(ZOOM_MAX, zoomScale + ZOOM_STEP);
+      applyZoom();
+    }
+    if (e.key === '-' || e.key === 'ㅡ') {
+      e.preventDefault();
+      zoomScale = Math.max(ZOOM_MIN, zoomScale - ZOOM_STEP);
+      applyZoom();
+    }
+    if (e.key === '0') {
+      e.preventDefault();
+      resetZoom();
+    }
+  });
 
   // ── 초기 로드 ──
   if (site && date) loadImage();
