@@ -75,11 +75,19 @@
       align-items: center; overflow-y: auto;
       background: #f0f0f0;
     }
+    .img-body {
+      cursor: grab;
+    }
+    .img-body.dragging {
+      cursor: grabbing;
+    }
     .img-body img {
       width: 100%; height: auto; display: none;
       object-fit: contain;
-      transform-origin: top center;
-      transition: transform .15s ease;
+      transform-origin: center center;
+      transition: transform .1s ease;
+      user-select: none;
+      pointer-events: none; /* 드래그 중 이미지 선택 방지 */
     }
     .img-empty {
       flex: 1; display: flex; align-items: center; justify-content: center;
@@ -196,24 +204,69 @@
     });
   }
 
-  // ── 줌 ──
+  // ── 줌 + 드래그 이동 ──
   var zoomScale = 1.0;
+  var panX = 0, panY = 0;       // 현재 이동 오프셋
   var ZOOM_MIN = 0.3, ZOOM_MAX = 5.0, ZOOM_STEP = 0.15;
 
-  function applyZoom() {
-    document.getElementById('theImg').style.transform = 'scale('+zoomScale+')';
-    document.getElementById('zoomLabel').textContent  = Math.round(zoomScale*100)+'%';
+  function applyTransform() {
+    var img = document.getElementById('theImg');
+    img.style.transform = 'translate('+panX+'px,'+panY+'px) scale('+zoomScale+')';
+    document.getElementById('zoomLabel').textContent = Math.round(zoomScale*100)+'%';
   }
-  function resetZoom() { zoomScale = 1.0; applyZoom(); }
 
+  function applyZoom() { applyTransform(); }
+
+  function resetZoom() {
+    zoomScale = 1.0; panX = 0; panY = 0;
+    applyTransform();
+  }
+
+  // Shift + 휠 : 줌
   document.querySelector('.img-body').addEventListener('wheel', function(e) {
     if (!e.shiftKey) return;
     e.preventDefault();
     zoomScale = e.deltaY < 0
       ? Math.min(ZOOM_MAX, zoomScale + ZOOM_STEP)
       : Math.max(ZOOM_MIN, zoomScale - ZOOM_STEP);
-    applyZoom();
+    applyTransform();
   }, { passive: false });
+
+  // 클릭+드래그 : 이동 (줌 > 1일 때만 의미있음)
+  var isDragging = false;
+  var dragStartX = 0, dragStartY = 0;
+  var panStartX = 0, panStartY = 0;
+  var imgBody = document.querySelector('.img-body');
+
+  imgBody.addEventListener('mousedown', function(e) {
+    if (e.button !== 0) return; // 좌클릭만
+    isDragging  = true;
+    dragStartX  = e.clientX;
+    dragStartY  = e.clientY;
+    panStartX   = panX;
+    panStartY   = panY;
+    imgBody.classList.add('dragging');
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    panX = panStartX + (e.clientX - dragStartX);
+    panY = panStartY + (e.clientY - dragStartY);
+    applyTransform();
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (!isDragging) return;
+    isDragging = false;
+    imgBody.classList.remove('dragging');
+  });
+
+  // 더블클릭: 위치 초기화
+  imgBody.addEventListener('dblclick', function() {
+    panX = 0; panY = 0;
+    applyTransform();
+  });
 
   // ── 단축키: + / - 확대축소, 0 초기화 ──
   document.addEventListener('keydown', function(e) {
