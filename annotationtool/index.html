@@ -77,6 +77,64 @@
     }
     .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ─── Site ID 히스토리 드롭다운 ─── */
+    .site-wrapper { position: relative; flex-shrink: 0; }
+    .site-history {
+      position: absolute; top: calc(100% + 4px); left: 0;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.12);
+      z-index: 300; min-width: 180px; overflow: hidden;
+      display: none;
+    }
+    .site-history.show { display: block; }
+    .site-history-item {
+      padding: 7px 12px; font-size: 12px; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; color: var(--text);
+      transition: background .1s;
+    }
+    .site-history-item:hover { background: var(--panel-label); }
+    .site-history-del {
+      font-size: 10px; color: var(--text-muted);
+      background: none; border: none; cursor: pointer;
+      padding: 0 2px; line-height: 1; flex-shrink: 0;
+    }
+    .site-history-del:hover { color: var(--accent); }
+    .site-history-empty { padding: 8px 12px; font-size: 11px; color: var(--text-muted); }
+
+    /* ─── 클립보드 메모 ─── */
+    .clip-memo {
+      position: absolute; bottom: 3px; left: 4px; right: 4px;
+      font-size: 9px; background: rgba(255,255,255,.85);
+      border: none; border-radius: 3px; padding: 1px 4px;
+      color: var(--text-muted); outline: none;
+      z-index: 15; display: none;
+    }
+    .clip-drop-area.has-image .clip-memo { display: block; }
+    .clip-memo::placeholder { color: #ccc; }
+
+    /* ─── 클립보드 다운로드 버튼 ─── */
+    .clip-download-btn {
+      position: absolute; top: 2px; right: 22px;
+      background: #3b82f6; color: #fff; border: none;
+      border-radius: 3px; font-size: 9px; padding: 1px 5px;
+      cursor: pointer; display: none; z-index: 10;
+    }
+    .clip-download-btn:hover { opacity: .8; }
+
+    /* ─── URL 공유 버튼 ─── */
+    .url-share-toast {
+      position: fixed; top: 64px; right: 16px;
+      background: #1a1008; color: #fff;
+      font-size: 12px; font-weight: 600;
+      padding: 6px 16px; border-radius: 20px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      transform: translateY(-6px);
+      z-index: 200; white-space: nowrap;
+    }
+    .url-share-toast.show { opacity: 1; transform: translateY(0); }
+
     /* ─── WORKSPACE: 3열 2행 그리드 ───
        [ 1:debug  ][ 2:clipAB ][ 3:clipCD ]
        [ 4:debug  ][ 5~6:viewer           ]
@@ -287,7 +345,11 @@
   <div class="header-title">매뉴얼 어노테이션 통합 툴 <span>/ Manual Annotation Integrator</span></div>
   <div class="h-divider"></div>
   <div class="h-label">Site ID</div>
-  <input id="siteInput" class="h-input" type="text" placeholder="예: jinhaejoy_1x9" />
+  <div class="site-wrapper">
+    <input id="siteInput" class="h-input" type="text" placeholder="예: jinhaejoy_1x9"
+           autocomplete="off" onfocus="showHistory()" />
+    <div class="site-history" id="siteHistory"></div>
+  </div>
   <div class="h-label">날짜</div>
   <input id="dateInput" class="h-input" type="date" />
   <button class="btn" onclick="applyAll()">적용</button>
@@ -307,7 +369,11 @@
   <button class="btn-copy" onclick="openTrainset()" title="단축키: M / ㅡ">
     🗂 트레인셋 매니저 <kbd>[M]</kbd>
   </button>
+  <button class="btn-copy" onclick="shareURL()" title="현재 URL 공유">
+    🔗 URL 공유
+  </button>
   <div id="copyToast" class="copy-toast"></div>
+  <div id="urlShareToast" class="url-share-toast"></div>
 </header>
 
 <!-- ═══ WORKSPACE ═══ -->
@@ -337,6 +403,8 @@
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgA" alt="A" />
+        <button class="clip-download-btn" id="clipDlA" onclick="downloadClip('A');event.stopPropagation()" title="다운로드">↓</button>
+        <input class="clip-memo" id="clipMemoA" placeholder="메모..." onclick="event.stopPropagation()" />
       </div>
     </div>
     <div class="clip-slot" id="clipSlotB" onclick="activateSlot('B')">
@@ -348,6 +416,8 @@
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgB" alt="B" />
+        <button class="clip-download-btn" id="clipDlB" onclick="downloadClip('B');event.stopPropagation()" title="다운로드">↓</button>
+        <input class="clip-memo" id="clipMemoB" placeholder="메모..." onclick="event.stopPropagation()" />
       </div>
     </div>
     <div class="clip-slot" id="clipSlotC" onclick="activateSlot('C')">
@@ -359,6 +429,8 @@
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgC" alt="C" />
+        <button class="clip-download-btn" id="clipDlC" onclick="downloadClip('C');event.stopPropagation()" title="다운로드">↓</button>
+        <input class="clip-memo" id="clipMemoC" placeholder="메모..." onclick="event.stopPropagation()" />
       </div>
     </div>
     <div class="clip-slot" id="clipSlotD" onclick="activateSlot('D')">
@@ -370,6 +442,8 @@
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgD" alt="D" />
+        <button class="clip-download-btn" id="clipDlD" onclick="downloadClip('D');event.stopPropagation()" title="다운로드">↓</button>
+        <input class="clip-memo" id="clipMemoD" placeholder="메모..." onclick="event.stopPropagation()" />
       </div>
     </div>
     <div class="clip-slot" id="clipSlotE" onclick="activateSlot('E')">
@@ -381,6 +455,8 @@
           <p>클릭 후<br><kbd>Ctrl+V</kbd></p>
         </div>
         <img class="clip-img" id="clipImgE" alt="E" />
+        <button class="clip-download-btn" id="clipDlE" onclick="downloadClip('E');event.stopPropagation()" title="다운로드">↓</button>
+        <input class="clip-memo" id="clipMemoE" placeholder="메모..." onclick="event.stopPropagation()" />
       </div>
     </div>
   </div>
@@ -455,6 +531,7 @@
     if (!site) { alert('Site ID를 입력해 주세요.'); return; }
     if (!date) { alert('날짜를 입력해 주세요.'); return; }
     document.getElementById('copyBtnLabel').textContent = site+' 복사';
+    saveHistory(site); hideHistory();
 
     const fImg = document.getElementById('frame-img');
     fImg.src = 'https://playtag-debugging-tool.vercel.app/sync-images.html?mode=all&date='+date+'&site='+encodeURIComponent(site);
@@ -635,11 +712,77 @@
     document.getElementById('clipImg'+slot).src             = '';
     document.getElementById('clipHint'+slot).style.display  = 'flex';
     document.getElementById('clipClear'+slot).style.display = 'none';
+    document.getElementById('clipDl'+slot).style.display    = 'none';
+    document.getElementById('clipMemo'+slot).value          = '';
     document.getElementById('clipArea'+slot).classList.remove('has-image');
   }
 
   // ══ 4. 초기화 ══
   document.getElementById('dateInput').value = formatDate(getLastWorkday());
+
+  // ── Site ID 히스토리 (localStorage) ──
+  var HISTORY_KEY = 'siteHistory_v1';
+  function getHistory() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); } catch(e){return[];} }
+  function saveHistory(site) {
+    if (!site) return;
+    var h = getHistory().filter(function(s){return s!==site;});
+    h.unshift(site);
+    if (h.length > 10) h = h.slice(0,10);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  }
+  function deleteHistory(site) {
+    var h = getHistory().filter(function(s){return s!==site;});
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+    renderHistory();
+  }
+  function renderHistory() {
+    var box = document.getElementById('siteHistory');
+    var h   = getHistory();
+    if (!h.length) {
+      box.innerHTML = '<div class="site-history-empty">검색 기록 없음</div>';
+      return;
+    }
+    box.innerHTML = h.map(function(s){
+      var enc = encodeURIComponent(s);
+      return '<div class="site-history-item" onclick="pickHistory(decodeURIComponent(\'' + enc + '\'))">'
+        +'<span>'+s+'</span>'
+        +'<button class="site-history-del" onclick="event.stopPropagation();deleteHistory(decodeURIComponent(\'' + enc + '\'))">✕</button>'
+        +'</div>';
+    }).join('');
+  }
+  function showHistory() { renderHistory(); document.getElementById('siteHistory').classList.add('show'); }
+  function hideHistory() { document.getElementById('siteHistory').classList.remove('show'); }
+  function pickHistory(site) {
+    document.getElementById('siteInput').value = site;
+    hideHistory(); applyAll();
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.site-wrapper')) hideHistory();
+  });
+
+  // ── 클립보드 이미지 다운로드 ──
+  function downloadClip(slot) {
+    var img = document.getElementById('clipImg'+slot);
+    if (!img.src || img.src==='') return;
+    var a = document.createElement('a');
+    a.href = img.src;
+    var memo = (document.getElementById('clipMemo'+slot).value||'').trim();
+    a.download = 'clip_'+slot+(memo?'_'+memo:'')+'.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+
+  // ── URL 공유 ──
+  function shareURL() {
+    var site = document.getElementById('siteInput').value.trim();
+    var date = document.getElementById('dateInput').value;
+    var url  = location.origin + location.pathname + (location.pathname.endsWith('/')?'':'/')
+      + (site||date ? '?'+(site?'site='+encodeURIComponent(site):'')+(site&&date?'&':'')+(date?'date='+date:'') : '');
+    navigator.clipboard.writeText(url).then(function(){
+      var t = document.getElementById('urlShareToast');
+      t.textContent = '🔗 URL 복사됨!'; t.classList.add('show');
+      setTimeout(function(){ t.classList.remove('show'); }, 2000);
+    });
+  }
 
   (function() {
     const p = new URLSearchParams(window.location.search);
@@ -670,6 +813,11 @@
     if (e.key==='a'||e.key==='A'||e.key==='ㅁ') { e.preventDefault(); openAnnotation(); return; }
     if (e.key==='m'||e.key==='M'||e.key==='ㅡ') { e.preventDefault(); openTrainset(); return; }
     if (e.key==='p'||e.key==='P'||e.key==='ㅔ') { e.preventDefault(); openTemplatePopup(); return; }
+    // 숫자키 1~5 → 클립보드 슬롯 A~E
+    if (['1','2','3','4','5'].includes(e.key)) {
+      var slotMap = {'1':'A','2':'B','3':'C','4':'D','5':'E'};
+      e.preventDefault(); activateSlot(slotMap[e.key]); return;
+    }
   }
 
   // 부모 페이지 keydown
@@ -733,6 +881,7 @@
         document.getElementById('clipImg'+s).style.display   = 'block';
         document.getElementById('clipHint'+s).style.display  = 'none';
         document.getElementById('clipClear'+s).style.display = 'block';
+        document.getElementById('clipDl'+s).style.display    = 'block';
         var area = document.getElementById('clipArea'+s);
         area.classList.add('has-image','paste-flash');
         setTimeout(function(){ area.classList.remove('paste-flash'); }, 300);
