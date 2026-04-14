@@ -95,6 +95,9 @@
   <div class="header-site" id="siteLabel"></div>
   <input type="date" class="h-date" id="dateInput" onchange="loadImage()" />
   <button class="zoom-btn" onclick="resetZoom()">⊙ <span id="zoomLabel">100%</span></button>
+  <button class="zoom-btn" id="baseBtn" onclick="goBase()" title="최초 기준일로 돌아가기" style="background:rgba(255,255,255,.35);font-weight:800;">
+    ↩ 기준일 <span id="baseDateLabel"></span>
+  </button>
   <span style="font-size:10px;opacity:.7;white-space:nowrap;flex-shrink:0;">⇧+휠: 확대/축소</span>
 </div>
 
@@ -111,12 +114,27 @@
 
 <script>
   // ── URL 파라미터 읽기 ──
-  var params = new URLSearchParams(window.location.search);
-  var site = params.get('site') || '';
-  var date = params.get('date') || '';
+  var params   = new URLSearchParams(window.location.search);
+  var site     = params.get('site') || '';
+  var date     = params.get('date') || '';
+  var baseDate = date; // 최초 기준일 고정
 
   document.getElementById('siteLabel').textContent = site;
   if (date) document.getElementById('dateInput').value = date;
+
+  // 기준일 라벨 표시
+  if (baseDate) {
+    var bd = new Date(baseDate);
+    var mm = String(bd.getMonth()+1).padStart(2,'0');
+    var dd = String(bd.getDate()).padStart(2,'0');
+    document.getElementById('baseDateLabel').textContent = mm+'/'+dd;
+  }
+
+  // 기준일로 복귀
+  function goBase() {
+    document.getElementById('dateInput').value = baseDate;
+    loadImage();
+  }
 
   // ── 날짜 포맷 ──
   function formatDate(d) {
