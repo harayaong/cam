@@ -298,6 +298,9 @@
   <button class="btn-copy" id="templateToggleBtn" onclick="toggleTemplatePanel()" title="단축키: Y / ㅛ">
     🖼 이미지 템플릿 <kbd>[Y]</kbd>
   </button>
+  <button class="btn-copy" onclick="openTemplatePopup()" title="단축키: P / ㅔ">
+    🔲 팝업 <kbd>[P]</kbd>
+  </button>
   <button class="btn-copy" onclick="openAnnotation()" title="단축키: A / ㅁ">
     ✏️ 매뉴얼 어노테이션 <kbd>[A]</kbd>
   </button>
@@ -575,6 +578,25 @@
     applyZoom();
   }, { passive: false });
 
+  // ── 이미지 템플릿 팝업 ──  단축키: P
+  function openTemplatePopup() {
+    var site = document.getElementById('siteInput').value.trim();
+    var date = document.getElementById('dateInput').value;
+    if (!site) { alert('Site ID를 입력해 주세요.'); return; }
+    if (!date) { alert('날짜를 입력해 주세요.'); return; }
+    var w = Math.floor(screen.width  / 3);
+    var h = screen.height;
+    var left = screen.width - w;
+    var url = 'template-popup.html?site='+encodeURIComponent(site)+'&date='+date;
+    var popup = window.open(url, 'template_popup',
+      'width='+w+',height='+h+',left='+left+',top=0,resizable=yes,scrollbars=no');
+    if (!popup || popup.closed || typeof popup.closed==='undefined') {
+      var a = document.createElement('a');
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    }
+  }
+
   function openAnnotation() {
     const colW = Math.floor(screen.width  / 4);
     const rowH = Math.floor(screen.height / 2);
@@ -647,6 +669,7 @@
     if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') { e.preventDefault(); toggleTemplatePanel(); return; }
     if (e.key==='a'||e.key==='A'||e.key==='ㅁ') { e.preventDefault(); openAnnotation(); return; }
     if (e.key==='m'||e.key==='M'||e.key==='ㅡ') { e.preventDefault(); openTrainset(); return; }
+    if (e.key==='p'||e.key==='P'||e.key==='ㅔ') { e.preventDefault(); openTemplatePopup(); return; }
   }
 
   // 부모 페이지 keydown
