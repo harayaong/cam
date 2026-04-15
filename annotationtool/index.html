@@ -705,8 +705,13 @@
     const rowH = Math.floor(screen.height / 2);
     const pos  = ANNOTATION_POSITIONS[annotationPosIdx];
     annotationPosIdx = (annotationPosIdx + 1) % ANNOTATION_POSITIONS.length;
+    // 너비 400px, 높이 800px 고정, 위치는 4→8→3→7 순환
+    var fixW = 400;
+    var fixH = 800;
+    var fixL = Math.floor(screen.width * pos.col / 4);
+    var fixT = 0;
     const popup = window.open('http://54.211.199.218:8080/', 'ann_'+Date.now(),
-      'width='+colW+',height='+rowH+',left='+(colW*pos.col)+',top='+(rowH*pos.row)+',resizable=yes,scrollbars=yes');
+      'width='+fixW+',height='+fixH+',left='+fixL+',top='+fixT+',resizable=yes,scrollbars=yes');
     if (!popup || popup.closed || typeof popup.closed==='undefined') {
       const a = document.createElement('a');
       a.href='http://54.211.199.218:8080/'; a.target='_blank'; a.rel='noopener';
