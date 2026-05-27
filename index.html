@@ -440,7 +440,7 @@
   <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
     <h1>통합카메라조회</h1>
     <div class="header-actions">
-      <button class="btn" onclick="openImageTemplate()">이미지템플릿 <kbd class="kbd">T</kbd></button>
+      <button class="btn" onclick="openImageTemplate()">이미지템플릿 <kbd class="kbd">P</kbd></button>
       <button class="btn" onclick="openTrainsetManager()">트레인셋매니저 <kbd class="kbd">M</kbd></button>
       <button class="btn" id="btnCopySiteId" onclick="copySiteId()">SITE-ID 복사 <kbd class="kbd">X</kbd></button>
     </div>
@@ -467,7 +467,7 @@
 
 <!-- 단축키 안내 -->
 <div class="shortcut-bar">
-  <span class="shortcut-item"><kbd class="kbd">T</kbd> 이미지템플릿</span>
+  <span class="shortcut-item"><kbd class="kbd">P</kbd> 이미지템플릿</span>
   <span class="shortcut-item"><kbd class="kbd">M</kbd> 트레인셋매니저</span>
   <span class="shortcut-item"><kbd class="kbd">X</kbd> SITE-ID 복사</span>
   <span class="shortcut-item"><kbd class="kbd">D</kbd> 디버그툴</span>
@@ -892,7 +892,7 @@
     if (["Escape","f","F","ㄹ"].includes(e.key)) {
       if ($("fullscreenOverlay").classList.contains("active")) { closeFullscreen(); return; }
     }
-    if (["t","T","ㅅ"].includes(e.key)) { openImageTemplate(); return; }
+    if (["p","P","ㅔ"].includes(e.key)) { openImageTemplate(); return; }
     if (["m","M","ㅡ"].includes(e.key)) { openTrainsetManager(); return; }
     if (["x","X","ㅌ"].includes(e.key)) { copySiteId(); return; }
     if (["d","D","ㅇ"].includes(e.key)) { openDebugTool(); return; }
