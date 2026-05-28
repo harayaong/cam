@@ -520,7 +520,7 @@
       const found = Array.from(sel.options).find(o => o.value === selectedSite);
       if (found) sel.value = selectedSite;
     }
-    updateWeekday(); renderSyncButtons(); autoSelectSyncByTime();
+    updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
     updateClassroomIframe(); updateSiteIdBtn();
   }
 
@@ -686,13 +686,13 @@
   })();
 
   function onDateChange() {
-    updateWeekday(); renderSyncButtons(); autoSelectSyncByTime();
+    updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
     updateClassroomIframe();
     if (debugImgOpen) updateDebugImgPanel();
   }
 
   function onSiteChange() {
-    renderSyncButtons(); autoSelectSyncByTime();
+    renderSyncButtons(); setActiveSyncByPos(0);
     updateClassroomIframe();
     if (imgTplOpen) loadImgTplByDate(todayStr());
     if (debugImgOpen) updateDebugImgPanel();
@@ -767,19 +767,6 @@
     top.appendChild(frag);
   }
 
-  // 현재 시각에 맞는 싱크 자동 선택
-  function autoSelectSyncByTime() {
-    if (!visibleMap.length) { setActiveSyncByPos(0); return; }
-    const now = new Date();
-    const nowMin = now.getHours() * 60 + now.getMinutes();
-    // 현재 시각보다 크지 않은 마지막 슬롯 선택
-    let bestPos = 0;
-    for (let i = 0; i < visibleMap.length; i++) {
-      if (visibleMap[i].t <= nowMin) bestPos = i;
-    }
-    setActiveSyncByPos(bestPos);
-  }
-
   function setActiveSyncByPos(pos) {
     if (!visibleMap.length) return;
     currentPos = Math.max(0, Math.min(pos, visibleMap.length - 1));
@@ -800,16 +787,15 @@
                   : d >= new Date("2025-06-16")  ? "https://d22x5o96gu3cuo.cloudfront.net"
                   :                                "https://d175ce76v5cwjf.cloudfront.net";
     const frag = document.createDocumentFragment();
-    for (let cam = 1; cam <= 8; cam++) {
+    for (let cam = 1; cam <= 10; cam++) {
       const url   = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
       const label = `CAM${pad2(cam)}`;
       const wrapper = document.createElement("div");
       wrapper.className = "video-wrapper";
-      wrapper.style.display = "none"; // 로드 전 숨김
+      wrapper.style.display = ""; // 기본 표시
       const video = document.createElement("video");
       video.src = url; video.controls = true; video.preload = "metadata"; video.muted = true;
-      video.onerror       = () => { wrapper.style.display = "none"; };
-      video.onloadedmetadata = () => { wrapper.style.display = ""; };
+      video.onerror = () => { wrapper.style.display = "none"; };
       const overlay = document.createElement("div");
       overlay.className = "overlay-label"; overlay.textContent = label;
       const fsBtn = document.createElement("button");
