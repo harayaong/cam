@@ -30,52 +30,37 @@
 
     body {
       font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0; padding: 0;
-      line-height: 1.5;
-      font-size: 14px;
+      background: var(--bg); color: var(--text);
+      margin: 0; padding: 0; line-height: 1.5; font-size: 14px;
       transition: margin-right 0.3s cubic-bezier(0.4,0,0.2,1);
     }
-    body.imgtpl-open  { margin-right: 50vw; }
+    body.imgtpl-open   { margin-right: 50vw; }
     body.debugimg-open { margin-left: 50vw; }
 
     /* ── 헤더 ── */
     .header-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 28px;
-      height: 56px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      position: sticky; top: 0; z-index: 100;
-      box-shadow: var(--shadow-sm);
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0 28px; height: 56px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 8px;
+      position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm);
     }
     .header-bar h1 {
-      margin: 0;
-      font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
+      margin: 0; font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
       display: flex; align-items: center; gap: 8px; color: var(--text);
     }
     .header-bar h1::before {
-      content: '';
-      display: inline-block;
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-light);
+      content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 0 3px var(--accent-light);
     }
     .header-actions { display: flex; flex-wrap: wrap; gap: 6px; }
 
     /* ── 컨트롤 바 ── */
     .control-bar {
-      background: var(--surface);
-      padding: 12px 28px;
+      background: var(--surface); padding: 12px 28px;
       display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
       border-bottom: 1px solid var(--border);
-      position: sticky; top: 56px; z-index: 99;
-      box-shadow: var(--shadow-sm);
+      position: sticky; top: 56px; z-index: 99; box-shadow: var(--shadow-sm);
     }
     .control-group { display: flex; align-items: center; gap: 7px; }
 
@@ -84,32 +69,27 @@
       white-space: nowrap; letter-spacing: 0.3px; text-transform: uppercase;
     }
     input[type="date"], input[type="text"], select {
-      height: 36px; padding: 0 12px;
-      font-size: 13px; font-family: inherit;
+      height: 36px; padding: 0 12px; font-size: 13px; font-family: inherit;
       border: 1.5px solid var(--border); border-radius: var(--radius-sm);
       background: var(--surface); color: var(--text);
       outline: none; transition: border-color 0.2s, box-shadow 0.2s;
     }
     input[type="date"]:focus, input[type="text"]:focus, select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0,200,180,0.12);
+      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,200,180,0.12);
     }
-    #siteInput { width: auto; max-width: 100%; }
+    #siteInput  { width: auto; max-width: 100%; }
     #siteSearch { width: 150px; }
 
     .weekday-badge {
-      display: inline-flex; align-items: center;
-      padding: 3px 12px; border-radius: 20px;
+      display: inline-flex; align-items: center; padding: 3px 12px; border-radius: 20px;
       background: var(--accent-light); color: var(--accent-dark);
-      font-weight: 700; font-size: 12px;
-      border: 1px solid var(--badge-border);
+      font-weight: 700; font-size: 12px; border: 1px solid var(--badge-border);
       white-space: nowrap; letter-spacing: 0.2px;
     }
 
     /* ── 버튼 ── */
     .btn {
-      height: 36px; padding: 0 14px;
-      font-size: 13px; font-weight: 600; font-family: inherit;
+      height: 36px; padding: 0 14px; font-size: 13px; font-weight: 600; font-family: inherit;
       border: 1.5px solid var(--border); border-radius: var(--radius-sm);
       background: var(--surface); color: var(--text-muted);
       cursor: pointer; white-space: nowrap; transition: all 0.18s;
@@ -138,8 +118,7 @@
     .sync-buttons button.win2 { background: var(--win2); border-color: var(--win2-border); }
     .sync-buttons button.active {
       background: var(--accent) !important; border-color: var(--accent) !important;
-      color: #fff !important; font-weight: 700;
-      box-shadow: 0 2px 8px rgba(0,200,180,0.3);
+      color: #fff !important; font-weight: 700; box-shadow: 0 2px 8px rgba(0,200,180,0.3);
     }
 
     /* ── 비디오 그리드 ── */
@@ -150,9 +129,8 @@
     @media (max-width: 1100px) { .video-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 480px)  { .video-grid { grid-template-columns: 1fr 1fr; } }
     .video-wrapper {
-      position: relative; border-radius: var(--radius);
-      overflow: hidden; background: #0a0a0a;
-      box-shadow: var(--shadow-sm); transition: box-shadow 0.2s;
+      position: relative; border-radius: var(--radius); overflow: hidden;
+      background: #0a0a0a; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s;
     }
     .video-wrapper:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.14); }
     video { width: 100%; height: auto; display: block; background: #000; }
@@ -180,8 +158,7 @@
     .fs-header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 10px 18px; background: #0d1117; color: #fff;
-      font-size: 13px; font-weight: 600; flex-shrink: 0;
-      border-bottom: 1px solid #222;
+      font-size: 13px; font-weight: 600; flex-shrink: 0; border-bottom: 1px solid #222;
     }
     .fs-close {
       background: #1e2530; color: #ccc; border: 1px solid #333;
@@ -193,8 +170,7 @@
 
     /* ── 단축키 안내 ── */
     .shortcut-bar {
-      padding: 7px 28px; background: #f8fafb;
-      border-bottom: 1px solid var(--border);
+      padding: 7px 28px; background: #f8fafb; border-bottom: 1px solid var(--border);
       font-size: 11.5px; color: var(--text-muted);
       display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
       position: sticky; top: 116px; z-index: 98;
@@ -223,27 +199,23 @@
       margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
     }
     .classroom-panel-title::before {
-      content: ''; display: inline-block;
-      width: 3px; height: 14px;
+      content: ''; display: inline-block; width: 3px; height: 14px;
       background: var(--accent); border-radius: 2px;
     }
     .iframe-clip {
-      width: 100%; overflow: hidden;
-      border-radius: var(--radius); border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm); background: var(--surface);
-      position: relative; scrollbar-width: none;
+      width: 100%; overflow: hidden; border-radius: var(--radius);
+      border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+      background: var(--surface); position: relative; scrollbar-width: none;
     }
     .iframe-clip::-webkit-scrollbar { display: none; }
     .iframe-clip iframe {
-      width: calc(100% + 20px); height: 2500px;
-      border: none; margin-top: -120px;
-      display: block; pointer-events: auto; overflow: hidden;
+      width: calc(100% + 20px); height: 2500px; border: none;
+      margin-top: -120px; display: block; pointer-events: auto; overflow: hidden;
     }
     .iframe-loading {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      background: var(--surface); color: var(--text-muted);
-      font-size: 13px; gap: 8px;
+      background: var(--surface); color: var(--text-muted); font-size: 13px; gap: 8px;
     }
     .iframe-loading.hidden { display: none; }
     .iframe-spinner {
@@ -255,22 +227,18 @@
 
     /* ── 사이드패널 공통 ── */
     .resize-handle {
-      position: absolute; top: 0; left: 0;
-      width: 5px; height: 100%;
-      cursor: ew-resize; background: transparent; z-index: 10;
-      transition: background 0.2s;
+      position: absolute; top: 0; left: 0; width: 5px; height: 100%;
+      cursor: ew-resize; background: transparent; z-index: 10; transition: background 0.2s;
     }
     .resize-handle:hover, .resize-handle.dragging { background: var(--accent); opacity: 0.5; }
 
     /* ── 이미지템플릿 패널 ── */
     #imgTplPanel {
-      position: fixed; top: 0; right: 0;
-      width: 50vw; height: 100vh;
+      position: fixed; top: 0; right: 0; width: 50vw; height: 100vh;
       background: var(--surface); border-left: 1px solid var(--border);
       box-shadow: -4px 0 24px rgba(0,0,0,0.1);
       z-index: 200; display: flex; flex-direction: column;
-      transform: translateX(100%);
-      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     #imgTplPanel.open { transform: translateX(0); }
     .imgtpl-header {
@@ -279,7 +247,7 @@
     }
     .imgtpl-header-left { display: flex; flex-direction: column; gap: 2px; }
     .imgtpl-title { font-size: 14px; font-weight: 700; color: var(--text); }
-    .imgtpl-meta { font-size: 11px; color: var(--text-muted); }
+    .imgtpl-meta  { font-size: 11px; color: var(--text-muted); }
     .imgtpl-close {
       background: none; border: none; font-size: 18px; cursor: pointer;
       color: var(--text-muted); padding: 4px; line-height: 1;
@@ -298,8 +266,7 @@
     .imgtpl-canvas.grabbing { cursor: grabbing; }
     .imgtpl-canvas img {
       width: 100%; height: auto; display: block;
-      user-select: none; -webkit-user-drag: none;
-      transform-origin: 0 0; transition: none;
+      user-select: none; -webkit-user-drag: none; transform-origin: 0 0; transition: none;
     }
     .imgtpl-img-error {
       width: 100%; flex: 1; background: #f3f4f6;
@@ -322,13 +289,11 @@
 
     /* ── 디버그이미지 패널 ── */
     #debugImgPanel {
-      position: fixed; top: 0; left: 0;
-      width: 50vw; height: 100vh;
+      position: fixed; top: 0; left: 0; width: 50vw; height: 100vh;
       background: var(--surface); border-right: 1px solid var(--border);
       box-shadow: 4px 0 24px rgba(0,0,0,0.1);
       z-index: 200; display: flex; flex-direction: column;
-      transform: translateX(-100%);
-      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
     }
     #debugImgPanel.open { transform: translateX(0); }
     .dbgpanel-header {
@@ -337,7 +302,7 @@
     }
     .dbgpanel-header-left { display: flex; flex-direction: column; gap: 2px; }
     .dbgpanel-title { font-size: 14px; font-weight: 700; color: var(--text); }
-    .dbgpanel-meta { font-size: 11px; color: var(--text-muted); }
+    .dbgpanel-meta  { font-size: 11px; color: var(--text-muted); }
     .dbgpanel-close {
       background: none; border: none; font-size: 18px; cursor: pointer;
       color: var(--text-muted); padding: 4px; line-height: 1;
@@ -443,6 +408,7 @@
       <button class="btn" onclick="openImageTemplate()">이미지템플릿 <kbd class="kbd">P</kbd></button>
       <button class="btn" onclick="openTrainsetManager()">트레인셋매니저 <kbd class="kbd">M</kbd></button>
       <button class="btn" id="btnCopySiteId" onclick="copySiteId()">SITE-ID 복사 <kbd class="kbd">X</kbd></button>
+      <button class="btn" onclick="refreshSiteList()" title="사이트 목록 강제 갱신">↺ 목록 갱신</button>
     </div>
   </div>
 </div>
@@ -457,7 +423,7 @@
   <div class="control-group">
     <label for="siteSearch">🔎</label>
     <input type="text" id="siteSearch" placeholder="검색어 입력"
-        oninput="filterSiteOptions()" onkeydown="handleSearchEnter(event)">
+      oninput="filterSiteOptions()" onkeydown="handleSearchKeydown(event)">
   </div>
   <div class="control-group" style="flex:1; min-width:200px;">
     <label for="siteInput">SITE</label>
@@ -480,17 +446,13 @@
   <span class="shortcut-item"><kbd class="kbd">Q</kbd> 전날</span>
   <span class="shortcut-item"><kbd class="kbd">W</kbd> 다음날</span>
   <span class="shortcut-item"><kbd class="kbd">1</kbd> -3분 <kbd class="kbd">2</kbd> -30초 <kbd class="kbd">3</kbd> +30초 <kbd class="kbd">4</kbd> +3분</span>
-  <span class="shortcut-item"><kbd class="kbd">F</kbd> 전체화면 닫기</span>
+  <span class="shortcut-item"><kbd class="kbd">ESC/F</kbd> 전체화면 닫기</span>
 </div>
 
 <!-- 메인 콘텐츠 -->
 <div class="main-content">
-  <div id="syncSection">
-    <div class="sync-buttons" id="syncContainerTop"></div>
-  </div>
-  <div id="videoSection">
-    <div id="videoContainer" class="video-grid"></div>
-  </div>
+  <div class="sync-buttons" id="syncContainerTop"></div>
+  <div id="videoContainer" class="video-grid"></div>
   <div class="classroom-panel">
     <div class="classroom-panel-title" style="display:flex; justify-content:flex-start; align-items:center; gap:10px;">
       <span>클래스룸 정보</span>
@@ -498,8 +460,7 @@
     </div>
     <div class="iframe-clip">
       <div class="iframe-loading" id="classroomLoading">
-        <div class="iframe-spinner"></div>
-        불러오는 중...
+        <div class="iframe-spinner"></div>불러오는 중...
       </div>
       <iframe id="classroomIframe" onload="
         $('classroomLoading').classList.add('hidden');
@@ -510,9 +471,10 @@
   <div class="version-note">
     <strong>버전 변경사항</strong>
     <ul>
-      <li>v2 - 반응형 레이아웃, 전체화면 모드, UI 개선</li>
-      <li>0105 - S3 버킷 주소 변경</li>
-      <li>sites.html - 사이트 리스트 외부 파일 분리</li>
+      <li>sites.html — 사이트 리스트 외부 파일 분리, 구글 스프레드시트 복붙으로 관리</li>
+      <li>현재 시각 기준 싱크 자동 선택, 사이트 이동 디바운스, 목록 강제 갱신 버튼 추가</li>
+      <li>↑↓ 사이트 이동 시 패널·버튼 정상 갱신, Q/W 날짜 이동 시 싱크 버튼 갱신 수정</li>
+      <li>검색박스 ESC 초기화, 단축키 T→P 변경</li>
     </ul>
   </div>
 </div>
@@ -521,10 +483,16 @@
   // ── 유틸 ──
   const $ = id => document.getElementById(id);
   const pad2 = v => String(v).padStart(2, "0");
-  const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; };
-  const dateStr = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  const todayStr = () => { const d = new Date(); return dateStr(d); };
+  const dateStr  = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
   const DAY_NAMES = ['일','월','화','수','목','금','토'];
-  const DAY_MAP = { '월':1, '화':2, '수':3, '목':4, '금':5, '토':6, '일':0 };
+  const DAY_MAP   = { '월':1, '화':2, '수':3, '목':4, '금':5, '토':6, '일':0 };
+
+  // 디바운스 — 연속 호출 시 마지막 것만 실행
+  function debounce(fn, ms) {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
 
   // ── 사이트 목록 (sites.html) ──
   const SITE_CACHE_KEY = "playtag_site_list";
@@ -552,7 +520,7 @@
       const found = Array.from(sel.options).find(o => o.value === selectedSite);
       if (found) sel.value = selectedSite;
     }
-    updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
+    updateWeekday(); renderSyncButtons(); autoSelectSyncByTime();
     updateClassroomIframe(); updateSiteIdBtn();
   }
 
@@ -564,7 +532,7 @@
       $("siteInput").innerHTML = `<option value="">목록 로딩 중...</option>`;
     }
     try {
-      const res = await fetch("sites.html?_=" + Date.now());
+      const res  = await fetch("sites.html?_=" + Date.now());
       const text = await res.text();
       localStorage.setItem(SITE_CACHE_KEY, text);
       if (!cached) applySiteOptions(parseSiteData(text), selectedSite);
@@ -574,10 +542,27 @@
     }
   }
 
+  // 강제 갱신 (캐시 무시)
+  async function refreshSiteList() {
+    const sel = $("siteInput");
+    const cur = sel.value;
+    localStorage.removeItem(SITE_CACHE_KEY);
+    sel.innerHTML = `<option value="">갱신 중...</option>`;
+    try {
+      const res  = await fetch("sites.html?_=" + Date.now());
+      const text = await res.text();
+      localStorage.setItem(SITE_CACHE_KEY, text);
+      applySiteOptions(parseSiteData(text), cur);
+    } catch (e) {
+      sel.innerHTML = `<option value="">로드 실패 — sites.html 확인</option>`;
+      console.error("강제 갱신 실패:", e);
+    }
+  }
+
   // ── 서비스 요일 ──
   function getServiceDays() {
     const txt = $("siteInput").options[$("siteInput").selectedIndex]?.textContent || "";
-    const match = txt.match(/([월화수목금토일,\s]+)\s*$/);
+    const match = txt.match(/\/\s*([월화수목금토일,\s]+)\s*$/);
     if (!match) return [];
     return match[1].split(/[,\s]+/).map(c => DAY_MAP[c.trim()]).filter(d => d !== undefined);
   }
@@ -603,16 +588,11 @@
   const applyImgTransform = () => {
     $("imgTplImg").style.transform = `translate(${tplX}px, ${tplY}px) scale(${tplScale})`;
   };
-
   function imgTplZoom(factor) {
     tplScale = Math.min(Math.max(tplScale * factor, 0.5), 8);
     applyImgTransform();
   }
-
-  function imgTplResetZoom() {
-    tplScale = 1; tplX = 0; tplY = 0;
-    applyImgTransform();
-  }
+  function imgTplResetZoom() { tplScale = 1; tplX = 0; tplY = 0; applyImgTransform(); }
 
   $("imgTplCanvas").addEventListener("wheel", e => {
     e.preventDefault();
@@ -620,7 +600,7 @@
       imgTplZoom(e.deltaY < 0 ? 1.1 : 1/1.1);
     } else {
       const renderedH = $("imgTplImg").offsetHeight * tplScale;
-      const canvasH = $("imgTplCanvas").clientHeight;
+      const canvasH   = $("imgTplCanvas").clientHeight;
       tplY = Math.min(0, Math.max(Math.min(0, canvasH - renderedH), tplY - e.deltaY));
       applyImgTransform();
     }
@@ -628,19 +608,16 @@
 
   $("imgTplCanvas").addEventListener("mousedown", e => {
     tplDragging = true;
-    tplDragStartX = e.clientX - tplX;
-    tplDragStartY = e.clientY - tplY;
+    tplDragStartX = e.clientX - tplX; tplDragStartY = e.clientY - tplY;
     $("imgTplCanvas").classList.add("grabbing");
   });
   window.addEventListener("mousemove", e => {
     if (!tplDragging) return;
-    tplX = e.clientX - tplDragStartX;
-    tplY = e.clientY - tplDragStartY;
+    tplX = e.clientX - tplDragStartX; tplY = e.clientY - tplDragStartY;
     applyImgTransform();
   });
   window.addEventListener("mouseup", () => {
-    tplDragging = false;
-    $("imgTplCanvas").classList.remove("grabbing");
+    tplDragging = false; $("imgTplCanvas").classList.remove("grabbing");
   });
 
   function loadImgTplByDate(date) {
@@ -650,17 +627,13 @@
     imgTplCurrentUrl = url;
     $("imgTplMeta").textContent = `${date} (${DAY_NAMES[new Date(date).getDay()]}) — ${site}`;
     const img = $("imgTplImg");
-    img.style.display = "block";
-    $("imgTplError").style.display = "none";
-    img.src = url;
-    imgTplResetZoom();
+    img.style.display = "block"; $("imgTplError").style.display = "none";
+    img.src = url; imgTplResetZoom();
     if ($("imgTplDateInput")) $("imgTplDateInput").value = date;
-    const prev1 = getNthPrevServiceDate(1);
-    const prev2 = getNthPrevServiceDate(2);
+    const prev1 = getNthPrevServiceDate(1), prev2 = getNthPrevServiceDate(2);
     $("btnImgPrev1").classList.toggle("btn-accent", date === prev1);
     $("btnImgPrev2").classList.toggle("btn-accent", date === prev2);
   }
-
   function loadImgTplPrevN(n) { loadImgTplByDate(getNthPrevServiceDate(n)); }
 
   function toggleImgTpl(open) {
@@ -673,7 +646,6 @@
       loadImgTplByDate(todayStr());
     }
   }
-
   function openImgTplInNew() { if (imgTplCurrentUrl) window.open(imgTplCurrentUrl, "_blank"); }
 
   // ── 전체화면 ──
@@ -684,23 +656,25 @@
     $("fullscreenVideo").focus();
   }
   function closeFullscreen() {
-    const v = $("fullscreenVideo");
-    v.pause(); v.src = "";
+    const v = $("fullscreenVideo"); v.pause(); v.src = "";
     $("fullscreenOverlay").classList.remove("active");
   }
-  $("fullscreenOverlay").addEventListener("click", e => { if (e.target === $("fullscreenOverlay")) closeFullscreen(); });
+  $("fullscreenOverlay").addEventListener("click", e => {
+    if (e.target === $("fullscreenOverlay")) closeFullscreen();
+  });
 
   // ── 상태 ──
   let currentPos = 0, visibleMap = [];
 
-  // ── iframe ──
-  function updateClassroomIframe() {
+  // ── iframe (디바운스 적용) ──
+  const updateClassroomIframe = debounce(() => {
     const site = $("siteInput").value.trim();
     const date = $("dateInput").value;
     if (!site || !date) return;
     $("classroomLoading").classList.remove("hidden");
-    $("classroomIframe").src = `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
-  }
+    $("classroomIframe").src =
+      `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+  }, 300);
 
   // ── 초기화 ──
   (function init() {
@@ -712,13 +686,13 @@
   })();
 
   function onDateChange() {
-    updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
+    updateWeekday(); renderSyncButtons(); autoSelectSyncByTime();
     updateClassroomIframe();
     if (debugImgOpen) updateDebugImgPanel();
   }
 
   function onSiteChange() {
-    renderSyncButtons(); setActiveSyncByPos(0);
+    renderSyncButtons(); autoSelectSyncByTime();
     updateClassroomIframe();
     if (imgTplOpen) loadImgTplByDate(todayStr());
     if (debugImgOpen) updateDebugImgPanel();
@@ -727,12 +701,19 @@
 
   // ── 요일 ──
   function updateWeekday() {
-    const dateVal = $("dateInput").value;
-    $("weekday").textContent = dateVal ? ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'][new Date(dateVal).getDay()] : "";
+    const v = $("dateInput").value;
+    $("weekday").textContent = v ? ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'][new Date(v).getDay()] : "";
   }
 
   // ── 검색 ──
-  function handleSearchEnter(e) {
+  function handleSearchKeydown(e) {
+    if (e.key === "Escape") {
+      // ESC: 검색어 초기화 + 전체 목록 복원
+      $("siteSearch").value = "";
+      for (const opt of $("siteInput").options) opt.style.display = "";
+      $("siteSearch").blur();
+      return;
+    }
     if (e.key !== "Enter") return;
     const q = $("siteSearch").value.trim().toLowerCase();
     const sel = $("siteInput");
@@ -745,7 +726,7 @@
     if (!matches.length) { alert("일치하는 교실이 없습니다."); return; }
     sel.selectedIndex = matches[0];
     $("siteSearch").blur();
-    renderSyncButtons(); setActiveSyncByPos(0); updateClassroomIframe();
+    onSiteChange();
   }
 
   function filterSiteOptions() {
@@ -784,9 +765,19 @@
       frag.appendChild(btn);
     });
     top.appendChild(frag);
+  }
 
-    if (currentPos < 0 || currentPos >= visibleMap.length) setActiveSyncByPos(0);
-    else $(`sync-btn-pos-${currentPos}`)?.classList.add("active");
+  // 현재 시각에 맞는 싱크 자동 선택
+  function autoSelectSyncByTime() {
+    if (!visibleMap.length) { setActiveSyncByPos(0); return; }
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    // 현재 시각보다 크지 않은 마지막 슬롯 선택
+    let bestPos = 0;
+    for (let i = 0; i < visibleMap.length; i++) {
+      if (visibleMap[i].t <= nowMin) bestPos = i;
+    }
+    setActiveSyncByPos(bestPos);
   }
 
   function setActiveSyncByPos(pos) {
@@ -797,12 +788,12 @@
     $(`sync-btn-pos-${currentPos}`)?.classList.add("active");
   }
 
-  // ── 비디오 ──
-  function loadVideos(syncNumber) {
+  // ── 비디오 (디바운스 적용) ──
+  const loadVideos = debounce((syncNumber) => {
     const date = $("dateInput").value;
     const site = $("siteInput").value.trim();
     const container = $("videoContainer");
-    if (!date || !site) { alert("날짜와 교실을 선택해주세요."); return; }
+    if (!date || !site) return;
     const syncLabel = `sync${syncNumber.padStart(3,'0')}`;
     const d = new Date(date);
     const baseURL = d >= new Date("2025-12-31") ? "https://d3j9wzynvd2br9.cloudfront.net"
@@ -810,13 +801,14 @@
                   :                                "https://d175ce76v5cwjf.cloudfront.net";
     const frag = document.createDocumentFragment();
     for (let cam = 1; cam <= 8; cam++) {
-      const url = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
+      const url   = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
       const label = `CAM${pad2(cam)}`;
       const wrapper = document.createElement("div");
       wrapper.className = "video-wrapper";
+      wrapper.style.display = "none"; // 로드 전 숨김
       const video = document.createElement("video");
       video.src = url; video.controls = true; video.preload = "metadata"; video.muted = true;
-      video.onerror = () => { wrapper.style.display = "none"; };
+      video.onerror       = () => { wrapper.style.display = "none"; };
       video.onloadedmetadata = () => { wrapper.style.display = ""; };
       const overlay = document.createElement("div");
       overlay.className = "overlay-label"; overlay.textContent = label;
@@ -828,7 +820,7 @@
     }
     container.innerHTML = "";
     container.appendChild(frag);
-  }
+  }, 200);
 
   // ── 바로가기 ──
   function getSiteAndDate() {
@@ -848,8 +840,7 @@
     const site = $("siteInput").value.trim();
     if (!site) { alert("SITE-ID를 선택해주세요."); return; }
     navigator.clipboard.writeText(site).then(() => {
-      const btn = $("btnCopySiteId");
-      const prev = btn.innerHTML;
+      const btn = $("btnCopySiteId"), prev = btn.innerHTML;
       btn.innerHTML = `✅ 복사됨!`;
       setTimeout(() => { btn.innerHTML = prev; }, 1500);
     });
@@ -870,7 +861,8 @@
     const { site, date } = getSiteAndDate();
     if (!site) return;
     $("debugImgMeta").textContent = `${date} — ${site}`;
-    $("debugImgIframe").src = `https://playtag-debugging-tool.vercel.app/sync-images.html?mode=all&date=${encodeURIComponent(date)}&site=${encodeURIComponent(site)}`;
+    $("debugImgIframe").src =
+      `https://playtag-debugging-tool.vercel.app/sync-images.html?mode=all&date=${encodeURIComponent(date)}&site=${encodeURIComponent(site)}`;
   }
   function toggleDebugImgPanel(open) {
     debugImgOpen = open;
@@ -912,23 +904,27 @@
       const prev = Math.max(currentPos - 1, 0);
       if (prev !== currentPos) setActiveSyncByPos(prev);
     } else if (["ArrowUp","ArrowDown"].includes(e.key)) {
+      e.preventDefault();
       const sel = $("siteInput");
       const idx = sel.selectedIndex;
-      if (e.key === "ArrowUp" && idx > 0) sel.selectedIndex = idx - 1;
-      else if (e.key === "ArrowDown" && idx < sel.options.length - 1) sel.selectedIndex = idx + 1;
-      else return;
-      renderSyncButtons(); setActiveSyncByPos(0); updateClassroomIframe();
+      // 숨겨진 옵션 건너뛰기
+      let next = idx;
+      const dir = e.key === "ArrowUp" ? -1 : 1;
+      do { next += dir; } while (next >= 0 && next < sel.options.length && sel.options[next].style.display === "none");
+      if (next < 0 || next >= sel.options.length) return;
+      sel.selectedIndex = next;
+      onSiteChange();
     } else if (["1","2","3","4"].includes(e.key)) {
       const seek = {"1":-180,"2":-30,"3":30,"4":180}[e.key];
       videos.forEach(v => { v.currentTime = Math.max(0, v.currentTime + seek); });
     } else if (["q","Q","ㅂ"].includes(e.key)) {
       const el = $("dateInput");
       const d = new Date(el.value); d.setDate(d.getDate() - 1);
-      el.value = dateStr(d); updateWeekday(); setActiveSyncByPos(currentPos); updateClassroomIframe();
+      el.value = dateStr(d); onDateChange();
     } else if (["w","W","ㅈ"].includes(e.key)) {
       const el = $("dateInput");
       const d = new Date(el.value); d.setDate(d.getDate() + 1);
-      el.value = dateStr(d); updateWeekday(); setActiveSyncByPos(currentPos); updateClassroomIframe();
+      el.value = dateStr(d); onDateChange();
     }
   });
 
@@ -937,8 +933,7 @@
 
   // ── 사이드패널 리사이즈 ──
   (function() {
-    const handle = $("imgTplResizeHandle");
-    const panel  = $("imgTplPanel");
+    const handle = $("imgTplResizeHandle"), panel = $("imgTplPanel");
     let dragging = false, startX = 0, startW = 0;
     handle.addEventListener("mousedown", e => {
       dragging = true; startX = e.clientX; startW = panel.offsetWidth;
