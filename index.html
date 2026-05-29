@@ -782,7 +782,7 @@
   }
 
   // ── 비디오 (디바운스 적용) ──
-  const loadVideos = debounce((syncNumber) => {
+  function loadVideos(syncNumber) {
     const date = $("dateInput").value;
     const site = $("siteInput").value.trim();
     const container = $("videoContainer");
@@ -812,7 +812,7 @@
     }
     container.innerHTML = "";
     container.appendChild(frag);
-  }, 200);
+  }
 
   // ── 바로가기 ──
   function getSiteAndDate() {
