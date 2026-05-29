@@ -463,6 +463,7 @@
         <div class="iframe-spinner"></div>불러오는 중...
       </div>
       <iframe id="classroomIframe" onload="
+        clearTimeout(updateClassroomIframe._t);
         $('classroomLoading').classList.add('hidden');
         try { this.style.height = this.contentDocument.documentElement.scrollHeight + 'px'; } catch(e) {}
       "></iframe>
@@ -674,6 +675,11 @@
     $("classroomLoading").classList.remove("hidden");
     $("classroomIframe").src =
       `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
+    // onload가 firing 안 될 경우 대비 — 5초 후 강제 숨김
+    clearTimeout(updateClassroomIframe._t);
+    updateClassroomIframe._t = setTimeout(() => {
+      $("classroomLoading").classList.add("hidden");
+    }, 5000);
   }, 300);
 
   // ── 초기화 ──
