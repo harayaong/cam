@@ -495,7 +495,6 @@
   const DAY_NAMES = ['일','월','화','수','목','금','토'];
   const DAY_MAP   = { '월':1, '화':2, '수':3, '목':4, '금':5, '토':6, '일':0 };
   const VIDEO_TILE_COUNT = 10;
-  const EAGER_VIDEO_COUNT = 4;
   const VIDEO_LOAD_DEBOUNCE_MS = 120;
 
   // 디바운스 — 연속 호출 시 마지막 것만 실행
@@ -821,7 +820,7 @@
       wrapper.className = "video-wrapper";
       wrapper.dataset.cam = String(cam);
       const video = document.createElement("video");
-      video.controls = true; video.preload = cam <= EAGER_VIDEO_COUNT ? "metadata" : "none"; video.muted = true;
+      video.controls = true; video.preload = "metadata"; video.muted = true;
       video.onerror = () => { wrapper.style.display = "none"; };
       const overlay = document.createElement("div");
       overlay.className = "overlay-label"; overlay.textContent = label;
@@ -852,7 +851,7 @@
       const fsBtn = wrapper.querySelector(".fullscreen-btn");
       overlay.textContent = label;
       fsBtn.onclick = () => openFullscreen(url, `${label} — ${site} / ${date} / ${syncLabel}`);
-      video.preload = cam <= EAGER_VIDEO_COUNT ? "metadata" : "none";
+      video.preload = "metadata";
       if (video.src !== url) {
         video.pause();
         video.src = url;
