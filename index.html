@@ -486,6 +486,12 @@
   const pad2 = v => String(v).padStart(2, "0");
   const todayStr = () => { const d = new Date(); return dateStr(d); };
   const dateStr  = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  const parseLocalDate = v => {
+    const [y, m, d] = v.split("-").map(Number);
+    if (!y || !m || !d) return new Date();
+    return new Date(y, m - 1, d);
+  };
+  const dayIndexFromDate = v => parseLocalDate(v).getDay();
   const DAY_NAMES = ['일','월','화','수','목','금','토'];
   const DAY_MAP   = { '월':1, '화':2, '수':3, '목':4, '금':5, '토':6, '일':0 };
 
@@ -507,10 +513,29 @@
       if (!siteId) continue;
       const opt = document.createElement("option");
       opt.value = siteId;
+      opt.dataset.company = company || "";
+      opt.dataset.room = room || "";
+      opt.dataset.schedule = schedule || "";
+      opt.dataset.days = days || "";
       opt.textContent = `${siteId} / ${company||''} / ${room||''} / ${schedule||''} / ${days||''}`;
       frag.appendChild(opt);
     }
     return frag;
+  }
+
+  function getSelectedSiteOption() {
+    const sel = $("siteInput");
+    return sel.options[sel.selectedIndex] || null;
+  }
+
+  function refreshView({ resetSync = true, updateTemplate = false } = {}) {
+    updateWeekday();
+    renderSyncButtons();
+    if (resetSync) setActiveSyncByPos(0);
+    updateClassroomIframe();
+    if (updateTemplate && imgTplOpen) loadImgTplByDate(todayStr());
+    if (debugImgOpen) updateDebugImgPanel();
+    updateSiteIdBtn();
   }
 
   function applySiteOptions(frag, selectedSite) {
@@ -521,8 +546,7 @@
       const found = Array.from(sel.options).find(o => o.value === selectedSite);
       if (found) sel.value = selectedSite;
     }
-    updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
-    updateClassroomIframe(); updateSiteIdBtn();
+    refreshView();
   }
 
   async function loadSiteList(selectedSite) {
@@ -562,10 +586,8 @@
 
   // ── 서비스 요일 ──
   function getServiceDays() {
-    const txt = $("siteInput").options[$("siteInput").selectedIndex]?.textContent || "";
-    const match = txt.match(/\/\s*([월화수목금토일,\s]+)\s*$/);
-    if (!match) return [];
-    return match[1].split(/[,\s]+/).map(c => DAY_MAP[c.trim()]).filter(d => d !== undefined);
+    const daysText = getSelectedSiteOption()?.dataset.days || "";
+    return daysText.split(/[,\s]+/).map(c => DAY_MAP[c.trim()]).filter(d => d !== undefined);
   }
 
   function getNthPrevServiceDate(n) {
@@ -626,7 +648,7 @@
     if (!site || !date) return;
     const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
     imgTplCurrentUrl = url;
-    $("imgTplMeta").textContent = `${date} (${DAY_NAMES[new Date(date).getDay()]}) — ${site}`;
+    $("imgTplMeta").textContent = `${date} (${DAY_NAMES[dayIndexFromDate(date)]}) — ${site}`;
     const img = $("imgTplImg");
     img.style.display = "block"; $("imgTplError").style.display = "none";
     img.src = url; imgTplResetZoom();
@@ -665,7 +687,7 @@
   });
 
   // ── 상태 ──
-  let currentPos = 0, visibleMap = [];
+  let currentPos = 0, visibleMap = [], debugImgOpen = false;
 
   // ── iframe (디바운스 적용) ──
   const updateClassroomIframe = debounce(() => {
@@ -692,23 +714,17 @@
   })();
 
   function onDateChange() {
-    updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
-    updateClassroomIframe();
-    if (debugImgOpen) updateDebugImgPanel();
+    refreshView();
   }
 
   function onSiteChange() {
-    renderSyncButtons(); setActiveSyncByPos(0);
-    updateClassroomIframe();
-    if (imgTplOpen) loadImgTplByDate(todayStr());
-    if (debugImgOpen) updateDebugImgPanel();
-    updateSiteIdBtn();
+    refreshView({ updateTemplate: true });
   }
 
   // ── 요일 ──
   function updateWeekday() {
     const v = $("dateInput").value;
-    $("weekday").textContent = v ? ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'][new Date(v).getDay()] : "";
+    $("weekday").textContent = v ? ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'][dayIndexFromDate(v)] : "";
   }
 
   // ── 검색 ──
@@ -744,7 +760,7 @@
 
   // ── 싱크 ──
   function getSiteWindows() {
-    const txt = $("siteInput").options[$("siteInput").selectedIndex]?.textContent || "";
+    const txt = getSelectedSiteOption()?.dataset.schedule || "";
     const toMin = s => parseInt(s.slice(0,2))*60 + parseInt(s.slice(2));
     return [...txt.matchAll(/(\d{4})-(\d{4})/g)].map(m => [toMin(m[1]), toMin(m[2])]).sort((a,b)=>a[0]-b[0]);
   }
@@ -781,37 +797,55 @@
     $(`sync-btn-pos-${currentPos}`)?.classList.add("active");
   }
 
-  // ── 비디오 (디바운스 적용) ──
-  function loadVideos(syncNumber) {
-    const date = $("dateInput").value;
-    const site = $("siteInput").value.trim();
+  function getVideoBaseURL(date) {
+    return date >= "2025-12-31" ? "https://d3j9wzynvd2br9.cloudfront.net"
+         : date >= "2025-06-16" ? "https://d22x5o96gu3cuo.cloudfront.net"
+         :                         "https://d175ce76v5cwjf.cloudfront.net";
+  }
+
+  function ensureVideoTiles() {
     const container = $("videoContainer");
-    if (!date || !site) return;
-    const syncLabel = `sync${syncNumber.padStart(3,'0')}`;
-    const d = new Date(date);
-    const baseURL = d >= new Date("2025-12-31") ? "https://d3j9wzynvd2br9.cloudfront.net"
-                  : d >= new Date("2025-06-16")  ? "https://d22x5o96gu3cuo.cloudfront.net"
-                  :                                "https://d175ce76v5cwjf.cloudfront.net";
+    if (container.children.length === 10) return;
     const frag = document.createDocumentFragment();
     for (let cam = 1; cam <= 10; cam++) {
-      const url   = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
       const label = `CAM${pad2(cam)}`;
       const wrapper = document.createElement("div");
       wrapper.className = "video-wrapper";
-      wrapper.style.display = ""; // 기본 표시
+      wrapper.dataset.cam = String(cam);
       const video = document.createElement("video");
-      video.src = url; video.controls = true; video.preload = "metadata"; video.muted = true;
+      video.controls = true; video.preload = "metadata"; video.muted = true;
       video.onerror = () => { wrapper.style.display = "none"; };
       const overlay = document.createElement("div");
       overlay.className = "overlay-label"; overlay.textContent = label;
       const fsBtn = document.createElement("button");
       fsBtn.className = "fullscreen-btn"; fsBtn.textContent = "⛶ 전체화면";
-      fsBtn.onclick = () => openFullscreen(url, `${label} — ${site} / ${date} / ${syncLabel}`);
       wrapper.append(video, overlay, fsBtn);
       frag.appendChild(wrapper);
     }
     container.innerHTML = "";
     container.appendChild(frag);
+  }
+
+  // ── 비디오 ──
+  function loadVideos(syncNumber) {
+    const date = $("dateInput").value;
+    const site = $("siteInput").value.trim();
+    if (!date || !site) return;
+    const syncLabel = `sync${syncNumber.padStart(3,'0')}`;
+    const baseURL = getVideoBaseURL(date);
+    ensureVideoTiles();
+    for (const wrapper of $("videoContainer").children) {
+      const cam = Number(wrapper.dataset.cam);
+      const url   = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
+      const label = `CAM${pad2(cam)}`;
+      wrapper.style.display = ""; // 기본 표시
+      const video = wrapper.querySelector("video");
+      const overlay = wrapper.querySelector(".overlay-label");
+      const fsBtn = wrapper.querySelector(".fullscreen-btn");
+      overlay.textContent = label;
+      fsBtn.onclick = () => openFullscreen(url, `${label} — ${site} / ${date} / ${syncLabel}`);
+      if (video.src !== url) video.src = url;
+    }
   }
 
   // ── 바로가기 ──
@@ -847,8 +881,6 @@
   }
 
   // ── 디버그이미지 패널 ──
-  let debugImgOpen = false;
-
   function updateDebugImgPanel() {
     const { site, date } = getSiteAndDate();
     if (!site) return;
@@ -919,9 +951,6 @@
       el.value = dateStr(d); onDateChange();
     }
   });
-
-  // ── iframe 포커스 복구 ──
-  window.addEventListener("blur", () => { setTimeout(() => window.focus(), 0); });
 
   // ── 사이드패널 리사이즈 ──
   (function() {
