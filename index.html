@@ -494,6 +494,9 @@
   const dayIndexFromDate = v => parseLocalDate(v).getDay();
   const DAY_NAMES = ['일','월','화','수','목','금','토'];
   const DAY_MAP   = { '월':1, '화':2, '수':3, '목':4, '금':5, '토':6, '일':0 };
+  const VIDEO_TILE_COUNT = 10;
+  const EAGER_VIDEO_COUNT = 4;
+  const VIDEO_LOAD_DEBOUNCE_MS = 120;
 
   // 디바운스 — 연속 호출 시 마지막 것만 실행
   function debounce(fn, ms) {
@@ -687,7 +690,7 @@
   });
 
   // ── 상태 ──
-  let currentPos = 0, visibleMap = [], debugImgOpen = false;
+  let currentPos = 0, visibleMap = [], debugImgOpen = false, pendingVideoLoad = null;
 
   // ── iframe (디바운스 적용) ──
   const updateClassroomIframe = debounce(() => {
@@ -792,9 +795,14 @@
   function setActiveSyncByPos(pos) {
     if (!visibleMap.length) return;
     currentPos = Math.max(0, Math.min(pos, visibleMap.length - 1));
-    loadVideos(String(visibleMap[currentPos].url).padStart(2, '0'));
+    scheduleVideoLoad(String(visibleMap[currentPos].url).padStart(2, '0'));
     document.querySelectorAll(".sync-buttons button").forEach(b => b.classList.remove("active"));
     $(`sync-btn-pos-${currentPos}`)?.classList.add("active");
+  }
+
+  function scheduleVideoLoad(syncNumber) {
+    clearTimeout(pendingVideoLoad);
+    pendingVideoLoad = setTimeout(() => loadVideos(syncNumber), VIDEO_LOAD_DEBOUNCE_MS);
   }
 
   function getVideoBaseURL(date) {
@@ -805,15 +813,15 @@
 
   function ensureVideoTiles() {
     const container = $("videoContainer");
-    if (container.children.length === 10) return;
+    if (container.children.length === VIDEO_TILE_COUNT) return;
     const frag = document.createDocumentFragment();
-    for (let cam = 1; cam <= 10; cam++) {
+    for (let cam = 1; cam <= VIDEO_TILE_COUNT; cam++) {
       const label = `CAM${pad2(cam)}`;
       const wrapper = document.createElement("div");
       wrapper.className = "video-wrapper";
       wrapper.dataset.cam = String(cam);
       const video = document.createElement("video");
-      video.controls = true; video.preload = "metadata"; video.muted = true;
+      video.controls = true; video.preload = cam <= EAGER_VIDEO_COUNT ? "metadata" : "none"; video.muted = true;
       video.onerror = () => { wrapper.style.display = "none"; };
       const overlay = document.createElement("div");
       overlay.className = "overlay-label"; overlay.textContent = label;
@@ -844,7 +852,11 @@
       const fsBtn = wrapper.querySelector(".fullscreen-btn");
       overlay.textContent = label;
       fsBtn.onclick = () => openFullscreen(url, `${label} — ${site} / ${date} / ${syncLabel}`);
-      if (video.src !== url) video.src = url;
+      video.preload = cam <= EAGER_VIDEO_COUNT ? "metadata" : "none";
+      if (video.src !== url) {
+        video.pause();
+        video.src = url;
+      }
     }
   }
 
