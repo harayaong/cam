@@ -913,18 +913,23 @@
   }
 
   // ── 키보드 단축키 ──
-  document.addEventListener("keydown", e => {
-    if (["input","select"].includes(document.activeElement.tagName.toLowerCase())) return;
+  function shouldKeepTyping(e) {
+    const el = document.activeElement;
+    if (el !== $("siteSearch")) return false;
+    return e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+  }
 
+  function handleGlobalShortcut(e) {
+    if (shouldKeepTyping(e)) return;
     if (["Escape","f","F","ㄹ"].includes(e.key)) {
       if ($("fullscreenOverlay").classList.contains("active")) { closeFullscreen(); return; }
     }
-    if (["p","P","ㅔ"].includes(e.key)) { openImageTemplate(); return; }
-    if (["m","M","ㅡ"].includes(e.key)) { openTrainsetManager(); return; }
-    if (["x","X","ㅌ"].includes(e.key)) { copySiteId(); return; }
-    if (["d","D","ㅇ"].includes(e.key)) { openDebugTool(); return; }
-    if (["y","Y","ㅛ"].includes(e.key)) { toggleImgTpl(!imgTplOpen); return; }
-    if (["i","I","ㅣ","ㅑ"].includes(e.key)) { toggleDebugImgPanel(!debugImgOpen); return; }
+    if (["p","P","ㅔ"].includes(e.key)) { e.preventDefault(); openImageTemplate(); return; }
+    if (["m","M","ㅡ"].includes(e.key)) { e.preventDefault(); openTrainsetManager(); return; }
+    if (["x","X","ㅌ"].includes(e.key)) { e.preventDefault(); copySiteId(); return; }
+    if (["d","D","ㅇ"].includes(e.key)) { e.preventDefault(); openDebugTool(); return; }
+    if (["y","Y","ㅛ"].includes(e.key)) { e.preventDefault(); toggleImgTpl(!imgTplOpen); return; }
+    if (["i","I","ㅣ","ㅑ"].includes(e.key)) { e.preventDefault(); toggleDebugImgPanel(!debugImgOpen); return; }
 
     const videos = document.querySelectorAll("#videoContainer video");
 
@@ -950,17 +955,30 @@
       sel.selectedIndex = next;
       onSiteChange();
     } else if (["1","2","3","4"].includes(e.key)) {
+      e.preventDefault();
       const seek = {"1":-180,"2":-30,"3":30,"4":180}[e.key];
       videos.forEach(v => { v.currentTime = Math.max(0, v.currentTime + seek); });
     } else if (["q","Q","ㅂ"].includes(e.key)) {
+      e.preventDefault();
       const el = $("dateInput");
-      const d = new Date(el.value); d.setDate(d.getDate() - 1);
+      const d = parseLocalDate(el.value); d.setDate(d.getDate() - 1);
       el.value = dateStr(d); onDateChange();
     } else if (["w","W","ㅈ"].includes(e.key)) {
+      e.preventDefault();
       const el = $("dateInput");
-      const d = new Date(el.value); d.setDate(d.getDate() + 1);
+      const d = parseLocalDate(el.value); d.setDate(d.getDate() + 1);
       el.value = dateStr(d); onDateChange();
     }
+  }
+
+  document.addEventListener("keydown", handleGlobalShortcut, true);
+
+  // cross-origin iframe 내부에서 발생한 keydown은 부모로 올라오지 않으므로,
+  // iframe 클릭 후에는 부모 문서가 다시 단축키 포커스를 갖도록 복구한다.
+  window.addEventListener("blur", () => {
+    setTimeout(() => {
+      if (document.activeElement?.tagName?.toLowerCase() === "iframe") window.focus();
+    }, 0);
   });
 
   // ── 사이드패널 리사이즈 ──
