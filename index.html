@@ -750,7 +750,13 @@
   }
 
   // ── 검색 ──
+  let searchComposing = false;
+  function isImeComposing(e) {
+    return searchComposing || e.isComposing || e.keyCode === 229;
+  }
+
   function handleSearchKeydown(e) {
+    if (isImeComposing(e)) return;
     if (e.key === "Escape") {
       // ESC: 검색어 초기화 + 전체 목록 복원
       $("siteSearch").value = "";
@@ -759,6 +765,11 @@
       return;
     }
     if (e.key !== "Enter") return;
+    e.preventDefault();
+    setTimeout(applySiteSearch, 0);
+  }
+
+  function applySiteSearch() {
     const q = $("siteSearch").value.trim().toLowerCase();
     const sel = $("siteInput");
     const matches = [];
@@ -769,7 +780,6 @@
     });
     if (!matches.length) { alert("일치하는 교실이 없습니다."); return; }
     sel.selectedIndex = matches[0];
-    $("siteSearch").blur();
     onSiteChange();
   }
 
@@ -936,7 +946,7 @@
   function shouldKeepTyping(e) {
     const el = document.activeElement;
     if (el !== $("siteSearch")) return false;
-    return e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+    return isImeComposing(e) || (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey);
   }
 
   function handleGlobalShortcut(e) {
@@ -992,6 +1002,10 @@
   }
 
   document.addEventListener("keydown", handleGlobalShortcut, true);
+  $("siteSearch").addEventListener("compositionstart", () => { searchComposing = true; });
+  $("siteSearch").addEventListener("compositionend", () => {
+    setTimeout(() => { searchComposing = false; }, 0);
+  });
 
   // cross-origin iframe 내부에서 발생한 keydown은 부모로 올라오지 않으므로,
   // iframe 클릭 후에는 부모 문서가 다시 단축키 포커스를 갖도록 복구한다.
