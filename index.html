@@ -626,7 +626,7 @@
   }
 
   // ── 이미지템플릿 패널 ──
-  let imgTplOpen = false, imgTplCurrentUrl = "";
+  let imgTplOpen = false, imgTplCurrentUrl = "", imgTplLoadSeq = 0;
   let tplScale = 1, tplX = 0, tplY = 0;
   let tplDragging = false, tplDragStartX = 0, tplDragStartY = 0;
 
@@ -665,19 +665,36 @@
     tplDragging = false; $("imgTplCanvas").classList.remove("grabbing");
   });
 
-  function loadImgTplByDate(date) {
+  async function getImageTemplateUrl(date, site) {
+    const res = await fetch(`/api/image-template-url?date=${encodeURIComponent(date)}&site=${encodeURIComponent(site)}`);
+    if (!res.ok) throw new Error("이미지템플릿 URL 발급 실패");
+    const data = await res.json();
+    if (!data.url) throw new Error("이미지템플릿 URL 응답이 비어 있습니다.");
+    return data.url;
+  }
+
+  async function loadImgTplByDate(date) {
     const site = $("siteInput").value.trim();
     if (!site || !date) return;
-    const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
-    imgTplCurrentUrl = url;
+    const seq = ++imgTplLoadSeq;
+    imgTplCurrentUrl = "";
     $("imgTplMeta").textContent = `${date} (${DAY_NAMES[dayIndexFromDate(date)]}) — ${site}`;
     const img = $("imgTplImg");
     img.style.display = "block"; $("imgTplError").style.display = "none";
-    img.src = url; imgTplResetZoom();
     if ($("imgTplDateInput")) $("imgTplDateInput").value = date;
     const prev1 = getNthPrevServiceDate(1), prev2 = getNthPrevServiceDate(2);
     $("btnImgPrev1").classList.toggle("btn-accent", date === prev1);
     $("btnImgPrev2").classList.toggle("btn-accent", date === prev2);
+    try {
+      const url = await getImageTemplateUrl(date, site);
+      if (seq !== imgTplLoadSeq) return;
+      imgTplCurrentUrl = url;
+      img.src = url; imgTplResetZoom();
+    } catch (e) {
+      if (seq !== imgTplLoadSeq) return;
+      console.error(e);
+      img.style.display = "none"; $("imgTplError").style.display = "flex";
+    }
   }
   function loadImgTplPrevN(n) { loadImgTplByDate(getNthPrevServiceDate(n)); }
 
@@ -691,7 +708,20 @@
       loadImgTplByDate(todayStr());
     }
   }
-  function openImgTplInNew() { if (imgTplCurrentUrl) window.open(imgTplCurrentUrl, "_blank"); }
+  async function openImgTplInNew() {
+    const { site, date } = getSiteAndDate();
+    if (!site) { alert("SITE-ID를 선택해주세요."); return; }
+    const win = window.open("about:blank", "_blank");
+    try {
+      const url = imgTplCurrentUrl || await getImageTemplateUrl(date, site);
+      if (win) { win.opener = null; win.location.href = url; }
+      else window.open(url, "_blank");
+    } catch (e) {
+      if (win) win.close();
+      alert("이미지템플릿 URL을 발급하지 못했습니다.");
+      console.error(e);
+    }
+  }
 
   // ── 전체화면 ──
   function openFullscreen(src, label) {
@@ -893,10 +923,19 @@
   function getSiteAndDate() {
     return { site: $("siteInput").value.trim(), date: $("dateInput").value || todayStr() };
   }
-  function openImageTemplate() {
+  async function openImageTemplate() {
     const { site, date } = getSiteAndDate();
     if (!site) { alert("SITE-ID를 선택해주세요."); return; }
-    window.open(`https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`, '_blank');
+    const win = window.open("about:blank", "_blank");
+    try {
+      const url = await getImageTemplateUrl(date, site);
+      if (win) { win.opener = null; win.location.href = url; }
+      else window.open(url, "_blank");
+    } catch (e) {
+      if (win) win.close();
+      alert("이미지템플릿 URL을 발급하지 못했습니다.");
+      console.error(e);
+    }
   }
   function openTrainsetManager() {
     const { site } = getSiteAndDate();
