@@ -26,13 +26,31 @@
       --radius-sm: 6px;
     }
 
+    /* ── 다크모드 (비비드블랙) ── */
+    body.dark {
+      --bg: #0d0d0d;
+      --surface: #1a1a1a;
+      --border: #2a2a2a;
+      --text: #e8eaf0;
+      --text-muted: #6b7280;
+      --accent: #00c8b4;
+      --accent-dark: #00a896;
+      --accent-light: #0d2e2b;
+      --btn-bg: #242424;
+      --badge-border: #1a3a36;
+      --win0: #0d1a2e; --win0-border: #1a3a5c;
+      --win1: #0d2420; --win1-border: #1a4a40;
+      --win2: #2e2300; --win2-border: #5c4600;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+    }
+
     * { box-sizing: border-box; }
 
     body {
       font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
       background: var(--bg); color: var(--text);
       margin: 0; padding: 0; line-height: 1.5; font-size: 14px;
-      transition: margin-right 0.3s cubic-bezier(0.4,0,0.2,1);
+      transition: margin-right 0.3s cubic-bezier(0.4,0,0.2,1), background 0.2s, color 0.2s;
     }
     body.imgtpl-open   { margin-right: 50vw; }
     body.debugimg-open { margin-left: 50vw; }
@@ -54,10 +72,17 @@
       background: var(--accent); box-shadow: 0 0 0 3px var(--accent-light);
     }
     .header-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-    .site-list-updated {
-      font-size: 11.5px; color: var(--text-muted); padding: 0 4px;
-      white-space: nowrap;
+
+    /* ── 다크모드 토글 ── */
+    .dark-toggle {
+      height: 36px; padding: 0 12px; font-size: 16px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text-muted);
+      cursor: pointer; transition: all 0.18s; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
     }
+    .dark-toggle:hover { background: var(--btn-bg); border-color: #c8d0dc; }
+    body.dark .dark-toggle { color: #fbbf24; border-color: #3a3a3a; }
 
     /* ── 컨트롤 바 ── */
     .control-bar {
@@ -174,14 +199,14 @@
 
     /* ── 단축키 안내 ── */
     .shortcut-bar {
-      padding: 7px 28px; background: #f8fafb; border-bottom: 1px solid var(--border);
+      padding: 7px 28px; background: var(--surface); border-bottom: 1px solid var(--border);
       font-size: 11.5px; color: var(--text-muted);
       display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
       position: sticky; top: 116px; z-index: 98;
     }
     .kbd {
       display: inline-block; background: var(--surface);
-      border: 1px solid #d0d8e4; border-bottom-width: 2px;
+      border: 1px solid var(--border); border-bottom-width: 2px;
       border-radius: 4px; padding: 1px 6px;
       font-size: 11px; font-family: 'SF Mono', monospace; color: var(--text);
     }
@@ -265,7 +290,7 @@
     .imgtpl-canvas {
       flex: 1; width: 100%; overflow: hidden; position: relative;
       cursor: grab; border-radius: var(--radius); border: 1px solid var(--border);
-      background: #f3f4f6; display: flex; align-items: flex-start; justify-content: flex-start;
+      background: #1a1a1a; display: flex; align-items: flex-start; justify-content: flex-start;
     }
     .imgtpl-canvas.grabbing { cursor: grabbing; }
     .imgtpl-canvas img {
@@ -273,7 +298,7 @@
       user-select: none; -webkit-user-drag: none; transform-origin: 0 0; transition: none;
     }
     .imgtpl-img-error {
-      width: 100%; flex: 1; background: #f3f4f6;
+      width: 100%; flex: 1; background: var(--btn-bg);
       border-radius: var(--radius); border: 1px dashed var(--border);
       display: flex; align-items: center; justify-content: center;
       color: var(--text-muted); font-size: 13px; flex-direction: column; gap: 8px;
@@ -413,7 +438,7 @@
       <button class="btn" onclick="openTrainsetManager()">트레인셋매니저 <kbd class="kbd">M</kbd></button>
       <button class="btn" id="btnCopySiteId" onclick="copySiteId()">SITE-ID 복사 <kbd class="kbd">X</kbd></button>
       <button class="btn" onclick="refreshSiteList()" title="사이트 목록 강제 갱신">↺ 목록 갱신</button>
-      <span id="siteListUpdatedAt" class="site-list-updated">목록 업데이트 —</span>
+      <button class="dark-toggle" id="darkToggle" onclick="toggleDark()" title="다크모드 토글">🌙</button>
     </div>
   </div>
 </div>
@@ -478,9 +503,9 @@
     <strong>버전 변경사항</strong>
     <ul>
       <li>sites.html — 사이트 리스트 외부 파일 분리, 구글 스프레드시트 복붙으로 관리</li>
-      <li>현재 시각 기준 싱크 자동 선택, 사이트 이동 디바운스, 목록 강제 갱신 버튼 추가</li>
-      <li>↑↓ 사이트 이동 시 패널·버튼 정상 갱신, Q/W 날짜 이동 시 싱크 버튼 갱신 수정</li>
-      <li>검색박스 ESC 초기화, 단축키 T→P 변경</li>
+      <li>다크모드(비비드블랙) 토글, 디버그이미지 패널 ESC/V 패스스루 단축키 추가</li>
+      <li>사이트 이동 디바운스, 목록 강제 갱신, 검색 ESC 초기화</li>
+      <li>카메라 10개 지원, URL 파라미터 초기 로드 버그 수정</li>
     </ul>
   </div>
 </div>
@@ -489,39 +514,31 @@
   // ── 유틸 ──
   const $ = id => document.getElementById(id);
   const pad2 = v => String(v).padStart(2, "0");
-  const todayStr = () => { const d = new Date(); return dateStr(d); };
+  const todayStr = () => dateStr(new Date());
   const dateStr  = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
-  const parseLocalDate = v => {
-    const [y, m, d] = v.split("-").map(Number);
-    if (!y || !m || !d) return new Date();
-    return new Date(y, m - 1, d);
-  };
+  const parseLocalDate = v => { const [y,m,d] = v.split("-").map(Number); return new Date(y, m-1, d); };
   const dayIndexFromDate = v => parseLocalDate(v).getDay();
   const DAY_NAMES = ['일','월','화','수','목','금','토'];
   const DAY_MAP   = { '월':1, '화':2, '수':3, '목':4, '금':5, '토':6, '일':0 };
-  const VIDEO_TILE_COUNT = 10;
-  const VIDEO_LOAD_DEBOUNCE_MS = 120;
 
-  // 디바운스 — 연속 호출 시 마지막 것만 실행
   function debounce(fn, ms) {
-    let t;
-    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+
+  // ── 다크모드 ──
+  function toggleDark() {
+    const on = document.body.classList.toggle("dark");
+    $("darkToggle").textContent = on ? "☀️" : "🌙";
+    localStorage.setItem("playtag_dark", on ? "1" : "");
+  }
+  // 저장된 설정 복원
+  if (localStorage.getItem("playtag_dark")) {
+    document.body.classList.add("dark");
+    document.addEventListener("DOMContentLoaded", () => { $("darkToggle").textContent = "☀️"; });
   }
 
   // ── 사이트 목록 (sites.html) ──
   const SITE_CACHE_KEY = "playtag_site_list";
-
-  function formatSiteListUpdatedAt(text) {
-    const match = text.match(/자동 생성됨:\s*([^\n<]+)/);
-    if (!match) return "목록 업데이트 알 수 없음";
-    const d = new Date(match[1].trim());
-    if (Number.isNaN(d.getTime())) return `목록 업데이트 ${match[1].trim()}`;
-    return `목록 업데이트 ${dateStr(d)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-  }
-
-  function updateSiteListUpdatedAt(text) {
-    $("siteListUpdatedAt").textContent = formatSiteListUpdatedAt(text);
-  }
 
   function parseSiteData(text) {
     const match = text.match(/<pre[^>]*id="site-data"[^>]*>([\s\S]*?)<\/pre>/i);
@@ -532,29 +549,12 @@
       if (!siteId) continue;
       const opt = document.createElement("option");
       opt.value = siteId;
-      opt.dataset.company = company || "";
-      opt.dataset.room = room || "";
       opt.dataset.schedule = schedule || "";
       opt.dataset.days = days || "";
       opt.textContent = `${siteId} / ${company||''} / ${room||''} / ${schedule||''} / ${days||''}`;
       frag.appendChild(opt);
     }
     return frag;
-  }
-
-  function getSelectedSiteOption() {
-    const sel = $("siteInput");
-    return sel.options[sel.selectedIndex] || null;
-  }
-
-  function refreshView({ resetSync = true, updateTemplate = false } = {}) {
-    updateWeekday();
-    renderSyncButtons();
-    if (resetSync) setActiveSyncByPos(0);
-    updateClassroomIframe();
-    if (updateTemplate && imgTplOpen) loadImgTplByDate(todayStr());
-    if (debugImgOpen) updateDebugImgPanel();
-    updateSiteIdBtn();
   }
 
   function applySiteOptions(frag, selectedSite) {
@@ -565,13 +565,13 @@
       const found = Array.from(sel.options).find(o => o.value === selectedSite);
       if (found) sel.value = selectedSite;
     }
-    refreshView();
+    updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
+    updateClassroomIframe(); updateSiteIdBtn();
   }
 
   async function loadSiteList(selectedSite) {
     const cached = localStorage.getItem(SITE_CACHE_KEY);
     if (cached) {
-      updateSiteListUpdatedAt(cached);
       applySiteOptions(parseSiteData(cached), selectedSite);
     } else {
       $("siteInput").innerHTML = `<option value="">목록 로딩 중...</option>`;
@@ -580,7 +580,6 @@
       const res  = await fetch("sites.html?_=" + Date.now());
       const text = await res.text();
       localStorage.setItem(SITE_CACHE_KEY, text);
-      updateSiteListUpdatedAt(text);
       if (!cached) applySiteOptions(parseSiteData(text), selectedSite);
     } catch (e) {
       if (!cached) $("siteInput").innerHTML = `<option value="">로드 실패 — sites.html 확인</option>`;
@@ -588,56 +587,51 @@
     }
   }
 
-  // 강제 갱신 (캐시 무시)
   async function refreshSiteList() {
-    const sel = $("siteInput");
-    const cur = sel.value;
+    const cur = $("siteInput").value;
     localStorage.removeItem(SITE_CACHE_KEY);
-    sel.innerHTML = `<option value="">갱신 중...</option>`;
+    $("siteInput").innerHTML = `<option value="">갱신 중...</option>`;
     try {
       const res  = await fetch("sites.html?_=" + Date.now());
       const text = await res.text();
       localStorage.setItem(SITE_CACHE_KEY, text);
-      updateSiteListUpdatedAt(text);
       applySiteOptions(parseSiteData(text), cur);
     } catch (e) {
-      sel.innerHTML = `<option value="">로드 실패 — sites.html 확인</option>`;
+      $("siteInput").innerHTML = `<option value="">로드 실패 — sites.html 확인</option>`;
       console.error("강제 갱신 실패:", e);
     }
   }
 
   // ── 서비스 요일 ──
+  function getSelectedOption() {
+    const sel = $("siteInput"); return sel.options[sel.selectedIndex] || null;
+  }
   function getServiceDays() {
-    const daysText = getSelectedSiteOption()?.dataset.days || "";
+    const daysText = getSelectedOption()?.dataset.days || "";
     return daysText.split(/[,\s]+/).map(c => DAY_MAP[c.trim()]).filter(d => d !== undefined);
   }
-
   function getNthPrevServiceDate(n) {
     const days = getServiceDays();
     if (!days.length) return todayStr();
     const today = new Date();
     let found = 0;
     for (let i = 1; i <= 30; i++) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
+      const d = new Date(today); d.setDate(today.getDate() - i);
       if (days.includes(d.getDay()) && ++found === n) return dateStr(d);
     }
     return todayStr();
   }
 
   // ── 이미지템플릿 패널 ──
-  let imgTplOpen = false, imgTplCurrentUrl = "", imgTplLoadSeq = 0;
+  let imgTplOpen = false, imgTplCurrentUrl = "";
   let tplScale = 1, tplX = 0, tplY = 0;
   let tplDragging = false, tplDragStartX = 0, tplDragStartY = 0;
 
   const applyImgTransform = () => {
     $("imgTplImg").style.transform = `translate(${tplX}px, ${tplY}px) scale(${tplScale})`;
   };
-  function imgTplZoom(factor) {
-    tplScale = Math.min(Math.max(tplScale * factor, 0.5), 8);
-    applyImgTransform();
-  }
-  function imgTplResetZoom() { tplScale = 1; tplX = 0; tplY = 0; applyImgTransform(); }
+  function imgTplZoom(f) { tplScale = Math.min(Math.max(tplScale*f, 0.5), 8); applyImgTransform(); }
+  function imgTplResetZoom() { tplScale=1; tplX=0; tplY=0; applyImgTransform(); }
 
   $("imgTplCanvas").addEventListener("wheel", e => {
     e.preventDefault();
@@ -645,56 +639,34 @@
       imgTplZoom(e.deltaY < 0 ? 1.1 : 1/1.1);
     } else {
       const renderedH = $("imgTplImg").offsetHeight * tplScale;
-      const canvasH   = $("imgTplCanvas").clientHeight;
-      tplY = Math.min(0, Math.max(Math.min(0, canvasH - renderedH), tplY - e.deltaY));
+      tplY = Math.min(0, Math.max(Math.min(0, $("imgTplCanvas").clientHeight - renderedH), tplY - e.deltaY));
       applyImgTransform();
     }
   }, { passive: false });
 
   $("imgTplCanvas").addEventListener("mousedown", e => {
-    tplDragging = true;
-    tplDragStartX = e.clientX - tplX; tplDragStartY = e.clientY - tplY;
+    tplDragging = true; tplDragStartX = e.clientX-tplX; tplDragStartY = e.clientY-tplY;
     $("imgTplCanvas").classList.add("grabbing");
   });
   window.addEventListener("mousemove", e => {
     if (!tplDragging) return;
-    tplX = e.clientX - tplDragStartX; tplY = e.clientY - tplDragStartY;
-    applyImgTransform();
+    tplX = e.clientX-tplDragStartX; tplY = e.clientY-tplDragStartY; applyImgTransform();
   });
-  window.addEventListener("mouseup", () => {
-    tplDragging = false; $("imgTplCanvas").classList.remove("grabbing");
-  });
+  window.addEventListener("mouseup", () => { tplDragging=false; $("imgTplCanvas").classList.remove("grabbing"); });
 
-  async function getImageTemplateUrl(date, site) {
-    const res = await fetch(`/api/image-template-url?date=${encodeURIComponent(date)}&site=${encodeURIComponent(site)}`);
-    if (!res.ok) throw new Error("이미지템플릿 URL 발급 실패");
-    const data = await res.json();
-    if (!data.url) throw new Error("이미지템플릿 URL 응답이 비어 있습니다.");
-    return data.url;
-  }
-
-  async function loadImgTplByDate(date) {
+  function loadImgTplByDate(date) {
     const site = $("siteInput").value.trim();
     if (!site || !date) return;
-    const seq = ++imgTplLoadSeq;
-    imgTplCurrentUrl = "";
+    const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
+    imgTplCurrentUrl = url;
     $("imgTplMeta").textContent = `${date} (${DAY_NAMES[dayIndexFromDate(date)]}) — ${site}`;
     const img = $("imgTplImg");
     img.style.display = "block"; $("imgTplError").style.display = "none";
+    img.src = url; imgTplResetZoom();
     if ($("imgTplDateInput")) $("imgTplDateInput").value = date;
     const prev1 = getNthPrevServiceDate(1), prev2 = getNthPrevServiceDate(2);
     $("btnImgPrev1").classList.toggle("btn-accent", date === prev1);
     $("btnImgPrev2").classList.toggle("btn-accent", date === prev2);
-    try {
-      const url = await getImageTemplateUrl(date, site);
-      if (seq !== imgTplLoadSeq) return;
-      imgTplCurrentUrl = url;
-      img.src = url; imgTplResetZoom();
-    } catch (e) {
-      if (seq !== imgTplLoadSeq) return;
-      console.error(e);
-      img.style.display = "none"; $("imgTplError").style.display = "flex";
-    }
   }
   function loadImgTplPrevN(n) { loadImgTplByDate(getNthPrevServiceDate(n)); }
 
@@ -708,20 +680,7 @@
       loadImgTplByDate(todayStr());
     }
   }
-  async function openImgTplInNew() {
-    const { site, date } = getSiteAndDate();
-    if (!site) { alert("SITE-ID를 선택해주세요."); return; }
-    const win = window.open("about:blank", "_blank");
-    try {
-      const url = imgTplCurrentUrl || await getImageTemplateUrl(date, site);
-      if (win) { win.opener = null; win.location.href = url; }
-      else window.open(url, "_blank");
-    } catch (e) {
-      if (win) win.close();
-      alert("이미지템플릿 URL을 발급하지 못했습니다.");
-      console.error(e);
-    }
-  }
+  function openImgTplInNew() { if (imgTplCurrentUrl) window.open(imgTplCurrentUrl, "_blank"); }
 
   // ── 전체화면 ──
   function openFullscreen(src, label) {
@@ -739,21 +698,17 @@
   });
 
   // ── 상태 ──
-  let currentPos = 0, visibleMap = [], debugImgOpen = false, pendingVideoLoad = null;
+  let currentPos = 0, visibleMap = [], debugImgOpen = false;
 
-  // ── iframe (디바운스 적용) ──
+  // ── iframe ──
   const updateClassroomIframe = debounce(() => {
-    const site = $("siteInput").value.trim();
-    const date = $("dateInput").value;
+    const site = $("siteInput").value.trim(), date = $("dateInput").value;
     if (!site || !date) return;
     $("classroomLoading").classList.remove("hidden");
     $("classroomIframe").src =
       `https://playtag-debugging-tool.vercel.app/?site=${encodeURIComponent(site)}&date=${encodeURIComponent(date)}`;
-    // onload가 firing 안 될 경우 대비 — 5초 후 강제 숨김
     clearTimeout(updateClassroomIframe._t);
-    updateClassroomIframe._t = setTimeout(() => {
-      $("classroomLoading").classList.add("hidden");
-    }, 5000);
+    updateClassroomIframe._t = setTimeout(() => $("classroomLoading").classList.add("hidden"), 5000);
   }, 300);
 
   // ── 초기화 ──
@@ -766,11 +721,16 @@
   })();
 
   function onDateChange() {
-    refreshView();
+    updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
+    updateClassroomIframe();
+    if (debugImgOpen) updateDebugImgPanel();
   }
-
   function onSiteChange() {
-    refreshView({ updateTemplate: true });
+    renderSyncButtons(); setActiveSyncByPos(0);
+    updateClassroomIframe();
+    if (imgTplOpen) loadImgTplByDate(todayStr());
+    if (debugImgOpen) updateDebugImgPanel();
+    updateSiteIdBtn();
   }
 
   // ── 요일 ──
@@ -781,28 +741,20 @@
 
   // ── 검색 ──
   let searchComposing = false;
-  function isImeComposing(e) {
-    return searchComposing || e.isComposing || e.keyCode === 229;
-  }
+  $("siteSearch").addEventListener("compositionstart", () => { searchComposing = true; });
+  $("siteSearch").addEventListener("compositionend",   () => { setTimeout(() => { searchComposing = false; }, 0); });
 
   function handleSearchKeydown(e) {
-    if (isImeComposing(e)) return;
+    if (searchComposing || e.isComposing) return;
     if (e.key === "Escape") {
-      // ESC: 검색어 초기화 + 전체 목록 복원
       $("siteSearch").value = "";
       for (const opt of $("siteInput").options) opt.style.display = "";
-      $("siteSearch").blur();
-      return;
+      $("siteSearch").blur(); return;
     }
     if (e.key !== "Enter") return;
     e.preventDefault();
-    setTimeout(applySiteSearch, 0);
-  }
-
-  function applySiteSearch() {
     const q = $("siteSearch").value.trim().toLowerCase();
-    const sel = $("siteInput");
-    const matches = [];
+    const sel = $("siteInput"), matches = [];
     Array.from(sel.options).forEach((opt, idx) => {
       const hit = !q || opt.value.toLowerCase().includes(q) || opt.textContent.toLowerCase().includes(q);
       opt.style.display = hit ? "" : "none";
@@ -810,6 +762,7 @@
     });
     if (!matches.length) { alert("일치하는 교실이 없습니다."); return; }
     sel.selectedIndex = matches[0];
+    $("siteSearch").blur();
     onSiteChange();
   }
 
@@ -822,9 +775,9 @@
 
   // ── 싱크 ──
   function getSiteWindows() {
-    const txt = getSelectedSiteOption()?.dataset.schedule || "";
+    const txt = getSelectedOption()?.dataset.schedule || "";
     const toMin = s => parseInt(s.slice(0,2))*60 + parseInt(s.slice(2));
-    return [...txt.matchAll(/(\d{4})-(\d{4})/g)].map(m => [toMin(m[1]), toMin(m[2])]).sort((a,b)=>a[0]-b[0]);
+    return [...txt.matchAll(/(\d{4})-(\d{4})/g)].map(m => [toMin(m[1]),toMin(m[2])]).sort((a,b)=>a[0]-b[0]);
   }
 
   function renderSyncButtons() {
@@ -833,17 +786,15 @@
     const wins = getSiteWindows();
     const base = wins.length ? Math.ceil(wins[0][0]/10)*10 : 9*60;
     const slots = [];
-    for (const [s, e] of wins) for (let t = Math.ceil(s/10)*10; t < e; t += 10) slots.push(t);
-    if (!slots.length) for (let i = 0; i < 18; i++) slots.push(base + i*10);
-
-    visibleMap = slots.map((t, pos) => ({ url: Math.round((t - base) / 10), t, pos }));
-
+    for (const [s,e] of wins) for (let t=Math.ceil(s/10)*10; t<e; t+=10) slots.push(t);
+    if (!slots.length) for (let i=0; i<18; i++) slots.push(base+i*10);
+    visibleMap = slots.map((t,pos) => ({ url: Math.round((t-base)/10), t, pos }));
     const frag = document.createDocumentFragment();
     slots.forEach((t, pos) => {
       const btn = document.createElement("button");
       btn.id = `sync-btn-pos-${pos}`;
       btn.textContent = `sync${pad2(visibleMap[pos].url)} ${pad2(Math.floor(t/60))}:${pad2(t%60)}`;
-      const wi = wins.findIndex(([s,e]) => t >= s && t < e);
+      const wi = wins.findIndex(([s,e]) => t>=s && t<e);
       if (wi >= 0) btn.classList.add(`win${wi}`);
       btn.addEventListener("click", () => setActiveSyncByPos(pos));
       frag.appendChild(btn);
@@ -853,69 +804,46 @@
 
   function setActiveSyncByPos(pos) {
     if (!visibleMap.length) return;
-    currentPos = Math.max(0, Math.min(pos, visibleMap.length - 1));
-    scheduleVideoLoad(String(visibleMap[currentPos].url).padStart(2, '0'));
+    currentPos = Math.max(0, Math.min(pos, visibleMap.length-1));
+    loadVideos(String(visibleMap[currentPos].url).padStart(2,'0'));
     document.querySelectorAll(".sync-buttons button").forEach(b => b.classList.remove("active"));
     $(`sync-btn-pos-${currentPos}`)?.classList.add("active");
   }
 
-  function scheduleVideoLoad(syncNumber) {
-    clearTimeout(pendingVideoLoad);
-    pendingVideoLoad = setTimeout(() => loadVideos(syncNumber), VIDEO_LOAD_DEBOUNCE_MS);
-  }
-
-  function getVideoBaseURL(date) {
-    return date >= "2025-12-31" ? "https://d3j9wzynvd2br9.cloudfront.net"
-         : date >= "2025-06-16" ? "https://d22x5o96gu3cuo.cloudfront.net"
-         :                         "https://d175ce76v5cwjf.cloudfront.net";
-  }
-
-  function ensureVideoTiles() {
-    const container = $("videoContainer");
-    if (container.children.length === VIDEO_TILE_COUNT) return;
-    const frag = document.createDocumentFragment();
-    for (let cam = 1; cam <= VIDEO_TILE_COUNT; cam++) {
-      const label = `CAM${pad2(cam)}`;
-      const wrapper = document.createElement("div");
-      wrapper.className = "video-wrapper";
-      wrapper.dataset.cam = String(cam);
-      const video = document.createElement("video");
-      video.controls = true; video.preload = "metadata"; video.muted = true;
-      video.onerror = () => { wrapper.style.display = "none"; };
-      const overlay = document.createElement("div");
-      overlay.className = "overlay-label"; overlay.textContent = label;
-      const fsBtn = document.createElement("button");
-      fsBtn.className = "fullscreen-btn"; fsBtn.textContent = "⛶ 전체화면";
-      wrapper.append(video, overlay, fsBtn);
-      frag.appendChild(wrapper);
-    }
-    container.innerHTML = "";
-    container.appendChild(frag);
-  }
-
   // ── 비디오 ──
   function loadVideos(syncNumber) {
-    const date = $("dateInput").value;
-    const site = $("siteInput").value.trim();
+    const date = $("dateInput").value, site = $("siteInput").value.trim();
     if (!date || !site) return;
     const syncLabel = `sync${syncNumber.padStart(3,'0')}`;
-    const baseURL = getVideoBaseURL(date);
-    ensureVideoTiles();
-    for (const wrapper of $("videoContainer").children) {
+    const baseURL = date >= "2025-12-31" ? "https://d3j9wzynvd2br9.cloudfront.net"
+                  : date >= "2025-06-16"  ? "https://d22x5o96gu3cuo.cloudfront.net"
+                  :                         "https://d175ce76v5cwjf.cloudfront.net";
+    const container = $("videoContainer");
+    // 타일이 없으면 생성
+    if (!container.children.length) {
+      const frag = document.createDocumentFragment();
+      for (let cam=1; cam<=10; cam++) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "video-wrapper"; wrapper.dataset.cam = cam;
+        const video = document.createElement("video");
+        video.controls = true; video.preload = "metadata"; video.muted = true;
+        video.onerror = () => { wrapper.style.display = "none"; };
+        const overlay = document.createElement("div"); overlay.className = "overlay-label";
+        const fsBtn = document.createElement("button"); fsBtn.className = "fullscreen-btn"; fsBtn.textContent = "⛶ 전체화면";
+        wrapper.append(video, overlay, fsBtn); frag.appendChild(wrapper);
+      }
+      container.appendChild(frag);
+    }
+    for (const wrapper of container.children) {
       const cam = Number(wrapper.dataset.cam);
-      const url   = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
-      const label = `CAM${pad2(cam)}`;
-      wrapper.style.display = ""; // 기본 표시
+      const url = `${baseURL}/${site}/${date}/processed/${syncLabel}/${cam}.MP4`;
+      wrapper.style.display = "";
       const video = wrapper.querySelector("video");
       const overlay = wrapper.querySelector(".overlay-label");
       const fsBtn = wrapper.querySelector(".fullscreen-btn");
-      overlay.textContent = label;
-      fsBtn.onclick = () => openFullscreen(url, `${label} — ${site} / ${date} / ${syncLabel}`);
-      video.preload = "metadata";
-      if (video.src !== url) {
-        video.pause();
-        video.src = url;
-      }
+      overlay.textContent = `CAM${pad2(cam)}`;
+      fsBtn.onclick = () => openFullscreen(url, `CAM${pad2(cam)} — ${site} / ${date} / ${syncLabel}`);
+      if (video.src !== url) { video.pause(); video.src = url; }
     }
   }
 
@@ -923,19 +851,10 @@
   function getSiteAndDate() {
     return { site: $("siteInput").value.trim(), date: $("dateInput").value || todayStr() };
   }
-  async function openImageTemplate() {
+  function openImageTemplate() {
     const { site, date } = getSiteAndDate();
     if (!site) { alert("SITE-ID를 선택해주세요."); return; }
-    const win = window.open("about:blank", "_blank");
-    try {
-      const url = await getImageTemplateUrl(date, site);
-      if (win) { win.opener = null; win.location.href = url; }
-      else window.open(url, "_blank");
-    } catch (e) {
-      if (win) win.close();
-      alert("이미지템플릿 URL을 발급하지 못했습니다.");
-      console.error(e);
-    }
+    window.open(`https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`, '_blank');
   }
   function openTrainsetManager() {
     const { site } = getSiteAndDate();
@@ -952,8 +871,7 @@
     });
   }
   function updateSiteIdBtn() {
-    const site = $("siteInput").value.trim();
-    $("btnCopySiteId").innerHTML = `${site || 'SITE-ID'} 복사 <kbd class="kbd">X</kbd>`;
+    $("btnCopySiteId").innerHTML = `${$("siteInput").value.trim() || 'SITE-ID'} 복사 <kbd class="kbd">X</kbd>`;
   }
   function openDebugTool() {
     const { site, date } = getSiteAndDate();
@@ -982,72 +900,69 @@
   }
 
   // ── 키보드 단축키 ──
-  function shouldKeepTyping(e) {
-    const el = document.activeElement;
-    if (el !== $("siteSearch")) return false;
-    return isImeComposing(e) || (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey);
+  // 디버그이미지 패널이 열려있을 때 ESC/V는 패널 내부 iframe으로 전달
+  function sendKeyToDebugPanel(e) {
+    try {
+      const iframe = $("debugImgIframe");
+      iframe.contentWindow.dispatchEvent(new KeyboardEvent("keydown", {
+        key: e.key, code: e.code, bubbles: true, cancelable: true
+      }));
+    } catch (_) {}
   }
 
-  function handleGlobalShortcut(e) {
-    if (shouldKeepTyping(e)) return;
+  document.addEventListener("keydown", e => {
+    const tag = document.activeElement.tagName.toLowerCase();
+    if (tag === "input" || tag === "select" || tag === "textarea") return;
+
+    // 디버그이미지 패널 열려있으면 ESC / V 는 패널로 전달
+    if (debugImgOpen && ["Escape","v","V"].includes(e.key)) {
+      sendKeyToDebugPanel(e);
+      // ESC는 패널도 닫기
+      if (e.key === "Escape") toggleDebugImgPanel(false);
+      return;
+    }
+
     if (["Escape","f","F","ㄹ"].includes(e.key)) {
       if ($("fullscreenOverlay").classList.contains("active")) { closeFullscreen(); return; }
     }
-    if (["p","P","ㅔ"].includes(e.key)) { e.preventDefault(); openImageTemplate(); return; }
-    if (["m","M","ㅡ"].includes(e.key)) { e.preventDefault(); openTrainsetManager(); return; }
-    if (["x","X","ㅌ"].includes(e.key)) { e.preventDefault(); copySiteId(); return; }
-    if (["d","D","ㅇ"].includes(e.key)) { e.preventDefault(); openDebugTool(); return; }
-    if (["y","Y","ㅛ"].includes(e.key)) { e.preventDefault(); toggleImgTpl(!imgTplOpen); return; }
-    if (["i","I","ㅣ","ㅑ"].includes(e.key)) { e.preventDefault(); toggleDebugImgPanel(!debugImgOpen); return; }
+    if (["p","P","ㅔ"].includes(e.key)) { openImageTemplate(); return; }
+    if (["m","M","ㅡ"].includes(e.key)) { openTrainsetManager(); return; }
+    if (["x","X","ㅌ"].includes(e.key)) { copySiteId(); return; }
+    if (["d","D","ㅇ"].includes(e.key)) { openDebugTool(); return; }
+    if (["y","Y","ㅛ"].includes(e.key)) { toggleImgTpl(!imgTplOpen); return; }
+    if (["i","I","ㅣ","ㅑ"].includes(e.key)) { toggleDebugImgPanel(!debugImgOpen); return; }
 
     const videos = document.querySelectorAll("#videoContainer video");
-
     if (e.key === " ") {
       e.preventDefault();
       const arr = Array.from(videos).filter(v => v.readyState >= 1);
       if (arr.length) { const play = arr[0].paused; arr.forEach(v => play ? v.play() : v.pause()); }
     } else if (e.key === "ArrowRight") {
-      const next = Math.min(currentPos + 1, visibleMap.length - 1);
+      const next = Math.min(currentPos+1, visibleMap.length-1);
       if (next !== currentPos) setActiveSyncByPos(next);
     } else if (e.key === "ArrowLeft") {
-      const prev = Math.max(currentPos - 1, 0);
+      const prev = Math.max(currentPos-1, 0);
       if (prev !== currentPos) setActiveSyncByPos(prev);
     } else if (["ArrowUp","ArrowDown"].includes(e.key)) {
       e.preventDefault();
-      const sel = $("siteInput");
-      const idx = sel.selectedIndex;
-      // 숨겨진 옵션 건너뛰기
-      let next = idx;
-      const dir = e.key === "ArrowUp" ? -1 : 1;
+      const sel = $("siteInput"), idx = sel.selectedIndex;
+      let next = idx, dir = e.key === "ArrowUp" ? -1 : 1;
       do { next += dir; } while (next >= 0 && next < sel.options.length && sel.options[next].style.display === "none");
       if (next < 0 || next >= sel.options.length) return;
-      sel.selectedIndex = next;
-      onSiteChange();
+      sel.selectedIndex = next; onSiteChange();
     } else if (["1","2","3","4"].includes(e.key)) {
-      e.preventDefault();
       const seek = {"1":-180,"2":-30,"3":30,"4":180}[e.key];
-      videos.forEach(v => { v.currentTime = Math.max(0, v.currentTime + seek); });
+      videos.forEach(v => { v.currentTime = Math.max(0, v.currentTime+seek); });
     } else if (["q","Q","ㅂ"].includes(e.key)) {
-      e.preventDefault();
-      const el = $("dateInput");
-      const d = parseLocalDate(el.value); d.setDate(d.getDate() - 1);
+      const el = $("dateInput"), d = parseLocalDate(el.value); d.setDate(d.getDate()-1);
       el.value = dateStr(d); onDateChange();
     } else if (["w","W","ㅈ"].includes(e.key)) {
-      e.preventDefault();
-      const el = $("dateInput");
-      const d = parseLocalDate(el.value); d.setDate(d.getDate() + 1);
+      const el = $("dateInput"), d = parseLocalDate(el.value); d.setDate(d.getDate()+1);
       el.value = dateStr(d); onDateChange();
     }
-  }
-
-  document.addEventListener("keydown", handleGlobalShortcut, true);
-  $("siteSearch").addEventListener("compositionstart", () => { searchComposing = true; });
-  $("siteSearch").addEventListener("compositionend", () => {
-    setTimeout(() => { searchComposing = false; }, 0);
   });
 
-  // cross-origin iframe 내부에서 발생한 keydown은 부모로 올라오지 않으므로,
-  // iframe 클릭 후에는 부모 문서가 다시 단축키 포커스를 갖도록 복구한다.
+  // iframe 포커스 시 부모 window로 복구
   window.addEventListener("blur", () => {
     setTimeout(() => {
       if (document.activeElement?.tagName?.toLowerCase() === "iframe") window.focus();
@@ -1059,18 +974,18 @@
     const handle = $("imgTplResizeHandle"), panel = $("imgTplPanel");
     let dragging = false, startX = 0, startW = 0;
     handle.addEventListener("mousedown", e => {
-      dragging = true; startX = e.clientX; startW = panel.offsetWidth;
-      handle.classList.add("dragging"); document.body.style.userSelect = "none"; e.preventDefault();
+      dragging=true; startX=e.clientX; startW=panel.offsetWidth;
+      handle.classList.add("dragging"); document.body.style.userSelect="none"; e.preventDefault();
     });
     window.addEventListener("mousemove", e => {
       if (!dragging) return;
-      const newW = Math.min(Math.max(startW + (startX - e.clientX), 300), window.innerWidth * 0.9);
-      panel.style.width = newW + "px";
-      if (document.body.classList.contains("imgtpl-open")) document.body.style.marginRight = newW + "px";
+      const newW = Math.min(Math.max(startW+(startX-e.clientX), 300), window.innerWidth*0.9);
+      panel.style.width = newW+"px";
+      if (document.body.classList.contains("imgtpl-open")) document.body.style.marginRight = newW+"px";
     });
     window.addEventListener("mouseup", () => {
       if (!dragging) return;
-      dragging = false; handle.classList.remove("dragging"); document.body.style.userSelect = "";
+      dragging=false; handle.classList.remove("dragging"); document.body.style.userSelect="";
     });
   })();
 </script>
