@@ -44,6 +44,24 @@
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
     }
 
+    /* 사이드 패널은 다크모드에서도 라이트 유지 */
+    body.dark #imgTplPanel,
+    body.dark #debugImgPanel {
+      --bg: #f5f7f9;
+      --surface: #ffffff;
+      --border: #e8ecf0;
+      --text: #1c2333;
+      --text-muted: #8492a6;
+      --accent: #00c8b4;
+      --accent-dark: #00a896;
+      --accent-light: #e0faf7;
+      --btn-bg: #f0f4f8;
+      --badge-border: #b2f0e8;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      background: #ffffff;
+      color: #1c2333;
+    }
+
     * { box-sizing: border-box; }
 
     body {
