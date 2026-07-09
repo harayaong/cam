@@ -259,6 +259,17 @@
       width: calc(100% + 20px); height: 2500px; border: none;
       margin-top: -120px; display: block; pointer-events: auto; overflow: hidden;
     }
+    /* 다크모드에서 iframe 위에 반투명 오버레이 */
+    .iframe-clip::after {
+      content: '';
+      display: none;
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.55);
+      pointer-events: none;
+      z-index: 1;
+      border-radius: var(--radius);
+    }
+    body.dark .iframe-clip::after { display: block; }
     .iframe-loading {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
