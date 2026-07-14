@@ -25,11 +25,7 @@
       font-size: 14px; line-height: 1.5;
     }
 
-    body {
-      transition: margin-right 0.25s cubic-bezier(0.4,0,0.2,1);
-      overflow-y: auto;
-    }
-    body.trainset-open { margin-right: var(--panel-w); }
+    body { overflow-y: auto; }
 
     .topbar {
       position: sticky; top: 0; z-index: 20;
@@ -92,30 +88,6 @@
       padding: 24px; color: var(--text-muted); text-align: center;
     }
 
-    #trainsetPanel {
-      position: fixed; top: 0; right: 0; z-index: 40;
-      width: var(--panel-w); height: 100vh;
-      display: flex; flex-direction: column;
-      background: var(--surface); border-left: 1px solid var(--border);
-      box-shadow: -4px 0 24px rgba(0,0,0,0.12);
-      transform: translateX(100%);
-      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
-    }
-    #trainsetPanel.open { transform: translateX(0); }
-
-    .panel-head {
-      height: 48px; padding: 0 12px;
-      display: flex; align-items: center; gap: 8px;
-      border-bottom: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .panel-title { font-weight: 700; font-size: 13px; }
-    .panel-meta {
-      color: var(--text-muted); font-size: 11px; overflow: hidden;
-      text-overflow: ellipsis; white-space: nowrap;
-    }
-    #trainsetFrame { flex: 1; width: 100%; border: 0; background: #fff; }
-
     @media (max-width: 900px) {
       :root { --panel-w: 86vw; }
       .meta { flex-basis: 100%; }
@@ -129,7 +101,7 @@
     <div class="title">리뷰테스크</div>
     <div class="meta" id="pageMeta">—</div>
     <div class="spacer"></div>
-    <button class="btn btn-accent" onclick="toggleTrainset()">트레인셋 <span class="kbd">T</span></button>
+    <button class="btn btn-accent" onclick="openTrainset()">트레인셋 <span class="kbd">T</span></button>
     <button class="btn" onclick="openTrainsetNew()">새 탭</button>
   </div>
 
@@ -138,19 +110,6 @@
     <img id="templateImage" alt="이미지템플릿" style="display:none;">
   </main>
 
-  <aside id="trainsetPanel" aria-label="트레인셋매니저 사이드패널">
-    <div class="panel-head">
-      <div>
-        <div class="panel-title">트레인셋매니저</div>
-        <div class="panel-meta" id="panelMeta">—</div>
-      </div>
-      <div class="spacer"></div>
-      <button class="btn" onclick="openTrainsetNew()">새 탭</button>
-      <button class="btn" onclick="toggleTrainset(false)">닫기</button>
-    </div>
-    <iframe id="trainsetFrame" title="트레인셋매니저"></iframe>
-  </aside>
-
   <script>
     const $ = id => document.getElementById(id);
 
@@ -158,6 +117,7 @@
     const site = (params.get("site") || "samsung_830").trim();
     const date = (params.get("date") || new Date().toISOString().slice(0, 10)).trim();
     let imageUrl = "";
+    let trainsetWin = null;
 
     function trainsetUrl() {
       return `https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true&siteid=${encodeURIComponent(site)}`;
@@ -173,8 +133,6 @@
 
     async function loadImage() {
       $("pageMeta").textContent = `${date} / ${site}`;
-      $("panelMeta").textContent = site;
-      $("trainsetFrame").src = trainsetUrl();
 
       try {
         imageUrl = await getImageTemplateUrl();
@@ -195,10 +153,15 @@
       }
     }
 
-    function toggleTrainset(force) {
-      const open = force === undefined ? !$("trainsetPanel").classList.contains("open") : force;
-      $("trainsetPanel").classList.toggle("open", open);
-      document.body.classList.toggle("trainset-open", open);
+    function openTrainset() {
+      if (trainsetWin && !trainsetWin.closed) {
+        trainsetWin.focus();
+        return;
+      }
+      trainsetWin = window.open(trainsetUrl(), "reviewtask_trainset");
+      if (!trainsetWin) {
+        alert("팝업이 차단되었습니다. 브라우저에서 팝업 허용 후 다시 시도해주세요.");
+      }
     }
 
     function openTrainsetNew() {
@@ -210,9 +173,7 @@
       if (["input", "textarea", "select"].includes(tag)) return;
       if (["t", "T", "ㅅ"].includes(e.key)) {
         e.preventDefault();
-        toggleTrainset();
-      } else if (e.key === "Escape") {
-        toggleTrainset(false);
+        openTrainset();
       }
     }, true);
 
