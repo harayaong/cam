@@ -48,6 +48,11 @@
       color: var(--text-muted); font-size: 12px; white-space: nowrap;
       overflow: hidden; text-overflow: ellipsis;
     }
+    .hint {
+      color: var(--accent-dark); font-size: 12px; white-space: nowrap;
+      opacity: 0; transition: opacity 0.18s;
+    }
+    .hint.show { opacity: 1; }
 
     .spacer { flex: 1; min-width: 12px; }
 
@@ -100,9 +105,9 @@
   <div class="topbar">
     <div class="title">리뷰테스크</div>
     <div class="meta" id="pageMeta">—</div>
+    <div class="hint" id="trainsetHint">트레인셋 탭을 다시 포커스했습니다.</div>
     <div class="spacer"></div>
-    <button class="btn btn-accent" onclick="openTrainset()">트레인셋 <span class="kbd">T</span></button>
-    <button class="btn" onclick="openTrainsetNew()">새 탭</button>
+    <button class="btn btn-accent" onclick="openTrainset()">트레인셋 열기/포커스 <span class="kbd">T</span></button>
   </div>
 
   <main class="image-wrap" id="imageWrap">
@@ -118,9 +123,18 @@
     const date = (params.get("date") || new Date().toISOString().slice(0, 10)).trim();
     let imageUrl = "";
     let trainsetWin = null;
+    let hintTimer = null;
 
     function trainsetUrl() {
       return `https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true&siteid=${encodeURIComponent(site)}`;
+    }
+
+    function showTrainsetHint(text) {
+      clearTimeout(hintTimer);
+      const el = $("trainsetHint");
+      el.textContent = text;
+      el.classList.add("show");
+      hintTimer = setTimeout(() => el.classList.remove("show"), 1800);
     }
 
     async function getImageTemplateUrl() {
@@ -156,16 +170,15 @@
     function openTrainset() {
       if (trainsetWin && !trainsetWin.closed) {
         trainsetWin.focus();
+        showTrainsetHint("트레인셋 탭을 다시 포커스했습니다.");
         return;
       }
       trainsetWin = window.open(trainsetUrl(), "reviewtask_trainset");
       if (!trainsetWin) {
         alert("팝업이 차단되었습니다. 브라우저에서 팝업 허용 후 다시 시도해주세요.");
+      } else {
+        showTrainsetHint("트레인셋 탭을 열었습니다. 작업 중에는 탭을 닫지 않고 재사용하세요.");
       }
-    }
-
-    function openTrainsetNew() {
-      window.open(trainsetUrl(), "_blank", "noopener");
     }
 
     document.addEventListener("keydown", e => {
