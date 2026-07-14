@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>리뷰태스크</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      background: #111;
+      color: #e8eaf0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── 상단 바 ── */
+    .top-bar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 44px;
+      background: rgba(17,17,17,0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #2a2a2a;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; z-index: 100;
+      transition: right 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    body.panel-open .top-bar { right: 40vw; }
+
+    .top-bar-left {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 13px; color: #8492a6;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .top-bar-left .site-id {
+      color: #00c8b4; font-weight: 700; font-size: 14px;
+    }
+    .top-bar-left .date-str { color: #6b7280; }
+
+    .top-bar-right {
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .kbd {
+      display: inline-block; background: #222;
+      border: 1px solid #3a3a3a; border-bottom-width: 2px;
+      border-radius: 4px; padding: 1px 7px;
+      font-size: 11px; font-family: 'SF Mono', monospace; color: #aaa;
+    }
+    .hint { font-size: 12px; color: #555; }
+
+    /* ── 이미지 영역 ── */
+    .image-area {
+      padding-top: 44px;
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      transition: margin-right 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    body.panel-open .image-area { margin-right: 40vw; }
+
+    .image-wrap {
+      width: 100%;
+      display: flex; justify-content: center;
+    }
+    .image-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .error-msg {
+      margin-top: 20vh;
+      text-align: center; color: #555; font-size: 14px; line-height: 2;
+    }
+    .error-msg span { font-size: 32px; display: block; margin-bottom: 12px; }
+
+    /* ── 트레인셋 사이드 패널 ── */
+    #trainsetPanel {
+      position: fixed; top: 0; right: 0;
+      width: 40vw; height: 100vh;
+      background: #1a1a1a;
+      border-left: 1px solid #2a2a2a;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+      z-index: 200;
+      display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    #trainsetPanel.open { transform: translateX(0); }
+
+    .panel-header {
+      height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid #2a2a2a;
+      font-size: 13px; font-weight: 600; color: #e8eaf0;
+    }
+    .panel-close {
+      background: none; border: none; color: #555;
+      font-size: 18px; cursor: pointer; line-height: 1;
+      padding: 4px; border-radius: 4px; transition: color 0.15s;
+    }
+    .panel-close:hover { color: #e8eaf0; }
+
+    .panel-body { flex: 1; overflow: hidden; }
+    .panel-body iframe { width: 100%; height: 100%; border: none; }
+
+    /* 패널 탭 버튼 */
+    #trainsetTab {
+      position: fixed; bottom: 24px; right: 0;
+      background: #00c8b4; color: #fff; border: none;
+      border-radius: 8px 0 0 8px; padding: 18px 12px;
+      cursor: pointer; z-index: 199;
+      font-size: 12px; font-weight: 700;
+      writing-mode: vertical-rl; letter-spacing: 2px;
+      box-shadow: -2px 0 10px rgba(0,200,180,0.3);
+      transition: background 0.15s, opacity 0.3s;
+    }
+    #trainsetTab:hover { background: #00a896; }
+    #trainsetTab.hidden { opacity: 0; pointer-events: none; }
+  </style>
+</head>
+<body>
+
+<!-- 트레인셋 사이드 패널 -->
+<div id="trainsetPanel">
+  <div class="panel-header">
+    <span>트레인셋매니저</span>
+    <button class="panel-close" onclick="togglePanel(false)">✕</button>
+  </div>
+  <div class="panel-body">
+    <iframe id="trainsetIframe"></iframe>
+  </div>
+</div>
+<button id="trainsetTab" onclick="togglePanel(true)">트레인셋 (T)</button>
+
+<!-- 상단 바 -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <span class="site-id" id="labelSite">—</span>
+    <span class="date-str" id="labelDate">—</span>
+  </div>
+  <div class="top-bar-right">
+    <span class="hint"><kbd class="kbd">T</kbd> 트레인셋매니저</span>
+  </div>
+</div>
+
+<!-- 이미지 영역 -->
+<div class="image-area">
+  <div class="image-wrap" id="imageWrap">
+    <img id="mainImg" alt="이미지템플릿"
+      onerror="showError()"
+      onload="hideError()">
+  </div>
+  <div class="error-msg" id="errorMsg" style="display:none;">
+    <span>🚫</span>
+    이미지템플릿이 없습니다.<br>
+    서비스요일이 아니거나 파이프라인이 동작하지 않았습니다.
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const sp = new URLSearchParams(location.search);
+  const site = sp.get("site") || "";
+  const date = sp.get("date") || "";
+
+  const IMG_URL = site && date
+    ? `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`
+    : "";
+
+  const TRAINSET_URL = site
+    ? `https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true&siteid=${encodeURIComponent(site)}`
+    : "";
+
+  // ── 상단 바 라벨 ──
+  $("labelSite").textContent = site || "SITE 없음";
+  $("labelDate").textContent = date || "날짜 없음";
+
+  // ── 이미지 로드 ──
+  if (IMG_URL) {
+    $("mainImg").src = IMG_URL;
+  } else {
+    showError();
+  }
+
+  function showError() {
+    $("mainImg").style.display = "none";
+    $("errorMsg").style.display = "block";
+  }
+  function hideError() {
+    $("mainImg").style.display = "block";
+    $("errorMsg").style.display = "none";
+  }
+
+  // ── 트레인셋 패널 ──
+  let panelOpen = false;
+
+  // 백그라운드에서 미리 로드
+  if (TRAINSET_URL) {
+    $("trainsetIframe").src = TRAINSET_URL;
+  }
+
+  function togglePanel(open) {
+    panelOpen = open;
+    $("trainsetPanel").classList.toggle("open", open);
+    $("trainsetTab").classList.toggle("hidden", open);
+    document.body.classList.toggle("panel-open", open);
+  }
+
+  // ── 단축키 ──
+  document.addEventListener("keydown", e => {
+    const tag = document.activeElement.tagName.toLowerCase();
+    if (tag === "input" || tag === "textarea") return;
+
+    if (["t","T","ㅅ"].includes(e.key)) {
+      togglePanel(!panelOpen); return;
+    }
+    if (e.key === "Escape" && panelOpen) {
+      togglePanel(false); return;
+    }
+  });
+</script>
+</body>
+</html>
