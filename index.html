@@ -680,10 +680,14 @@
   });
   window.addEventListener("mouseup", () => { tplDragging=false; $("imgTplCanvas").classList.remove("grabbing"); });
 
+  function imageTemplateOpenUrl(date, site) {
+    return `/api/image-template-open?date=${encodeURIComponent(date)}&site=${encodeURIComponent(site)}`;
+  }
+
   function loadImgTplByDate(date) {
     const site = $("siteInput").value.trim();
     if (!site || !date) return;
-    const url = `https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`;
+    const url = imageTemplateOpenUrl(date, site);
     imgTplCurrentUrl = url;
     $("imgTplMeta").textContent = `${date} (${DAY_NAMES[dayIndexFromDate(date)]}) — ${site}`;
     const img = $("imgTplImg");
@@ -706,7 +710,7 @@
       loadImgTplByDate(todayStr());
     }
   }
-  function openImgTplInNew() { if (imgTplCurrentUrl) window.open(imgTplCurrentUrl, "_blank"); }
+  function openImgTplInNew() { if (imgTplCurrentUrl) window.open(imgTplCurrentUrl, "_blank", "noopener"); }
 
   // ── 전체화면 ──
   function openFullscreen(src, label) {
@@ -880,7 +884,7 @@
   function openImageTemplate() {
     const { site, date } = getSiteAndDate();
     if (!site) { alert("SITE-ID를 선택해주세요."); return; }
-    window.open(`https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/${date}/${site}.jpg`, '_blank');
+    window.open(imageTemplateOpenUrl(date, site), "_blank", "noopener");
   }
   function openTrainsetManager() {
     const { site } = getSiteAndDate();
