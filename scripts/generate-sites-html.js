@@ -3,9 +3,12 @@
 const fs = require("fs");
 const https = require("https");
 const path = require("path");
+const crypto = require("crypto");
 
+const S3_BUCKET = "perception-public-data-us-east-1-prod";
+const S3_PREFIX = "oms_sync_check";
 const S3_BASE_URL =
-  "https://perception-public-data-us-east-1-prod.s3.amazonaws.com/oms_sync_check";
+  `https://${S3_BUCKET}.s3.amazonaws.com/${S3_PREFIX}`;
 
 const DAY_MAP = {
   MONDAY: "월",
@@ -60,6 +63,106 @@ function download(url) {
         res.on("end", () => resolve(body));
       })
       .on("error", reject);
+  });
+}
+
+function hmac(key, value, encoding) {
+  return crypto.createHmac("sha256", key).update(value, "utf8").digest(encoding);
+}
+
+function sha256(value, encoding) {
+  return crypto.createHash("sha256").update(value, "utf8").digest(encoding);
+}
+
+function getSignatureKey(secretAccessKey, dateStamp, region, service) {
+  const kDate = hmac(`AWS4${secretAccessKey}`, dateStamp);
+  const kRegion = hmac(kDate, region);
+  const kService = hmac(kRegion, service);
+  return hmac(kService, "aws4_request");
+}
+
+function encodeS3Key(key) {
+  return key.split("/").map(part => encodeURIComponent(part)).join("/");
+}
+
+function signedS3RequestOptions(key) {
+  const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+  const sessionToken = process.env.AWS_SESSION_TOKEN;
+  const region = process.env.AWS_REGION || "us-east-1";
+
+  if (!accessKeyId || !secretAccessKey) return null;
+
+  const now = new Date();
+  const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
+  const dateStamp = amzDate.slice(0, 8);
+  const host = `${S3_BUCKET}.s3.${region}.amazonaws.com`;
+  const canonicalUri = `/${encodeS3Key(key)}`;
+  const headers = {
+    host,
+    "x-amz-content-sha256": "UNSIGNED-PAYLOAD",
+    "x-amz-date": amzDate,
+  };
+  if (sessionToken) headers["x-amz-security-token"] = sessionToken;
+
+  const signedHeaders = Object.keys(headers).sort().join(";");
+  const canonicalHeaders = Object.keys(headers)
+    .sort()
+    .map(name => `${name}:${headers[name]}\n`)
+    .join("");
+  const canonicalRequest = [
+    "GET",
+    canonicalUri,
+    "",
+    canonicalHeaders,
+    signedHeaders,
+    "UNSIGNED-PAYLOAD",
+  ].join("\n");
+  const credentialScope = `${dateStamp}/${region}/s3/aws4_request`;
+  const stringToSign = [
+    "AWS4-HMAC-SHA256",
+    amzDate,
+    credentialScope,
+    sha256(canonicalRequest, "hex"),
+  ].join("\n");
+  const signature = hmac(
+    getSignatureKey(secretAccessKey, dateStamp, region, "s3"),
+    stringToSign,
+    "hex",
+  );
+
+  headers.authorization =
+    `AWS4-HMAC-SHA256 Credential=${accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+  return {
+    hostname: host,
+    path: canonicalUri,
+    method: "GET",
+    headers,
+  };
+}
+
+function downloadSignedS3(key) {
+  const options = signedS3RequestOptions(key);
+  if (!options) return null;
+
+  return new Promise((resolve, reject) => {
+    https
+      .request(options, res => {
+        if (res.statusCode < 200 || res.statusCode >= 300) {
+          reject(new Error(`S3 download failed: ${res.statusCode} s3://${S3_BUCKET}/${key}`));
+          res.resume();
+          return;
+        }
+        let body = "";
+        res.setEncoding("utf8");
+        res.on("data", chunk => {
+          body += chunk;
+        });
+        res.on("end", () => resolve(body));
+      })
+      .on("error", reject)
+      .end();
   });
 }
 
@@ -138,9 +241,15 @@ async function main() {
     sourceLabel = path.resolve(args.input);
     rawJson = fs.readFileSync(sourceLabel, "utf8");
   } else {
+    const key = `${S3_PREFIX}/oms_data_${date}.json`;
     const url = `${S3_BASE_URL}/oms_data_${date}.json`;
-    sourceLabel = url;
-    rawJson = await download(url);
+    sourceLabel = `s3://${S3_BUCKET}/${key}`;
+    rawJson = await downloadSignedS3(key);
+
+    if (!rawJson) {
+      sourceLabel = url;
+      rawJson = await download(url);
+    }
   }
 
   const parsed = JSON.parse(rawJson);
