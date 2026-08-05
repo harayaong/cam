@@ -150,6 +150,17 @@
   function formatDate(d) {
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   }
+  function parseDate(value) {
+    var parts = value.split('-').map(Number);
+    return new Date(parts[0], parts[1]-1, parts[2]);
+  }
+  function moveWorkday(date, step) {
+    var d = parseDate(date);
+    do {
+      d.setDate(d.getDate() + step);
+    } while (d.getDay()===0 || d.getDay()===6);
+    return formatDate(d);
+  }
 
   function imageTemplateOpenUrl(date, site) {
     return '/api/image-template-open?date=' + encodeURIComponent(date) + '&site=' + encodeURIComponent(site);
@@ -274,6 +285,20 @@
 
   // ── 단축키: + / - 확대축소, 0 초기화 ──
   document.addEventListener('keydown', function(e) {
+    if (!e.ctrlKey && !e.altKey && !e.metaKey && !e.isComposing) {
+      if (e.key === 'q' || e.key === 'Q' || e.key === 'ㅂ' || e.key === 'ㅃ' || e.code === 'KeyQ') {
+        e.preventDefault();
+        document.getElementById('dateInput').value = moveWorkday(document.getElementById('dateInput').value, -1);
+        loadImage();
+        return;
+      }
+      if (e.key === 'w' || e.key === 'W' || e.key === 'ㅈ' || e.key === 'ㅉ' || e.code === 'KeyW') {
+        e.preventDefault();
+        document.getElementById('dateInput').value = moveWorkday(document.getElementById('dateInput').value, 1);
+        loadImage();
+        return;
+      }
+    }
     if (e.key === '+' || e.key === '=' || e.key === 'ㅂ') {
       e.preventDefault();
       zoomScale = Math.min(ZOOM_MAX, zoomScale + ZOOM_STEP);

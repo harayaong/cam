@@ -548,6 +548,17 @@
   function formatDate(d) {
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   }
+  function parseDate(value) {
+    var parts = value.split('-').map(Number);
+    return new Date(parts[0], parts[1]-1, parts[2]);
+  }
+  function moveWorkday(date, step) {
+    var d = parseDate(date);
+    do {
+      d.setDate(d.getDate() + step);
+    } while (d.getDay()===0 || d.getDay()===6);
+    return formatDate(d);
+  }
 
   // ══ 3. 핵심 함수 ══
 
@@ -691,17 +702,7 @@
     var date = document.getElementById('dateInput').value;
     if (!site) { alert('Site ID를 입력해 주세요.'); return; }
     if (!date) { alert('날짜를 입력해 주세요.'); return; }
-    var w = Math.floor(screen.width  / 2);
-    var h = screen.height;
-    var left = screen.width - w;
-    var url = 'template-popup.html?site='+encodeURIComponent(site)+'&date='+date;
-    // 창 이름 고정 → 기존 창 재사용, 단 팝업 차단 시 새 탭(blank)으로 열어야 통합툴 덮어쓰기 방지
-    var popup = window.open(url, 'img_template_popup',
-      'width='+w+',height='+h+',left='+left+',top=0,resizable=yes,scrollbars=no');
-    if (!popup || popup.closed || typeof popup.closed==='undefined') {
-      // 팝업 차단 시 → 새 탭으로 (통합툴 덮어쓰기 방지를 위해 _blank 사용)
-      window.open(url, '_blank');
-    }
+    window.open(imageTemplateOpenUrl(date, site), '_blank', 'noopener');
   }
 
   function openAnnotation() {
@@ -837,13 +838,26 @@
     });
   });
 
+  function isDateShortcut(e, keys, codes) {
+    if (e.ctrlKey || e.altKey || e.metaKey || e.isComposing) return false;
+    return keys.includes(e.key) || codes.includes(e.code);
+  }
+  function changeMainDate(step) {
+    var dateInput = document.getElementById('dateInput');
+    if (!dateInput.value) return;
+    dateInput.value = moveWorkday(dateInput.value, step);
+    if (document.getElementById('siteInput').value.trim()) applyAll();
+  }
+
   // ── 전역 단축키 핸들러 ──
   // iframe에 포커스가 있어도 동작하도록
   // ESC만 예외: frame-img(이미지뷰어)에 포커스를 넘김
   function globalKeyHandler(e) {
     if (document.activeElement.id==='siteInput') return;
-    if (document.activeElement.id==='dateInput')  return;
 
+    if (isDateShortcut(e, ['q','Q','ㅂ','ㅃ'], ['KeyQ'])) { e.preventDefault(); changeMainDate(-1); return; }
+    if (isDateShortcut(e, ['w','W','ㅈ','ㅉ'], ['KeyW'])) { e.preventDefault(); changeMainDate(1); return; }
+    if (document.activeElement.id==='dateInput')  return;
     if (e.key==='x'||e.key==='X'||e.key==='ㅌ') { e.preventDefault(); copySiteID(); return; }
     if (e.key==='y'||e.key==='Y'||e.key==='ㅛ') { e.preventDefault(); toggleTemplatePanel(); return; }
     if (e.key==='a'||e.key==='A'||e.key==='ㅁ') { e.preventDefault(); openAnnotation(); return; }
