@@ -151,12 +151,16 @@
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   }
 
+  function imageTemplateOpenUrl(date, site) {
+    return '/api/image-template-open?date=' + encodeURIComponent(date) + '&site=' + encodeURIComponent(site);
+  }
+
   // ── 이미지 로드 ──
   function loadImage() {
     var d = document.getElementById('dateInput').value;
     if (!site || !d) return;
     date = d;
-    var url = 'https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/'+d+'/'+site+'.jpg';
+    var url = imageTemplateOpenUrl(d, site);
     var img   = document.getElementById('theImg');
     var empty = document.getElementById('imgEmpty');
     img.style.display   = 'none';

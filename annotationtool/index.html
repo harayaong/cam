@@ -582,8 +582,12 @@
     });
   }
 
+  function imageTemplateOpenUrl(date, site) {
+    return '/api/image-template-open?date=' + encodeURIComponent(date) + '&site=' + encodeURIComponent(site);
+  }
+
   function updateTemplatePanel(site, date) {
-    const url = 'https://perception-public-data-us-east-1-prod.s3.us-east-1.amazonaws.com/'+date+'/'+site+'.jpg';
+    const url = imageTemplateOpenUrl(date, site);
     const img   = document.getElementById('imgPanelImg');
     const empty = document.getElementById('imgPanelEmpty');
     img.style.display   = 'none';
