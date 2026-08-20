@@ -594,7 +594,10 @@
   }
 
   function imageTemplateOpenUrl(date, site) {
-    return '/api/image-template-open?date=' + encodeURIComponent(date) + '&site=' + encodeURIComponent(site);
+    var apiOrigin = location.hostname.endsWith('vercel.app')
+      ? location.origin
+      : 'https://storyline-camera-viewer.vercel.app';
+    return apiOrigin + '/api/image-template-open?date=' + encodeURIComponent(date) + '&site=' + encodeURIComponent(site);
   }
 
   function updateTemplatePanel(site, date) {

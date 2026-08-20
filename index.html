@@ -681,7 +681,10 @@
   window.addEventListener("mouseup", () => { tplDragging=false; $("imgTplCanvas").classList.remove("grabbing"); });
 
   function imageTemplateOpenUrl(date, site) {
-    return `/api/image-template-open?date=${encodeURIComponent(date)}&site=${encodeURIComponent(site)}`;
+    const apiOrigin = location.hostname.endsWith("vercel.app")
+      ? location.origin
+      : "https://storyline-camera-viewer.vercel.app";
+    return `${apiOrigin}/api/image-template-open?date=${encodeURIComponent(date)}&site=${encodeURIComponent(site)}`;
   }
 
   function loadImgTplByDate(date) {
