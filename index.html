@@ -913,19 +913,38 @@
   function storylineUrl(companyId, classroomId) {
     return `https://storyline.playtag.ai/ko/link/${encodeURIComponent(companyId)}/${encodeURIComponent(classroomId)}?action=dependents`;
   }
-  function openStorylineWeb() {
+  function storylineLookupUrl(site) {
+    const apiOrigin = location.hostname.endsWith("vercel.app")
+      ? location.origin
+      : "https://storyline-camera-viewer.vercel.app";
+    return `${apiOrigin}/api/storyline-url?site=${encodeURIComponent(site)}`;
+  }
+  async function openStorylineWeb() {
     const { site } = getSiteAndDate();
     if (!site) { alert("SITE-ID를 선택해주세요."); return; }
     const { companyId, classroomId } = getStorylineIds();
-    if (!companyId || !classroomId) {
-      alert("이 사이트에는 아직 스토리라인 이동용 company_id/classroom_id 정보가 없습니다.");
+    const popup = window.open("", "storylineClassroomWindow", "popup=yes,width=1440,height=900,resizable=yes,scrollbars=yes");
+    if (!popup) {
+      alert("팝업이 차단되었습니다. 브라우저 팝업 허용 후 다시 시도해주세요.");
       return;
     }
-    window.open(
-      storylineUrl(companyId, classroomId),
-      "storylineClassroomWindow",
-      "popup=yes,width=1440,height=900,resizable=yes,scrollbars=yes"
-    );
+    if (companyId && classroomId) {
+      popup.location.href = storylineUrl(companyId, classroomId);
+      return;
+    }
+    try {
+      popup.document.title = "스토리라인 조회 중";
+      popup.document.body.innerHTML = "<p style=\"font-family:sans-serif;padding:24px\">스토리라인 교실 정보를 찾는 중...</p>";
+    } catch (e) {}
+    try {
+      const res = await fetch(storylineLookupUrl(site), { cache: "no-store" });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.message || data.error || "스토리라인 정보를 찾지 못했습니다.");
+      popup.location.href = data.url;
+    } catch (error) {
+      popup.close();
+      alert(error.message || "스토리라인 정보를 찾지 못했습니다.");
+    }
   }
   function copySiteId() {
     const site = $("siteInput").value.trim();
@@ -942,11 +961,10 @@
   function updateStorylineBtn() {
     const btn = $("btnStoryline");
     const { companyId, classroomId } = getStorylineIds();
-    const enabled = Boolean(companyId && classroomId);
-    btn.disabled = !enabled;
-    btn.title = enabled
+    btn.disabled = !$("siteInput").value.trim();
+    btn.title = companyId && classroomId
       ? `스토리라인 열기: ${companyId} / ${classroomId}`
-      : "스토리라인 ID 정보가 필요합니다";
+      : "siteID로 스토리라인 정보를 찾아 엽니다";
   }
   function openDebugTool() {
     const { site, date } = getSiteAndDate();
