@@ -189,6 +189,8 @@ function normalizeRow(row) {
     classroom,
     schedule: String(row.schedule || "스케쥴미설정").trim(),
     serviceDays: formatServiceDays(row.serviceDays),
+    storylineCompanyId: String(row.company_id || row.companyId || row.teacher_org_id || row.teacherOrgId || "").trim(),
+    storylineClassroomId: String(row.classroom_id || row.classroomId || row.teacher_class_id || row.teacherClassId || "").trim(),
   };
 }
 
@@ -205,7 +207,15 @@ function validateRows(rows) {
 
 function renderSitesHtml(rows, sourceLabel) {
   const lines = rows
-    .map(row => [row.siteId, row.company, row.classroom, row.schedule, row.serviceDays].join("\t"))
+    .map(row => [
+      row.siteId,
+      row.company,
+      row.classroom,
+      row.schedule,
+      row.serviceDays,
+      row.storylineCompanyId,
+      row.storylineClassroomId,
+    ].join("\t"))
     .join("\n");
 
   return `<!DOCTYPE html>
@@ -219,7 +229,7 @@ function renderSitesHtml(rows, sourceLabel) {
   사이트 리스트 관리 파일
   자동 생성됨: ${new Date().toISOString()}
   원본: ${sourceLabel}
-  형식: siteID / 기관명 / 교실명 / 스케쥴 / 서비스요일
+  형식: siteID / 기관명 / 교실명 / 스케쥴 / 서비스요일 / 스토리라인기관ID / 스토리라인교실ID
 -->
 <pre id="site-data">
 ${lines}

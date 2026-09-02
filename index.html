@@ -150,6 +150,10 @@
       cursor: pointer; white-space: nowrap; transition: all 0.18s;
     }
     .btn:hover { background: var(--btn-bg); border-color: #c8d0dc; color: var(--text); }
+    .btn:disabled {
+      opacity: 0.45; cursor: not-allowed;
+      background: var(--btn-bg); color: var(--text-muted);
+    }
     .btn-accent { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
     .btn-accent:hover {
       background: var(--accent-dark); border-color: var(--accent-dark); color: #fff;
@@ -461,6 +465,7 @@
     <h1>통합카메라조회</h1>
     <div class="header-actions">
       <button class="btn" onclick="openImageTemplate()">이미지템플릿 <kbd class="kbd">P</kbd></button>
+      <button class="btn" id="btnStoryline" onclick="openStorylineWeb()" title="스토리라인 ID 정보가 필요합니다">스토리라인 <kbd class="kbd">S</kbd></button>
       <button class="btn" onclick="openTrainsetManager()">트레인셋매니저 <kbd class="kbd">M</kbd></button>
       <button class="btn" id="btnCopySiteId" onclick="copySiteId()">SITE-ID 복사 <kbd class="kbd">X</kbd></button>
       <button class="btn" onclick="refreshSiteList()" title="사이트 목록 강제 갱신">↺ 목록 갱신</button>
@@ -490,6 +495,7 @@
 <!-- 단축키 안내 -->
 <div class="shortcut-bar">
   <span class="shortcut-item"><kbd class="kbd">P</kbd> 이미지템플릿</span>
+  <span class="shortcut-item"><kbd class="kbd">S</kbd> 스토리라인</span>
   <span class="shortcut-item"><kbd class="kbd">M</kbd> 트레인셋매니저</span>
   <span class="shortcut-item"><kbd class="kbd">X</kbd> SITE-ID 복사</span>
   <span class="shortcut-item"><kbd class="kbd">D</kbd> 디버그툴</span>
@@ -571,12 +577,14 @@
     const raw = match ? match[1] : text;
     const frag = document.createDocumentFragment();
     for (const line of raw.split("\n")) {
-      const [siteId, company, room, schedule, days] = line.trim().split("\t");
+      const [siteId, company, room, schedule, days, storylineCompanyId, storylineClassroomId] = line.trim().split("\t");
       if (!siteId) continue;
       const opt = document.createElement("option");
       opt.value = siteId;
       opt.dataset.schedule = schedule || "";
       opt.dataset.days = days || "";
+      opt.dataset.storylineCompanyId = storylineCompanyId || "";
+      opt.dataset.storylineClassroomId = storylineClassroomId || "";
       opt.textContent = `${siteId} / ${company||''} / ${room||''} / ${schedule||''} / ${days||''}`;
       frag.appendChild(opt);
     }
@@ -592,7 +600,7 @@
       if (found) sel.value = selectedSite;
     }
     updateWeekday(); renderSyncButtons(); setActiveSyncByPos(0);
-    updateClassroomIframe(); updateSiteIdBtn();
+    updateClassroomIframe(); updateSiteIdBtn(); updateStorylineBtn();
   }
 
   async function loadSiteList(selectedSite) {
@@ -764,6 +772,7 @@
     if (imgTplOpen) loadImgTplByDate(todayStr());
     if (debugImgOpen) updateDebugImgPanel();
     updateSiteIdBtn();
+    updateStorylineBtn();
   }
 
   // ── 요일 ──
@@ -894,6 +903,30 @@
     if (!site) { alert("SITE-ID를 선택해주세요."); return; }
     window.open(`https://trainset-management-tool.vercel.app/service/trainingset?fullscreen=true&siteid=${encodeURIComponent(site)}`, "_blank");
   }
+  function getStorylineIds() {
+    const opt = getSelectedOption();
+    return {
+      companyId: opt?.dataset.storylineCompanyId || "",
+      classroomId: opt?.dataset.storylineClassroomId || "",
+    };
+  }
+  function storylineUrl(companyId, classroomId) {
+    return `https://storyline.playtag.ai/ko/link/${encodeURIComponent(companyId)}/${encodeURIComponent(classroomId)}?action=dependents`;
+  }
+  function openStorylineWeb() {
+    const { site } = getSiteAndDate();
+    if (!site) { alert("SITE-ID를 선택해주세요."); return; }
+    const { companyId, classroomId } = getStorylineIds();
+    if (!companyId || !classroomId) {
+      alert("이 사이트에는 아직 스토리라인 이동용 company_id/classroom_id 정보가 없습니다.");
+      return;
+    }
+    window.open(
+      storylineUrl(companyId, classroomId),
+      "storylineClassroomWindow",
+      "popup=yes,width=1440,height=900,resizable=yes,scrollbars=yes"
+    );
+  }
   function copySiteId() {
     const site = $("siteInput").value.trim();
     if (!site) { alert("SITE-ID를 선택해주세요."); return; }
@@ -905,6 +938,15 @@
   }
   function updateSiteIdBtn() {
     $("btnCopySiteId").innerHTML = `${$("siteInput").value.trim() || 'SITE-ID'} 복사 <kbd class="kbd">X</kbd>`;
+  }
+  function updateStorylineBtn() {
+    const btn = $("btnStoryline");
+    const { companyId, classroomId } = getStorylineIds();
+    const enabled = Boolean(companyId && classroomId);
+    btn.disabled = !enabled;
+    btn.title = enabled
+      ? `스토리라인 열기: ${companyId} / ${classroomId}`
+      : "스토리라인 ID 정보가 필요합니다";
   }
   function openDebugTool() {
     const { site, date } = getSiteAndDate();
@@ -954,6 +996,7 @@
       if ($("fullscreenOverlay").classList.contains("active")) { closeFullscreen(); return; }
     }
     if (["p","P","ㅔ"].includes(e.key)) { openImageTemplate(); return; }
+    if (["s","S","ㄴ"].includes(e.key)) { openStorylineWeb(); return; }
     if (["m","M","ㅡ"].includes(e.key)) { openTrainsetManager(); return; }
     if (["x","X","ㅌ"].includes(e.key)) { copySiteId(); return; }
     if (["d","D","ㅇ"].includes(e.key)) { openDebugTool(); return; }
