@@ -182,17 +182,19 @@
 
     /* ── 비디오 그리드 ── */
     .video-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 10px; margin-bottom: 16px;
     }
+    @media (min-width: 1400px) { .video-grid { grid-template-columns: repeat(5, 1fr); } }
     @media (max-width: 1100px) { .video-grid { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 480px)  { .video-grid { grid-template-columns: 1fr 1fr; } }
     .video-wrapper {
       position: relative; border-radius: var(--radius); overflow: hidden;
       background: #0a0a0a; box-shadow: var(--shadow-sm); transition: box-shadow 0.2s;
+      aspect-ratio: 16 / 9;
     }
     .video-wrapper:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.14); }
-    video { width: 100%; height: auto; display: block; background: #000; }
+    #videoContainer video { width: 100%; height: 100%; display: block; background: #000; object-fit: contain; }
     .overlay-label {
       position: absolute; top: 7px; left: 7px;
       background: rgba(0,0,0,0.6); color: #fff;
@@ -537,7 +539,7 @@
       <li>sites.html — 사이트 리스트 외부 파일 분리, 구글 스프레드시트 복붙으로 관리</li>
       <li>다크모드(비비드블랙) 토글, 디버그이미지 패널 ESC/V 패스스루 단축키 추가</li>
       <li>사이트 이동 디바운스, 목록 강제 갱신, 검색 ESC 초기화</li>
-      <li>카메라 10개 지원, URL 파라미터 초기 로드 버그 수정</li>
+      <li>카메라 최대 20개 지원, URL 파라미터 초기 로드 버그 수정</li>
     </ul>
   </div>
 </div>
@@ -552,6 +554,7 @@
   const dayIndexFromDate = v => parseLocalDate(v).getDay();
   const DAY_NAMES = ['일','월','화','수','목','금','토'];
   const DAY_MAP   = { '월':1, '화':2, '수':3, '목':4, '금':5, '토':6, '일':0 };
+  const MAX_CAMERA_COUNT = 20;
 
   function debounce(fn, ms) {
     let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
@@ -864,7 +867,7 @@
     // 타일이 없으면 생성
     if (!container.children.length) {
       const frag = document.createDocumentFragment();
-      for (let cam=1; cam<=10; cam++) {
+      for (let cam=1; cam<=MAX_CAMERA_COUNT; cam++) {
         const wrapper = document.createElement("div");
         wrapper.className = "video-wrapper"; wrapper.dataset.cam = cam;
         const video = document.createElement("video");
