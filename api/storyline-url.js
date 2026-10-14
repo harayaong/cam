@@ -60,39 +60,40 @@ async function getJson(url, headers = {}) {
   return response.json();
 }
 
-async function lookupViaDirectoryAction(site) {
-  const url = pickString(process.env.DIRECTORY_API_URL);
-  const apiKey = pickString(process.env.DIRECTORY_API_KEY);
-  if (!url || !apiKey) return [];
+function siteApi() {
+  return {
+    url: pickString(process.env.SITE_API_URL || DEFAULT_SITE_API_URL).replace(/\/$/, ""),
+    key: pickString(process.env.SITE_API_KEY),
+  };
+}
 
-  const actionNames = [
-    "storylineBySite",
-    "storylineLinksBySite",
-    "siteDetailsBySite",
-  ];
-  for (const action of actionNames) {
-    try {
-      const payload = await postJson(url, { action, siteID: site, siteId: site, apiKey });
-      if (payload?.ok === false) continue;
-      const rows = [
-        ...pickArray(payload, ["matches", "rows", "sites", "links"]),
-        payload.match,
-        payload.site,
-      ].filter(Boolean);
-      const matches = rows.map(normalizeMatch).filter(Boolean);
-      if (matches.length) return matches;
-    } catch (error) {
-      console.warn(`directory action ${action} failed`, error.message);
-    }
+function siteMatches(payload, site) {
+  return pickArray(payload, ["matches", "rows"])
+    .map(normalizeMatch)
+    .filter(match => match && (!match.siteId || match.siteId.toLowerCase() === site.toLowerCase()));
+}
+
+// Direct siteID -> classroom lookup on site-lookup-api. Returns [] if the
+// endpoint is unavailable so the phone fallback still runs.
+async function lookupViaSiteId(site) {
+  const { url, key } = siteApi();
+  if (!url || !key) return [];
+  try {
+    const payload = await getJson(
+      `${url}/site-by-id?site_id=${encodeURIComponent(site)}`,
+      { Authorization: `Bearer ${key}` }
+    );
+    return siteMatches(payload, site);
+  } catch (error) {
+    console.warn("site api site-by-id lookup failed", error.message);
+    return [];
   }
-  return [];
 }
 
 async function lookupViaTeacherPhones(site) {
   const directoryUrl = pickString(process.env.DIRECTORY_API_URL);
   const directoryKey = pickString(process.env.DIRECTORY_API_KEY);
-  const siteApiUrl = pickString(process.env.SITE_API_URL || DEFAULT_SITE_API_URL);
-  const siteApiKey = pickString(process.env.SITE_API_KEY);
+  const { url: siteApiUrl, key: siteApiKey } = siteApi();
   if (!directoryUrl || !directoryKey || !siteApiUrl || !siteApiKey) return [];
 
   const teachers = await postJson(directoryUrl, {
@@ -107,23 +108,33 @@ async function lookupViaTeacherPhones(site) {
     .filter(Boolean)
     .slice(0, 5);
 
-  const matches = [];
-  for (const phone of phones) {
+  const results = await Promise.all(phones.map(async phone => {
     try {
       const payload = await getJson(
-        `${siteApiUrl.replace(/\/$/, "")}/channel-user?phone=${encodeURIComponent(phone)}`,
+        `${siteApiUrl}/channel-user?phone=${encodeURIComponent(phone)}`,
         { Authorization: `Bearer ${siteApiKey}` }
       );
-      for (const row of pickArray(payload, ["matches", "rows"])) {
-        const match = normalizeMatch(row);
-        if (match && (!match.siteId || match.siteId.toLowerCase() === site.toLowerCase())) {
-          matches.push(match);
-        }
-      }
+      return siteMatches(payload, site);
     } catch (error) {
-      console.warn(`site api phone lookup failed`, error.message);
+      console.warn("site api phone lookup failed", error.message);
+      return [];
     }
-  }
+  }));
+  return results.flat();
+}
+
+// Per-instance cache; mappings only change with the daily directory sync.
+const CACHE_TTL_MS = 10 * 60 * 1000;
+const cache = new Map();
+
+async function lookupMatches(site) {
+  const cacheKey = site.toLowerCase();
+  const cached = cache.get(cacheKey);
+  if (cached && Date.now() - cached.at < CACHE_TTL_MS) return cached.matches;
+
+  let matches = await lookupViaSiteId(site);
+  if (!matches.length) matches = await lookupViaTeacherPhones(site);
+  cache.set(cacheKey, { at: Date.now(), matches });
   return matches;
 }
 
@@ -135,10 +146,7 @@ module.exports = async function handler(req, res) {
       return;
     }
 
-    const matches = [
-      ...(await lookupViaDirectoryAction(site)),
-      ...(await lookupViaTeacherPhones(site)),
-    ];
+    const matches = await lookupMatches(site);
     const unique = [];
     const seen = new Set();
     for (const match of matches) {
