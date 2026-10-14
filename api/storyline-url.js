@@ -100,8 +100,9 @@ async function lookupViaTeacherPhones(site) {
     siteID: site,
     apiKey: directoryKey,
   });
+  // teachersBySite responds with a bare array of phone numbers.
   const phones = [
-    ...pickArray(teachers, ["phoneNumbers", "phones", "rows"]),
+    ...(Array.isArray(teachers) ? teachers : pickArray(teachers, ["phoneNumbers", "phones", "rows"])),
   ].map(row => pickString(typeof row === "string" ? row : row.phone_number || row.phoneNumber || row.phone))
     .filter(Boolean)
     .slice(0, 5);
