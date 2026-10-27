@@ -176,9 +176,44 @@ function splitCompanyClassroom(name) {
   };
 }
 
-function formatServiceDays(days) {
-  if (!Array.isArray(days) || !days.length) return "교실미등록(기관)";
-  return days.map(day => DAY_MAP[day] || "").filter(Boolean).join("");
+function activeWeeklyDays(row) {
+  const days = row.weeklySchedule?.active?.days;
+  return Array.isArray(days) ? days : [];
+}
+
+function hhmm(time) {
+  return String(time || "").slice(0, 5).replace(":", "");
+}
+
+// Newer classrooms only carry weeklySchedule (legacy `schedule` is null).
+// Rebuild the legacy "today_0900-1200" / "nextday_0930-1130+1500-1600"
+// string from the most common day pattern. Only the HHMM-HHMM part drives
+// the sync buttons; the prefix follows the legacy convention (same-day
+// 17:00 delivery = today), which matches ~98% of rows that have both.
+function scheduleFromWeekly(row) {
+  const counts = new Map();
+  for (const day of activeWeeklyDays(row)) {
+    const slots = (day.slots || [])
+      .map(slot => `${hhmm(slot.startTime)}-${hhmm(slot.endTime)}`)
+      .filter(slot => /^\d{4}-\d{4}$/.test(slot));
+    if (!slots.length) continue;
+    const g = day.deliveryGuarantee || {};
+    const sameDay = g.type === "ABSOLUTE" && g.dayOffset === 0 && hhmm(g.guaranteeTime) === "1700";
+    const value = `${sameDay ? "today" : "nextday"}_${slots.join("+")}`;
+    counts.set(value, (counts.get(value) || 0) + 1);
+  }
+  return [...counts].sort((a, b) => b[1] - a[1])[0]?.[0] || "";
+}
+
+function formatServiceDays(row) {
+  let days = Array.isArray(row.serviceDays) ? row.serviceDays : [];
+  if (!days.length) {
+    days = activeWeeklyDays(row)
+      .filter(day => (day.slots || []).length)
+      .map(day => day.dayOfWeek);
+  }
+  const text = days.map(day => DAY_MAP[day] || "").filter(Boolean).join("");
+  return text || "요일미설정";
 }
 
 function normalizeRow(row) {
@@ -187,8 +222,8 @@ function normalizeRow(row) {
     siteId: String(row.positionId || "").trim(),
     company,
     classroom,
-    schedule: String(row.schedule || "스케쥴미설정").trim(),
-    serviceDays: formatServiceDays(row.serviceDays),
+    schedule: String(row.schedule || scheduleFromWeekly(row) || "스케쥴미설정").trim(),
+    serviceDays: formatServiceDays(row),
     storylineCompanyId: String(row.company_id || row.companyId || row.teacher_org_id || row.teacherOrgId || "").trim(),
     storylineClassroomId: String(row.classroom_id || row.classroomId || row.teacher_class_id || row.teacherClassId || "").trim(),
   };
