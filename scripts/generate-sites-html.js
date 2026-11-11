@@ -229,6 +229,12 @@ function normalizeRow(row) {
   };
 }
 
+// Data-hub export (`bq query --format=json 'SELECT raw ...'`) wraps each
+// original OMS row as a JSON string in `raw`.
+function unwrapHubRow(row) {
+  return typeof row?.raw === "string" ? JSON.parse(row.raw) : row;
+}
+
 function validateRows(rows) {
   const errors = [];
   const seen = new Set();
@@ -283,8 +289,8 @@ async function main() {
   let rawJson;
 
   if (args.input) {
-    sourceLabel = path.resolve(args.input);
-    rawJson = fs.readFileSync(sourceLabel, "utf8");
+    rawJson = fs.readFileSync(path.resolve(args.input), "utf8");
+    sourceLabel = args.source || path.resolve(args.input);
   } else {
     const key = `${S3_PREFIX}/oms_data_${date}.json`;
     const url = `${S3_BASE_URL}/oms_data_${date}.json`;
@@ -300,7 +306,7 @@ async function main() {
   const parsed = JSON.parse(rawJson);
   if (!Array.isArray(parsed)) throw new Error("OMS JSON root는 배열이어야 합니다.");
 
-  const rows = parsed.map(normalizeRow).sort((a, b) => a.siteId.localeCompare(b.siteId));
+  const rows = parsed.map(unwrapHubRow).map(normalizeRow).sort((a, b) => a.siteId.localeCompare(b.siteId));
   const errors = validateRows(rows);
   if (errors.length) {
     throw new Error(`sites.html 생성 중단:\n${errors.slice(0, 20).join("\n")}`);
