@@ -1,20 +1,12 @@
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-
-const REGION = process.env.AWS_REGION || "us-east-1";
+// 개인 AWS 키 폐기(2026-11-20) 대비: 직접 서명하지 않고 팀 공용 Lambda URL로 보낸다.
+// Lambda가 role 임시 자격증명으로 presigned URL(302)을 만들어 주므로 이 서비스에는 AWS 키가 필요 없다.
+const PROXY_BASE = (process.env.PUBLIC_PROXY_BASE ||
+  "https://zvy2p6g4fa2tc2e7f46u2kwafe0ogiog.lambda-url.us-east-1.on.aws").replace(/\/+$/, "");
 const BUCKET = process.env.S3_BUCKET || "perception-public-data-us-east-1-prod";
-const EXPIRES_IN_SECONDS = Number(process.env.IMAGE_TEMPLATE_URL_TTL_SECONDS || 600);
 
-const s3 = new S3Client({
-  region: REGION,
-  credentials: process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
-    ? {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        sessionToken: process.env.AWS_SESSION_TOKEN || undefined,
-      }
-    : undefined,
-});
+function proxyUrl(key) {
+  return `${PROXY_BASE}/${BUCKET}/${key}`;
+}
 
 function isValidDate(date) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date || "");
@@ -36,14 +28,7 @@ module.exports = async function handler(req, res) {
     }
 
     const key = `${date}/${site}.jpg`;
-    const command = new GetObjectCommand({
-      Bucket: BUCKET,
-      Key: key,
-    });
-
-    const url = await getSignedUrl(s3, command, {
-      expiresIn: EXPIRES_IN_SECONDS,
-    });
+    const url = proxyUrl(key);
 
     res.statusCode = 200;
     res.setHeader("Cache-Control", "no-store");
@@ -52,7 +37,6 @@ module.exports = async function handler(req, res) {
       url,
       bucket: BUCKET,
       key,
-      expiresIn: EXPIRES_IN_SECONDS,
     }));
   } catch (err) {
     console.error(err);
